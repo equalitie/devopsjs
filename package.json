@@ -1,0 +1,15 @@
+{
+	"name":"devlopsjs",
+	"version" : "0.0.1",
+	"author" : "wikifier",
+	"description" : "dev & ops using smw, cucumber bdd, nrpe and solr",
+
+	 "devDependencies" : {
+    "cucumber": "latest",
+		"commander": "latest",
+	  "cucumber": "latest",
+	  "line-reader": "latest",
+		"nodemw" : "latest",
+		"solr-client" : "latest"
+  }
+}
