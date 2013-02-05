@@ -1,10 +1,11 @@
 var solr = require('solr-client');
 
-var client = solr.createClient({ host: 'lilpad.zooid.org', core: 'core0'});
+var client = solr.createClient({ host: 'localsolr', core: 'core1'});
+console.log(client);
 client.autoCommit = true;
 
 exports.query = function(callback) {
-  var query = client.createQuery()
+  var queryNRPEResults = client.createQuery()
      .q({aCheck_s : '*'})
      .start(0)
      .sort({aCheck_s:'asc', tickDate_dt: 'desc', edge_s : 'asc'})
@@ -22,7 +23,8 @@ exports.query = function(callback) {
 
 exports.commit = function(docs) {
 	console.log("commiting " + docs.length + " docs");
-	docs.forEach(function(f) { process.stdout.write(f.id + " ");});
+	docs.forEach(function(f) { console.log(f.id + " ");});
+console.log(client);
     client.add(docs, function(err,obj){
         if(err){
            throw "commit ERROR: " + err;
@@ -32,4 +34,9 @@ exports.commit = function(docs) {
   });
 }
 
+exports.setLastClassTick = function(c, tick) {
+    classTick = { id : c + "/lastTick", class_s : 'Class tick', className_s : c, tickTime_l: tick.tickTime, tickDate_dt : tick.tickDate};
+    console.log(classTick);
+    this.commit([classTick]);
+}
 

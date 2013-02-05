@@ -5,10 +5,12 @@
 var inputStream = process.stdin
   , data = '';
 
-var solr = require('solr-client');
+var store = require('./lib/solrNagios.js');
+var util = require('./lib/util.js');
 
-var client = solr.createClient({ host: 'lilpad.zooid.org', core: 'core0'});
-client.autoCommit = true;
+var thisTick = util.getTick();
+
+// consume stdin
 
 process.stdin.resume();
  
@@ -22,30 +24,35 @@ inputStream.on('end', function() {
 });
 
 function processResult(a) {
+    var feature = a.id;
+    store.setLastClassTick('Test feature/' + feature, thisTick);
     for (var i = 0; i < a.elements.length; i++) {
         var e = a.elements[i];
-        console.log("\n" + e.name + ":");
-        for (var j = 0; j < e.steps.length; j++) {
-            var s = e.steps[j];
-            if (s.result) {
-                console.log(s.keyword + s.name + ": " + s.result.status);
-                if (s.result.status == 'failed') {
-                  console.log(s.result.error_message);
+        if (e.keyword === 'Scenario') {
+            var scenario = e.name;
+            steps = [];
+            for (var j = 0; j < e.steps.length; j++) {
+                var s = e.steps[j];
+                var stepName = s.keyword + s.name;
+                var step = {class_s : 'Test step', id: feature + "/" + scenario + "/" + stepName + "/" + thisTick.tickTime, tickDate_dt: thisTick.tickDate};
+                if (s.result) {
+                    step.keyword_s = s.keyword;
+                    step.name_s = s.name;
+                    step.status_s = s.result.status;
+                    if (s.result.status == 'failed') {
+                        step.error_s = s.result.error_message;
+                    }
+                } else {
+                    step.result_s = "none";
                 }
-            } else {
-                console.log("no result in " + console.dir(s));
+                steps.push(step);
             }
+            console.log(steps);
+            addResult(steps);
         }
     }
 }
-
-function add(docs) {
-    client.add(docs, function(err,obj){
-        if(err){
-           throw "commit ERROR: " + err;
-        } else {
-           //console.log(obj);
-        }
-  });
+function addResult(docs) {
+  store.commit(docs);
 }
 

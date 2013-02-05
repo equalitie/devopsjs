@@ -4,7 +4,7 @@ var edges = require('./edges.json');
 var store = require('./lib/solrNagios.js');
 var nrpe = require('./lib/nrpe/check.js');
 var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks();
-var tick = nrpe.getTick();
+var tick = util.getTick();
 
 var docs = [];
 

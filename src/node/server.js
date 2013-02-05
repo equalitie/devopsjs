@@ -6,7 +6,7 @@ http.createServer(function (req, response) {
   response.writeHead(200, {'Content-Type': 'text/plain'});
 	tab = {response: response, writeTable: writeTable};
 
-	store.query(tab);
+	store.queryNRPEResults(tab);
 }).listen(7777, '199.166.207.200');
 
 function writeTable(res) {

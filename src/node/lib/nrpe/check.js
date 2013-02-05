@@ -19,7 +19,3 @@ exports.checkEdge = function(edge, aCheck, tick, callback) {
 	});
 }
 
-exports.getTick = function() {
-	return { tickTime : new Date().getTime(), tickDate : new Date().toISOString() }
-}
-
