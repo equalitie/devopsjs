@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var utils = require('./lib/util.js');
 var program = require('commander');
 
 program
@@ -21,7 +22,7 @@ var edges = require('./edges.json');
 if (program.test) {
 	var nrpe = require('./lib/nrpe/check.js');
 	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks('fail2ban')[0];
-	nrpe.checkEdge(program.test, nrpeChecks, nrpe.getTick(), function(res) {
+	nrpe.checkEdge(program.test, nrpeChecks, utils.getTick(), function(res) {
 		console.log(res);
 		});
 }

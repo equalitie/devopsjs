@@ -1,17 +1,17 @@
-var solr = require('solr-client');
+var solr = require('solr-node-client');
 
-var client = solr.createClient({ host: 'localsolr', core: 'core1'});
-console.log(client);
-client.autoCommit = true;
+require("../../../config/localConfig.js");
+var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
+solrClient.autoCommit = true;
 
 exports.query = function(callback) {
-  var queryNRPEResults = client.createQuery()
+  var queryNRPEResults = solrClient.createQuery()
      .q({aCheck_s : '*'})
      .start(0)
      .sort({aCheck_s:'asc', tickDate_dt: 'desc', edge_s : 'asc'})
      .rows(900);
 
-  client.search(query,function(err,res) {
+  solrClient.search(query,function(err,res) {
      if(err){
       console.log(err);
       return null;
@@ -24,9 +24,9 @@ exports.query = function(callback) {
 exports.commit = function(docs) {
 	console.log("commiting " + docs.length + " docs");
 	docs.forEach(function(f) { console.log(f.id + " ");});
-console.log(client);
-    client.add(docs, function(err,obj){
+    solrClient.add(docs, function(err,obj){
         if(err){
+					console.log(solrClient);
            throw "commit ERROR: " + err;
         } else {
            //console.log(obj);
@@ -36,7 +36,7 @@ console.log(client);
 
 exports.setLastClassTick = function(c, tick) {
     classTick = { id : c + "/lastTick", class_s : 'Class tick', className_s : c, tickTime_l: tick.tickTime, tickDate_dt : tick.tickDate};
-    console.log(classTick);
     this.commit([classTick]);
 }
+
 

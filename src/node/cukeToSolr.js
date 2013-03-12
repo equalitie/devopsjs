@@ -24,7 +24,7 @@ inputStream.on('end', function() {
 });
 
 function processResult(a) {
-    var feature = a.id;
+    var feature = a.name;
     store.setLastClassTick('Test feature/' + feature, thisTick);
     for (var i = 0; i < a.elements.length; i++) {
         var e = a.elements[i];
@@ -48,11 +48,11 @@ function processResult(a) {
                 steps.push(step);
             }
             console.log(steps);
-            addResult(steps);
+            commit(steps);
         }
     }
 }
-function addResult(docs) {
+function commit(docs) {
   store.commit(docs);
 }
 

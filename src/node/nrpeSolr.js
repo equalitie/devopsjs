@@ -1,5 +1,5 @@
 
-var util=require('util')
+var util=require('./lib/util.js')
 var edges = require('./edges.json');
 var store = require('./lib/solrNagios.js');
 var nrpe = require('./lib/nrpe/check.js');
@@ -39,19 +39,18 @@ for (var j = 0; j < nrpeChecks.length; j++) {
 }
 
 function addResult(doc) {
-//  console.log("adding " + doc.id);
   docs.push(doc);
-	if (docs.length == (nrpeChecks.length * edges.length)) {
-	  console.log("Committing " + JSON.stringify(docs));
- 	  store.commit(docs);
-	}
+  if (docs.length == (nrpeChecks.length * edges.length)) {
+    console.log("Committing " + JSON.stringify(docs));
+    store.commit(docs);
+  }
 }
 
 function commitEdgeSummary(edges, tick, store) {
   var edgeSummary = [];
   for (var i = 0; i < edges.length; i++) {
     var edge = edges[i];
-    edgeSummary.push({id: edge.name + "/" + tick.tickTime, name_s: edge.name, rotatedOut_s: edge.rotatedOut, offline_s: edge.offline, tickDate_dt : tick.tickDate});
+    edgeSummary.push({id: edge.name + "/" + tick.tickTime, class_s: 'edge summary', name_s: edge.name, rotatedOut_s: edge.rotatedOut, offline_s: edge.offline, tickDate_dt : tick.tickDate});
   }
   store.commit(edgeSummary);
 }

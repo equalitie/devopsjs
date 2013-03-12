@@ -1,10 +1,14 @@
 var bot = require('nodemw').bot;
 var fs = require('fs');
+var utils = require( "./lib/util.js");
 
 var wiki = getWiki();
 
 function getWiki() {
-  var wikibot = new bot(process.argv[2]);
+  require("../../"+utils.confFile);
+  var wikiConfig = require("../../"+GLOBAL.CONFIG.wikiConfig);
+
+  var wikibot = new bot(wikiConfig);
 
   wikibot.logIn(function() {
     processTests(wikibot);
