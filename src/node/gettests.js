@@ -6,7 +6,7 @@ var wiki = getWiki();
 
 function getWiki() {
   require("../../"+utils.confFile);
-  var wikiConfig = require("../../"+GLOBAL.CONFIG.wikiConfig);
+  var wikiConfig = GLOBAL.CONFIG.wikiConfig;
 
   var wikibot = new bot(wikiConfig);
 
@@ -16,7 +16,15 @@ function getWiki() {
 }
 
 function processTests(wikibot) {
-  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags", sort : 'Test item page'}, processTestItems);
+  var params = {
+    action: 'ask',
+    query: '[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item page'
+  };
+wikibot.api.call(params, function(info, next, data) {
+  console.log(data && data.query && data.query.results);
+});
+
+//  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags", sort : 'Test item page'}, processTestItems);
 }
 
 function processTestItems(data) {
