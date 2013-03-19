@@ -6,7 +6,7 @@ var wiki = getWiki();
 
 function getWiki() {
   require("../../"+utils.confFile);
-  var wikiConfig = require("../../"+GLOBAL.CONFIG.wikiConfig);
+  var wikiConfig = GLOBAL.CONFIG.wikiConfig;
 
   var wikibot = new bot(wikiConfig);
 
@@ -16,7 +16,18 @@ function getWiki() {
 }
 
 function processTests(wikibot) {
-  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags", sort : 'Test item page'}, processTestItems);
+/*
+  var params = {
+    action: 'ask',
+    query: '[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item type'
+  };
+
+	wikibot.api.call(params, function(info, next, data) {
+ 		console.log("call:", data && data.query && data.query.results);
+  });
+*/
+
+  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item page|sort=Test item type"}, processTestItems);
 }
 
 function processTestItems(data) {
@@ -25,8 +36,8 @@ function processTestItems(data) {
   for (var r in data.info.results) {
     var b = data.info.results[r]['printouts'];
     var page = b['Test item page'][0].fulltext;
-    var type = b['Test item type'][0];
-    var desc = b['Test item description'][0];
+    var type = b['Test item type'][0].fulltext;
+    var desc = b['Test item description'][0].fulltext;
     var content = b['Test item content'][0].split("\n");
 
     var feature = features[page] || "";
@@ -45,4 +56,5 @@ function writeFeature(name, feature) {
   console.log("writing tests/features/" + name);
   fs.writeFileSync("tests/features/" + name, feature);
 }
+
 

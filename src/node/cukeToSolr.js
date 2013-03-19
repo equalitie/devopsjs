@@ -19,7 +19,12 @@ inputStream.on('data', function(chunk) {
 });
  
 inputStream.on('end', function() {
-  var json = JSON.parse(data);
+  try {
+  	var json = JSON.parse(data);
+	} catch (e) {
+    console.log("failing: ", e, data);
+    throw e;
+	}
   processResult(json[0]);
 });
 
