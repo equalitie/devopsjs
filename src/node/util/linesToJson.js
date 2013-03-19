@@ -1,27 +1,21 @@
 var lineReader = require('line-reader');
 
-var edges = [];
-lineReader.eachLine('edges.live', function(line, last) {
-	var edge = {};
-	edge.name = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
-console.log(edge.name);
-	edge.lastUpdate = new Date().toISOString();
-	edge.comment = 'Auto-imported';
+var hosts = [];
+lineReader.eachLine('hosts', function(line, last) {
+	var host = {};
+	host.name = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
+	host.lastUpdate = new Date().toISOString();
+	host.comment = 'Auto-imported';
 
 	if (/^##/.test(line)) {
-		edge.rotatedOut = true;
+		host.rotatedOut = true;
 	} else if (/^#/.test(line)) {
-		edge.offline = true;
+		host.offline = true;
 	}
-	edges.push(edge);
+	hosts.push(host);
 	if (last) {
-		writeEdges(edges);
+		console.log(JSON.stringify(hosts, null, '  '));
 	}
 });
 
-function writeEdges(edges) {
-	console.log(JSON.stringify(edges));
-	var fs = require('fs');
-	fs.writeFile("/tmp/test", JSON.stringify(edges, null, '\t'));
-}
 
