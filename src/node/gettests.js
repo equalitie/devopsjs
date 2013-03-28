@@ -33,14 +33,24 @@ function processTests(wikibot) {
 function processTestItems(data) {
   var features = {};
 
+var i = 0;
   for (var r in data.info.results) {
+//    var b = data.info.results[r]['printouts'];
     var b = data.info.results[r]['printouts'];
+console.log(b);
+console.log("here", i++);
+console.log(b['Test item page']);
     var page = b['Test item page'][0].fulltext;
+console.log("here", i++);
     var type = b['Test item type'][0].fulltext;
+console.log("here", i++);
     var desc = b['Test item description'][0].fulltext;
+console.log("here", i++);
     var content = b['Test item content'][0].split("\n");
+console.log("here", i++);
 
     var feature = features[page] || "";
+console.log('feature', feature);
     feature += type + ": " + desc + "\n  " + content.join("\n  ") + "\n\n";
     features[page] = feature;
   }
