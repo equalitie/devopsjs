@@ -7,7 +7,6 @@ var wiki = getWiki();
 function getWiki() {
   require("../../"+utils.confFile);
   var wikiConfig = GLOBAL.CONFIG.wikiConfig;
-console.log(wikiConfig);
 
   var wikibot = new bot(wikiConfig);
 
@@ -31,7 +30,6 @@ processTestItems(data);
 }
 
 function processTestItems(data) {
-console.log(data);
   var features = {};
 debugger;
 
