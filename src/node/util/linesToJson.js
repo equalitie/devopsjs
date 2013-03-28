@@ -1,7 +1,9 @@
 var lineReader = require('line-reader');
 
 var hosts = [];
-lineReader.eachLine('hosts', function(line, last) {
+var filename = process.argv[2];
+
+lineReader.eachLine(filename, function(line, last) {
 	var host = {};
 	host.name = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
 	host.lastUpdate = new Date().toISOString();
