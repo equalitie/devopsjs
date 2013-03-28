@@ -1,4 +1,4 @@
-var solr = require('solr-node-client');
+var solr = require('solr-client');
 
 require("../../../config/localConfig.js");
 var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
