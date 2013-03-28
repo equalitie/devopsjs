@@ -1,15 +1,19 @@
 {
-	"name":"devlopsjs",
-	"version" : "0.0.1",
-	"author" : "wikifier",
-	"description" : "dev & ops using smw, cucumber bdd, nrpe and solr",
-
-	 "devDependencies" : {
+  "name": "devlopsjs",
+  "version": "0.0.1",
+  "author": "wikifier",
+  "description": "dev & ops using smw, cucumber bdd, nrpe and solr",
+  "devDependencies": {
     "cucumber": "latest",
-		"commander": "latest",
-	  "cucumber": "latest",
-	  "line-reader": "latest",
-		"nodemw" : "latest",
-		"solr-client" : "latest"
+    "commander": "latest",
+    "line-reader": "latest",
+    "nodemw": "latest"
+  },
+  "dependencies": {
+    "duplexer": "0.0.x",
+    "require-analyzer": "0.5.x",
+    "JSONStream": "0.4.x",
+    "request": "2.14.x",
+    "zombie": "latest"
   }
 }
