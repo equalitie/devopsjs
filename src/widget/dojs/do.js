@@ -48,7 +48,7 @@ console.log('doHosts', new Date());
             sum = hunits(low[check]) + '&mdash;' + hunits(high[check]);
           }
           var detail = t.find('.label_' + check).text().replace(/:.*/, '') + ': ' + sum;
-          t.find('.label_' + check).html('<a href="http://ovh1.deflect.ca:8983/solr/#/core0/query?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
+          t.find('.label_' + check).html('<a href="' + solrQuery + '?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
             });
           }, { sort : 'tickDate_dt desc', rows: 20});
     });
