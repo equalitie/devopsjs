@@ -13,12 +13,12 @@ console.log('doHosts', new Date());
       var t = $(this);
       var name = t.find('.name').text();
       solrQuery('name_s:'+name, function(data) {  // get summary
-        var values = {};
+        var values = {}, high = {}, low = {};
         var res = data.response.docs[0];
-	if (!res) {
-	  console.log('no results for host', name);
-	  return;
-	}
+    if (!res) {
+      console.log('no results for host', name);
+      return;
+    }
         var offline = res.offline_s && res.offline_s == 'true';
         var status = offline ? 'offline ' : 'available ';
         if (!offline) {
@@ -26,22 +26,45 @@ console.log('doHosts', new Date());
         }
         t.find('.status').html(status);
         t.find('.checkDate').html(prettyDate(res.tickDate_dt));
-	var vals = ['bytesPerSecond_i', 'httpBans_i'];
-	['tcptraffic', 'fail2ban'].forEach(function(check, index) {
-	  values[check] = [];
+    var vals = ['bytesPerSecond_i', 'httpBans_i'];
+    ['tcptraffic', 'fail2ban'].forEach(function(check, index) {
+      values[check] = [];
+      high[check] = 0;
+      low[check] = 0;
           solrQuery('edge_s:' + name + ' AND aCheck_s:check_' + check, function(data) {
             $.each(data.response.docs, function(i, doc)  {
-  	      if (doc[vals[index]]) {
-                values[check].push(doc[vals[index]]);
-	      }
-              t.find('.graph_' + check).sparkline(values[check], {});
-  	      t.find('.label_' + check).html('<a href="http://lilpad.zooid.org:8983/solr/#/core0/query?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">'+ t.find('.label_' + check).text() + '</a>');
+              var v = doc[vals[index]];
+            if (v) {
+                values[check].push(v);
+                if (v < low[check] || low[check] == 0) {
+                   low[check] = v;
+                } else if (v > high[check]) {
+                   high[check] = v;
+                }
+          }
+          t.find('.graph_' + check).sparkline(values[check], {});
+          var sum = hunits(low[check]);
+          if (low[check] != high[check]) {
+            sum = hunits(low[check]) + '&mdash;' + hunits(high[check]);
+          }
+          var detail = t.find('.label_' + check).text().replace(/:.*/, '') + ': ' + sum;
+          t.find('.label_' + check).html('<a href="http://ovh1.deflect.ca:8983/solr/#/core0/query?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
             });
           }, { sort : 'tickDate_dt desc', rows: 20});
-	});
+    });
       }, {sort: 'tickDate_dt desc', rows: 20});
     });
   }
+
+// human-friendly units
+function hunits(v) {
+  if (v > 1024*1024) {
+    return (Math.ceil((v / (1024*1024)) * 10) / 10) + "M";
+  } else if (v > 1024) {
+    return (Math.ceil((v / (1024)) * 10) / 10) + "K";
+  }
+  return v;
+}
 
 function prettyDate(solrTime){
   var ret = parseISO8601(solrTime),
@@ -113,7 +136,7 @@ function processGherkins(data) {
       for (var i = 0; i < s.length; i++) {
         var n = s[i].replace(/ *$/, '');
 
-	if (scenario && response) {
+    if (scenario && response) {
           testLine++;
           var q = window.feature + "/" + scenario + "/" + n + "/" + response.tickTime_l;
           getResult(q, testLine);
@@ -140,15 +163,15 @@ function getResult(id, testLine) {
     };
     var displayResult = function(data) {
         var response = data.response.docs[0];
-	if (!response || !response.status_s || !colour[response.status_s]) {
-	  console.log('unknown status', id, testLine, response, data);
-	} else {
-	  $('#testLine_' + testLine).append(result(response.status_s + (response.error_s ? ' *' : ''), colour[response.status_s] || 'purple'));
-	  if (response.error_s) { 
-	    $('#testLine_' + testLine).append('<sup>+</sup>');
-	    $('#testLine_' + testLine).attr('title', response.error_s); 
-	  }
-	}
+    if (!response || !response.status_s || !colour[response.status_s]) {
+      console.log('unknown status', id, testLine, response, data);
+    } else {
+      $('#testLine_' + testLine).append(result(response.status_s + (response.error_s ? ' *' : ''), colour[response.status_s] || 'purple'));
+      if (response.error_s) { 
+        $('#testLine_' + testLine).append('<sup>+</sup>');
+        $('#testLine_' + testLine).attr('title', response.error_s); 
+      }
+    }
     };
 
     solrQuery('id:"'+id+'"', displayResult);
