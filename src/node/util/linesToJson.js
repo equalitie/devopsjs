@@ -9,12 +9,13 @@ lineReader.eachLine(filename, function(line, last) {
 	host.lastUpdate_dt = new Date().toISOString();
 	host.comment_s = 'Auto-imported';
 
-	host.rotatedOut_b = false;
+	host.active_b = true;
 	
 	if (/^##/.test(line)) {
-		host.rotatedOut_b = true;
+		host.active_b = false;
 	} else if (/^#/.test(line)) {
 		host.offline_b = true;
+		host.active_b = false;
 	}
 	if (host.name_s) {
 		hosts.push(host);

@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+GLOBAL.MIN_HOSTS = 6;
+var hostsFile = process.cwd() + '/config/hosts.json';
+
+var fs = require('fs');
 var utils = require('./lib/util.js');
 var program = require('commander');
 var queue = require('queue-async');
@@ -8,21 +12,39 @@ var moment = require('moment');
 var units = 'hours';
 	
 program
-  .option('-r, --rotate [number]', 'do auto rotation based on stats over num hours', Number, 4)
-  .option('-c, --advice [number]', 'rotation advice based on stats over num hours', Number, 4)
-  
+  .option('-r, --rotate [number]', 'do auto rotation based on stats over num hours')
+  .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
+  .option('-s --stats', 'current statistics')
   .option('-a, --activate <edge>', ' make edge active')
   .option('-d, --deactivate <edge>', 'make edge inactive')
-  .option('-o, --out <edge>', 'remove for maintenance')
-  .option('-i, --in <edge>', 'add from maintenance')
+  .option('-o, --out <edge>', 'offline for maintenance')
+  .option('-i, --in <edge>', 'online from maintenance')
   .option('-t, --test <edge>', 'query latest test results')
   .option('--del <edge>', 'delete from configuration')
   .option('--add <edge>', 'add to configuration')
 
   .option('--override', 'override validation error')
-  .option('-r, --reason \'description\'', 'reason for the action')
-	.option('-i, --incident', 'file as an incident report')
-  .parse(process.argv);
+  .option('-c, --comment <\'description\'>', 'comment for the action')
+	.option('-i, --incident', 'file as an incident report');
+
+program.on('--help', function() {
+  console.log('Commands can be changed and will be transacted serially. For example:');
+  console.log('');
+  console.log('    $ edgemanage -a edge1 -o edge2 -s -c \'replacing broken edge2 with edge1\'');
+  console.log('');
+  console.log('will make edge1 active, take edge2 offline, and print statistics.');
+});
+
+program.parse(process.argv);
+
+
+if (!program.comment && !program.advice && !program.stats) {
+	throw "You must enter a comment";
+}
+
+if (program.stats) {
+	console.log(getHostStats());
+}
 
 if (program.test) {
 	var nrpe = require('./lib/nrpe/check.js');
@@ -32,12 +54,119 @@ if (program.test) {
 		});
 }
 
+if (program['in']) {
+	var hostIn = program['in'];
+	rotateIn(program['in']);
+}
+
+if (program.out) {
+	rotateOut(program.out);
+}
+
+if (program.online) {
+	setOnline(program.online);
+}
+
+if (program.offline) {
+	setOffline(program.offline);
+}
+
 if (program.advice) {
 	advise(program.advice);
 }
 
+function setOnline(hostIn) {
+	var hosts = require(hostsFile);
+	for (var h in hosts) {
+		var host = hosts[h];
+		if (host.name_s === hostIn) {
+			if (!isOffline(host)) {
+				throw "host is not offline";
+			}
+						
+			validateConfiguration(hosts);
+			host.active_b = false;
+			host.online_dt = new Date().toISOString();
+			host.comment_s = program.comment;
+			writeHosts(hosts);
+			return;
+		}
+	}
+	throw "no such host: " + hostIn;
+}
+
+function writeHosts(hosts) {
+	validateConfiguration(hosts);
+	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
+}
+
+
+function setOffline(hostIn) {
+	var hosts = require(hostsFile);
+	for (var h in hosts) {
+		var host = hosts[h];
+		if (host.name_s === hostIn) {
+			if (isOffline(host)) {
+				throw "host is already offline";
+			} else if (isActive(host)) {
+				throw "host is already active";
+			} else {
+				host.active_b = false;
+				host.offline_dt = new Date().toISOString();
+				host.comment_s = program.comment;
+				writeHosts(hosts);
+			}
+			return;
+		}
+	}
+	throw "no such host: " + hostIn;
+}
+
+function rotateOut(hostIn) {
+	var hosts = require(hostsFile);
+	for (var h in hosts) {
+		var host = hosts[h];
+		if (host.name_s === hostIn) {
+			if (isOffline(host)) {
+				throw "host is offline";
+			} else if (isInactive(host)) {
+				throw "host is already inactive";
+			} else {
+				validateConfiguration(hosts);
+				host.active_b = false;
+				host.inactive_dt = new Date().toISOString();
+				host.comment_s = program.comment;
+				writeHosts(hosts);
+			}
+			return;
+		}
+	}
+	throw "no such host: " + hostIn;
+}
+
+function rotateIn(hostIn) {
+	var hosts = require(hostsFile);
+	for (var h in hosts) {
+		var host = hosts[h];
+		if (host.name_s === hostIn) {
+			if (isOffline(host)) {
+				throw "host is offline";
+			} else if (isActive(host)) {
+				throw "host is already online";
+			} else {
+				host.active_b = true;
+				host.active_dt = new Date().toISOString();
+				host.comment_s = program.comment;
+				writeHosts(hosts);
+			}
+			return;
+		}
+	}
+	throw "no such host: " + hostIn;
+}
+
 function advise(num) {
-	var hosts = require('../../config/hosts.json');
+	var hosts = require(hostsFile);
 	require('../../config/localConfig.js');
 	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks();
 
@@ -65,6 +194,13 @@ function advise(num) {
 		var maxCount = 0;
 		
 		var hostSummaries = {};
+		var averages = {};
+		for (var name in nrpeChecks) {
+			for (var field in nrpeChecks[name].fields) {
+				averages[field] = {sum : 0, count : 0};
+			}
+		}
+
 		for (var r in results) {
 			var response = results[r].response;
 			for (var d in response.docs) {	// parse host results
@@ -93,12 +229,25 @@ function advise(num) {
 					hostSummary['errorWeight'] = hostSummary['errorWeight'] + w;
 				} else {
 					for (var field in nrpeChecks[doc.aCheck_s].fields) {
-						hostSummary[field + 'Count'] = hostSummary[field + 'Count'] + doc[field];
+						if (doc[field]) {
+							hostSummary[field + 'Count'] = hostSummary[field + 'Count'] + doc[field];
+							averages[field]['sum'] = averages[field]['sum'] + doc[field];
+							averages[field]['count'] = averages[field]['count'] + 1;
+						}
 					}
 				}
 			}
 		}
-		for (var host in hostSummaries) {	// determine best host to rotate in, out using a scoring system
+		
+		for (var name in nrpeChecks) {
+			for (var field in nrpeChecks[name].fields) {
+				averages[field]['average'] = averages[field]['sum'] / averages[field]['count'];
+			}
+		}
+		
+		console.log(averages);
+		/*
+		for (var host in hostSummaries) {	// determine best host to rotate in, out
 			var summary = hostSummaries[host];
 			for (var k in hosts) {	if (hosts[k].name_s === host) { var rec = hosts[k]; } } // get host record
 			['name_s', 'rotatedOut_b', 'offline_b'].forEach(function(f) { summary[f] = rec[f]; });
@@ -138,15 +287,71 @@ function advise(num) {
 			}
 		}
 		
-		console.log('bestIn', bestIn, 'bestOut', bestOut);
+		console.log('bestIn', bestIn, 'bestOut', bestOut);*/
 	});
 
 // error_t
 }
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
-	if (hosts.length < GLOBAL.MIN_HOSTS) {
-		throw "not enough hosts; " + numHosts;
+	var stats = getHostStats(hosts);
+	if (stats.active < GLOBAL.MIN_HOSTS) {
+		throw "not enough available hosts; " + stats.active + ' (required: ' + GLOBAL.MIN_HOSTS + ')';
 	}
+}
+
+function getHostStats(hosts) {
+	if (!hosts) {
+		hosts = require(hostsFile);
+	}
+	
+  var available = 0;
+  var unavailable = 0;
+  var offline = 0;
+  var active = 0;
+  var inactive = 0;
+  var activeHosts = {};
+  var inactiveHosts = {};
+  var offlineHosts = {};
+  var total = 0;
+
+  for (var h in hosts) { 
+    total++;
+	var host = hosts[h];
+	if (isAvailable(host)) {
+	  available++;
+	} else{
+	  unavailable++;
+	}
+	if (isActive(host)) {
+		active++;
+		activeHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), commment : hosts[h].comment_s };
+	}
+	if (isOffline(host)) {
+		offline++;
+		offlineHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), comment : hosts[h].comment_s };
+	} else if (isInactive(host)) {
+		inactive++;
+		inactiveHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), comment : hosts[h].comment_s };
+	}
+  }
+  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_HOSTS};
+}
+	
+		
+function isInactive(host) {
+	return !host.active_b;
+}
+
+function isActive(host) {
+	return host.active_b;
+}
+
+function isOffline(host) {
+	return host.offline_b;
+}
+
+function isAvailable(host) {
+	return (!isInactive(host) && !isOffline(host));
 }
 
