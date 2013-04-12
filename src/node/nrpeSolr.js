@@ -1,16 +1,32 @@
 
 var util=require('./lib/util.js')
+var program = require('commander');
+
 var hosts = require('../../config/hosts.json');
 var store = require('./lib/solrNagios.js');
 var nrpe = require('./lib/nrpe/check.js');
-var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks();
+
 var tick = util.getTick();
+var numChecks = 0;
+
+program
+  .option('-c, --check', 'only execute checks that match this regex')
+  .option('-h, --host', 'only check this host')
+  .option('-s --save', 'write results (defaults to no if a check or host is specified');
+
+var save = program.save || (!program.check && !program.host);
+
+var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks(program.check ? program.check : null);
+
+for (var key in nrpeChecks) {
+    if (obj.hasOwnProperty(key)) numChecks++;
+}
 
 var docs = [];
 
 // only include one host
-if (process.argv.length == 3) {
-	var onlyEdge = process.argv[2];
+if (program.host) {
+	var onlyEdge = program.host;
 	var newHosts;
 	for (var i = 0; i < hosts.length; i++) {
 		if (hosts[i].name === onlyEdge) {
@@ -28,19 +44,26 @@ if (nrpeChecks.length < 1) {
 	throw "No hosts";
 }
 
-commitEdgeSummary(hosts, tick, store);
+if (save) {
+	commitEdgeSummary(hosts, tick, store);
+}
+	
 
-for (var j = 0; j < nrpeChecks.length; j++) {
+for (var name in nrpeChecks) {
 	for (var i = 0; i < hosts.length; i++) {
-		var res = nrpe.checkEdge(hosts[i].name, nrpeChecks[j], tick, function(res) {
-			addResult(res);
+		var res = nrpe.checkEdge(hosts[i].name, nrpeChecks[name], tick, function(res) {
+			if (save) {
+				addResult(res);
+			} else {
+				console.log(res);
+			}
 		});
 	}
 }
 
 function addResult(doc) {
   docs.push(doc);
-  if (docs.length == (nrpeChecks.length * hosts.length)) {
+  if (docs.length == (numChecks * hosts.length)) {
     console.log("Committing " + JSON.stringify(docs));
     store.commit(docs);
   }
@@ -48,9 +71,10 @@ function addResult(doc) {
 
 function commitEdgeSummary(hosts, tick, store) {
   var hostSummary = [];
+  var nomination = '';
   for (var i = 0; i < hosts.length; i++) {
     var host = hosts[i];
-    hostSummary.push({id: host.name + "/" + tick.tickTime, class_s: 'host summary', name_s: host.name, rotatedOut_s: host.rotatedOut, offline_s: host.offline, tickDate_dt : tick.tickDate});
+    hostSummary.push({id: host.name + "/" + tick.tickTime, class_s: 'host summary', name_s: host.name, nomination_s: nomination, rotatedOut_s: host.rotatedOut, offline_s: host.offline, tickDate_dt : tick.tickDate});
   }
   store.commit(hostSummary);
 }

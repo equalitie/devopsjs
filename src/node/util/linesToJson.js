@@ -5,16 +5,20 @@ var filename = process.argv[2];
 
 lineReader.eachLine(filename, function(line, last) {
 	var host = {};
-	host.name = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
-	host.lastUpdate = new Date().toISOString();
-	host.comment = 'Auto-imported';
+	host.name_s = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
+	host.lastUpdate_dt = new Date().toISOString();
+	host.comment_s = 'Auto-imported';
 
+	host.rotatedOut_b = false;
+	
 	if (/^##/.test(line)) {
-		host.rotatedOut = true;
+		host.rotatedOut_b = true;
 	} else if (/^#/.test(line)) {
-		host.offline = true;
+		host.offline_b = true;
 	}
-	hosts.push(host);
+	if (host.name_s) {
+		hosts.push(host);
+	}
 	if (last) {
 		console.log(JSON.stringify(hosts, null, '  '));
 	}
