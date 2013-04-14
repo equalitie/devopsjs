@@ -12,13 +12,13 @@ var moment = require('moment');
 var units = 'hours';
 	
 program
-  .option('-r, --rotate [number]', 'do auto rotation based on stats over num hours')
-  .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
   .option('-s --stats', 'current statistics')
   .option('-a, --activate <edge>', ' make edge active')
   .option('-d, --deactivate <edge>', 'make edge inactive')
-  .option('-o, --out <edge>', 'offline for maintenance')
-  .option('-i, --in <edge>', 'online from maintenance')
+  .option('-r, --rotate [number]', 'do auto-rotation based on stats over num hours')
+  .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
+  .option('-o, --offline <edge>', 'offline for maintenance')
+  .option('-n, --online <edge>', 'online from maintenance')
   .option('-t, --test <edge>', 'query latest test results')
   .option('--del <edge>', 'delete from configuration')
   .option('--add <edge>', 'add to configuration')
@@ -27,8 +27,9 @@ program
   .option('-c, --comment <\'description\'>', 'comment for the action')
 	.option('-i, --incident', 'file as an incident report');
 
+/* argument processing **/
 program.on('--help', function() {
-  console.log('Commands can be changed and will be transacted serially. For example:');
+  console.log('Commands can be chained and will be transacted serially. For example:');
   console.log('');
   console.log('    $ edgemanage -a edge1 -o edge2 -s -c \'replacing broken edge2 with edge1\'');
   console.log('');
@@ -42,10 +43,6 @@ if (!program.comment && !program.advice && !program.stats) {
 	throw "You must enter a comment";
 }
 
-if (program.stats) {
-	console.log(getHostStats());
-}
-
 if (program.test) {
 	var nrpe = require('./lib/nrpe/check.js');
 	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks()['fail2ban'];
@@ -54,115 +51,100 @@ if (program.test) {
 		});
 }
 
-if (program['in']) {
-	var hostIn = program['in'];
-	rotateIn(program['in']);
+if (program.activate) {
+	rotateIn(program.activate);
+	console.log(program.activate + ' is now active');
 }
 
-if (program.out) {
-	rotateOut(program.out);
+if (program.deactivate) {
+	rotateOut(program.deactivate);
+	console.log(program.deactivate + ' is now inactive');
 }
 
 if (program.online) {
 	setOnline(program.online);
+	console.log(program.online + ' is now online');
 }
 
 if (program.offline) {
 	setOffline(program.offline);
+	console.log(program.offline + ' is now offline');
 }
 
 if (program.advice) {
 	advise(program.advice);
 }
 
+if (program.stats) {
+	console.log(getHostStats());
+}
+
+/** argument processing **/
+
 function setOnline(hostIn) {
-	var hosts = require(hostsFile);
-	for (var h in hosts) {
-		var host = hosts[h];
-		if (host.name_s === hostIn) {
-			if (!isOffline(host)) {
-				throw "host is not offline";
-			}
-						
-			validateConfiguration(hosts);
-			host.active_b = false;
-			host.online_dt = new Date().toISOString();
-			host.comment_s = program.comment;
-			writeHosts(hosts);
-			return;
-		}
+	var hp = getHost(hostIn);
+	var host = hp.host;
+
+	if (!isOffline(host)) {
+		throw "host is not offline";
 	}
-	throw "no such host: " + hostIn;
+				
+	host.active_b = false;
+	host.online_dt = new Date().toISOString();
+	host.comment_s = program.comment;
+	_writeHosts(hp.hosts);
+	return;
 }
-
-function writeHosts(hosts) {
-	validateConfiguration(hosts);
-	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
-}
-
 
 function setOffline(hostIn) {
-	var hosts = require(hostsFile);
-	for (var h in hosts) {
-		var host = hosts[h];
-		if (host.name_s === hostIn) {
-			if (isOffline(host)) {
-				throw "host is already offline";
-			} else if (isActive(host)) {
-				throw "host is already active";
-			} else {
-				host.active_b = false;
-				host.offline_dt = new Date().toISOString();
-				host.comment_s = program.comment;
-				writeHosts(hosts);
-			}
-			return;
-		}
+	var hp = getHost(hostIn);
+	var host = hp.host;
+
+	if (isOffline(host)) {
+		throw "host is already offline";
+	} else if (isActive(host)) {
+		throw "host is already active";
+	} else {
+		host.active_b = false;
+		host.offline_dt = new Date().toISOString();
+		host.comment_s = program.comment;
+		_writeHosts(hp.hosts);
 	}
-	throw "no such host: " + hostIn;
+	return;
 }
 
 function rotateOut(hostIn) {
-	var hosts = require(hostsFile);
-	for (var h in hosts) {
-		var host = hosts[h];
-		if (host.name_s === hostIn) {
-			if (isOffline(host)) {
-				throw "host is offline";
-			} else if (isInactive(host)) {
-				throw "host is already inactive";
-			} else {
-				validateConfiguration(hosts);
-				host.active_b = false;
-				host.inactive_dt = new Date().toISOString();
-				host.comment_s = program.comment;
-				writeHosts(hosts);
-			}
-			return;
-		}
+	var hp = getHost(hostIn);
+	var host = hp.host;
+
+	if (isOffline(host)) {
+		throw "host is offline";
+	} else if (isInactive(host)) {
+		throw "host is already inactive";
+	} else {
+		host.active_b = false;
+		host.inactive_dt = new Date().toISOString();
+		host.comment_s = program.comment;
+		_writeHosts(hp.hosts);
 	}
-	throw "no such host: " + hostIn;
+	return;
 }
 
 function rotateIn(hostIn) {
-	var hosts = require(hostsFile);
-	for (var h in hosts) {
-		var host = hosts[h];
-		if (host.name_s === hostIn) {
-			if (isOffline(host)) {
-				throw "host is offline";
-			} else if (isActive(host)) {
-				throw "host is already online";
-			} else {
-				host.active_b = true;
-				host.active_dt = new Date().toISOString();
-				host.comment_s = program.comment;
-				writeHosts(hosts);
-			}
-			return;
-		}
+	var hp = getHost(hostIn);
+	var host = hp.host;
+
+	if (isOffline(host)) {
+		throw "host is offline";
+	} else if (isActive(host)) {
+		throw "host is already online";
+	} else {
+		host.active_b = true;
+		host.active_dt = new Date().toISOString();
+		host.comment_s = program.comment;
+		_writeHosts(hp.hosts);
 	}
-	throw "no such host: " + hostIn;
+	return;
 }
 
 function advise(num) {
@@ -338,7 +320,25 @@ function getHostStats(hosts) {
   return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_HOSTS};
 }
 	
-		
+
+/** utilities **/
+
+function getHost(hostIn) {
+	var hosts = require(hostsFile);
+	for (var h in hosts) {
+		var host = hosts[h];
+		if (host.name_s === hostIn) {
+			return { hosts : hosts, host : host};
+		}
+	}
+	throw "no such host: " + hostIn;
+}
+
+function _writeHosts(hosts) {
+	validateConfiguration(hosts);
+	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
+}
+
 function isInactive(host) {
 	return !host.active_b;
 }
