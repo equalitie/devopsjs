@@ -16,7 +16,7 @@ edit config/localConfig.js based on this:
 var c = {};
 
 c.flatHostsFile = 'name of hosts flat file';
-c.solrConfig = { host: 'yourhos', core: 'yourcore'};
+c.solrConfig = { host: 'yourhost', core: 'yourcore'};
 GLOBAL.CONFIG = c;
 ```
 
