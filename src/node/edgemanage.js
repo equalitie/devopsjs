@@ -34,18 +34,18 @@ program
   .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
   .option('-o, --offline <edge>', 'offline for maintenance')
   .option('-n, --online <edge>', 'online from maintenance')
-  .option('-t, --test <edge>', 'query latest test results')
+  .option('-t, --testedge <edge>', 'query latest test results')
   .option('--del <edge>', 'delete from configuration')
   .option('--add <edge>', 'add to configuration')
   .option('--writeall <file>', 'write all hosts to a flat file')
-
+  .option('-z, --zonegen', 'execute zongene script')
   .option('--override', 'override validation error')
   .option('-c, --comment <\'description\'>', 'comment for the action')
-	.option('-i, --incident', 'file as an incident report');
+  .option('-i, --incident', 'file as an incident report');
 
 /* argument processing **/
 program.on('--help', function() {
-  console.log('Commands can be chained and will be transacted serially. For example:');
+  console.log('Commands can be chained, one per action. For example:');
   console.log('');
   console.log('    $ edgemanage -a edge1 -o edge2 -s -c \'replacing broken edge2 with edge1\'');
   console.log('');
@@ -54,8 +54,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-
-if (!program.comment && !program.advice && !program.stats && !program.writeall) {
+if (!program.comment && !program.advice && !program.stats && !program.writeall && !program.testedge) {
 	throw "You must enter a comment";
 }
 
@@ -64,12 +63,15 @@ if (program.writeall) {
 	writeFlatHosts(hosts, true, program.writeall);
 }
 
-if (program.test) {
-	var nrpe = require('./lib/nrpe/check.js');
-	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks()['fail2ban'];
-	nrpe.checkEdge(program.test, nrpeChecks, utils.getTick(), function(res) {
+if (program.testedge) {
+	var check = require('./lib/nrpe/check.js');
+	var testName = 'fail2ban';
+	
+	var test = require('./lib/nrpe/allchecks.js').getChecks(testName);
+
+	check.checkEdge(program.testedge, test, testName, utils.getTick(), function(res) {
 		console.log(res);
-		});
+	});
 }
 
 if (program.activate) {
