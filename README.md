@@ -12,12 +12,13 @@ npm install
 edit config/localConfig.js based on this:
 
 
-  var c = {};
-  
-  c.flatHostsFile = 'name of hosts flat file';
-  c.solrConfig = { host: 'yourhos', core: 'yourcore'};
-  GLOBAL.CONFIG = c;
+```javascript
+var c = {};
 
+c.flatHostsFile = 'name of hosts flat file';
+c.solrConfig = { host: 'yourhos', core: 'yourcore'};
+GLOBAL.CONFIG = c;
+```
 
 
 # General workflow
