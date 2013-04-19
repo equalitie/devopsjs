@@ -13,6 +13,8 @@
     "require-analyzer": "0.5.x",
     "JSONStream": "0.4.x",
     "request": "2.14.x",
-    "solr-client": "latest"
+    "solr-client": "latest",
+    "queue-async": "latest",
+    "moment": "latest"
   }
 }
