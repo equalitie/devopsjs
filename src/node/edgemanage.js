@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 GLOBAL.MIN_HOSTS = 6;
+GLOBAL.hostTestName = 'check_fail2ban';
+
 
 var configBase;
 if (process.env.DEVOPSCONFIG) {
@@ -65,10 +67,9 @@ if (program.writeall) {
 
 if (program.testedge) {
 	var check = require('./lib/nrpe/check.js');
-	var testName = 'check_fail2ban';
-	var test = require('./lib/nrpe/allchecks.js').getChecks(testName);
+	var test = require('./lib/nrpe/allchecks.js').getChecks(GLOBAL.hostTestName);
 
-	check.checkEdge(program.testedge, test, testName, utils.getTick(), function(res) {
+	check.checkEdge(program.testedge, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
 		console.log(res);
 	});
 }
