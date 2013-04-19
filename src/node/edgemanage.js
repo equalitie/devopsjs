@@ -65,7 +65,7 @@ if (program.writeall) {
 
 if (program.testedge) {
 	var check = require('./lib/nrpe/check.js');
-	var testName = 'fail2ban';
+	var testName = 'check_fail2ban';
 	
 	var test = require('./lib/nrpe/allchecks.js').getChecks(testName);
 

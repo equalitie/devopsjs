@@ -12,7 +12,7 @@ exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
 		var status = "UNKNOWN";
 		if (stdout) {
 			res.stdout_s = stdout;
-			['OK', 'WARNING', 'CRITICAL'].forEach(function(r) { 
+			['OK', 'WARNING', 'CRITICAL', 'UNKNOWN'].forEach(function(r) { 
 				if (stdout.indexOf(r) > -1) {
 					status = r;
 				}
