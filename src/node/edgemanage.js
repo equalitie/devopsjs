@@ -30,15 +30,17 @@ var units = 'hours';
 	
 program
   .option('-s --stats', 'current statistics')
-  .option('-a, --activate <edge>', ' make edge active')
-  .option('-d, --deactivate <edge>', 'make edge inactive')
+  .option('-a, --activate <host>', ' make host active')
+  .option('-d, --deactivate <host>', 'make host inactive')
   .option('-r, --rotate [number]', 'do auto-rotation based on stats over num hours')
   .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
-  .option('-o, --offline <edge>', 'offline for maintenance')
-  .option('-n, --online <edge>', 'online from maintenance')
-  .option('-t, --testedge <edge>', 'query latest test results')
-  .option('--del <edge>', 'delete from configuration')
-  .option('--add <edge>', 'add to configuration')
+  .option('-o, --offline <host>', 'offline for maintenance')
+  .option('-n, --online <host>', 'online from maintenance')
+  .option('-t, --testhost <host>', 'live test host')
+  .option('-q, --query <host>', 'query latest host test results')
+  
+  .option('--del <host>', 'delete from configuration')
+  .option('--add <host>', 'add to configuration')
   .option('--writeall <file>', 'write all hosts to a flat file')
   .option('-z, --zonegen', 'execute zongene script')
   .option('--override', 'override validation error')
@@ -56,7 +58,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-if (!program.comment && !program.advice && !program.stats && !program.writeall && !program.testedge) {
+if (!program.comment && !program.advice && !program.stats && !program.writeall && !program.testhost) {
 	throw "You must enter a comment";
 }
 
@@ -65,11 +67,11 @@ if (program.writeall) {
 	writeFlatHosts(hosts, true, program.writeall);
 }
 
-if (program.testedge) {
+if (program.testhost) {
 	var check = require('./lib/nrpe/check.js');
 	var test = require('./lib/nrpe/allchecks.js').getChecks(GLOBAL.hostTestName);
 
-	check.checkEdge(program.testedge, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
+	check.checkEdge(program.testhost, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
 		console.log(res);
 	});
 }
