@@ -8,7 +8,9 @@ lib-cov
 *.gz
 *.config.json
 
+.project
 npm-debug.log
 work
 config
+node_modules
 

@@ -398,7 +398,6 @@ function writeFlatHosts(hosts, writeAll, file) {
 	fs.writeFileSync(file, contents);
 }
 
-
 function isInactive(host) {
 	return !host.active_b;
 }
