@@ -5,9 +5,9 @@ Work in progress project to support development and operations around a semantic
 
 # Install
 
-sudo npm install cucumber
-cd devopsjs 
-npm install
+    sudo npm install -g cucumber
+    cd devopsjs 
+    npm install
 
 edit config/localConfig.js based on this:
 
