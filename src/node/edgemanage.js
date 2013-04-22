@@ -32,8 +32,8 @@ program
   .option('-s --stats', 'current statistics')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-r, --rotate [number]', 'do auto-rotation based on stats over num hours')
-  .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
+  .option('-r, --rotate', 'do auto-rotation')
+  .option('-g, --advice', 'rotation advice')
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-t, --testhost <host>', 'live test host')
@@ -51,7 +51,7 @@ program
 program.on('--help', function() {
   console.log('Commands can be chained, one per action. For example:');
   console.log('');
-  console.log('    $ edgemanage -a edge1 -o edge2 -s -c \'replacing broken edge2 with edge1\'');
+  console.log('    $ edgemanage -a edge1 -f edge2 -s -c \'replacing broken edge2 with edge1\'');
   console.log('');
   console.log('will make edge1 active, take edge2 offline, and print statistics.');
 });
@@ -185,19 +185,23 @@ function advise(err, ret) {
 	var oldestActive;
 	var oldestInactive;
 	
-	for (var i in stats.activeHosts) { // get oldest active host
+	for (var i in stats.activeHosts) { // get oldest active host to deactivate
 		var host = stats.activeHosts[i];
 		if (!oldestActive || (moment(host.active_dt).valueOf() < oldestActive.active_dt)) {
 			oldestActive = { name : i, stats : host};
 		}
 	}
 	
-	for (var i in stats.inactiveHosts) { // get oldest inactive host
+	for (var i in stats.inactiveHosts) { // get oldest inactive host to activate
 		var host = stats.inactiveHosts[i];
 		if (!oldestInactive || (moment(host.inactive_dt).valueOf() < oldestInactive.inactive_dt)) {
-			oldestInactive = { name : i, stats : host};
+			var rec = hostSummaries[i];
+			if (rec.errorWeight < 1) {
+				oldestInactive = { name : i, stats : host};
+			}
 		}
 	}
+
 	console.log(process.argv[1] + ' --activate ' + oldestInactive.name + ' --deactivate ' + oldestActive.name + ' -c "' + oldestActive.name + ' ' + oldestActive.stats.since +  ' w ' + oldestInactive.name + ' ' + oldestInactive.stats.since + '"'); 
 }
 
