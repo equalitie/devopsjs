@@ -128,8 +128,6 @@ function setOffline(hostIn) {
 
 	if (isOffline(host)) {
 		throw "host is already offline";
-	} else if (isActive(host)) {
-		throw "host is already active";
 	} else {
 		host.active_b = false;
 		host.offline_b = true;
