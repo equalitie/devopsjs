@@ -34,7 +34,7 @@ program
   .option('-d, --deactivate <host>', 'make host inactive')
   .option('-r, --rotate [number]', 'do auto-rotation based on stats over num hours')
   .option('-g, --advice [number]', 'rotation advice based on stats over num hours')
-  .option('-o, --offline <host>', 'offline for maintenance')
+  .option('-f, --offline <host>', 'offline for maintenance')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host>', 'query latest host test results')
@@ -58,14 +58,8 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-if (program.args.length < 1) {
-	console.log(process.argv[1], ' --help for help');
-	return;
-}
-
-
 if (!program.comment && !program.advice && !program.stats && !program.writeall && !program.testhost) {
-	throw "You must enter a comment";
+	throw "You must enter a comment. use --help for help.";
 }
 
 if (program.writeall) {
@@ -120,7 +114,7 @@ function setOnline(hostIn) {
 		throw "host is not offline";
 	}
 				
-	host.active_b = false;
+	host.offline_b = false;
 	host.online_dt = new Date().toISOString();
 	host.comment_s = program.comment;
 	_writeHosts(hp.hosts);
@@ -138,6 +132,7 @@ function setOffline(hostIn) {
 		throw "host is already active";
 	} else {
 		host.active_b = false;
+		host.offline_b = true;
 		host.offline_dt = new Date().toISOString();
 		host.comment_s = program.comment;
 		_writeHosts(hp.hosts);
@@ -183,7 +178,27 @@ function activate(hostIn) {
 }
 
 function advise(err, ret) {
-	console.log('hostSummaries', ret.hostSummaries, 'averages', ret.averages);
+//	console.log('** hostSummaries', ret.hostSummaries, '\n** averages', ret.averages);
+	var stats = getHostStats();
+	var averages = ret.averages;
+	var hostSummaries = ret.hostSummaries;
+	var oldestActive;
+	var oldestInactive;
+	
+	for (var i in stats.activeHosts) { // get oldest active host
+		var host = stats.activeHosts[i];
+		if (!oldestActive || (moment(host.active_dt).valueOf() < oldestActive.active_dt)) {
+			oldestActive = { name : i, stats : host};
+		}
+	}
+	
+	for (var i in stats.inactiveHosts) { // get oldest inactive host
+		var host = stats.inactiveHosts[i];
+		if (!oldestInactive || (moment(host.inactive_dt).valueOf() < oldestInactive.inactive_dt)) {
+			oldestInactive = { name : i, stats : host};
+		}
+	}
+	console.log(process.argv[1] + ' --activate ' + oldestInactive.name + ' --deactivate ' + oldestActive.name + ' -c "' + oldestActive.name + ' ' + oldestActive.stats.since +  ' w ' + oldestInactive.name + ' ' + oldestInactive.stats.since + '"'); 
 }
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
@@ -197,11 +212,10 @@ function getHosts() {
 	return require(hostsFile);
 }
 
-
 function getHostStats(hosts) {
-	if (!hosts) {
-		hosts = require(hostsFile);
-	}
+  if (!hosts) {
+	hosts = require(hostsFile);
+  }
 	
   var available = 0;
   var unavailable = 0;
@@ -223,14 +237,14 @@ function getHostStats(hosts) {
 	}
 	if (isActive(host)) {
 		active++;
-		activeHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), commment : hosts[h].comment_s };
+		activeHosts[hosts[h].name_s] = { active_dt : host.active_dt, since : moment(host.active_dt).fromNow(), commment : hosts[h].comment_s };
 	}
 	if (isOffline(host)) {
 		offline++;
-		offlineHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), comment : hosts[h].comment_s };
+		offlineHosts[hosts[h].name_s] = { offline_dt : host.offline_dt, since : moment(host.offline_dt).fromNow(), comment : hosts[h].comment_s };
 	} else if (isInactive(host)) {
 		inactive++;
-		inactiveHosts[hosts[h].name_s] = { date : moment(host.active_dt).fromNow(), comment : hosts[h].comment_s };
+		inactiveHosts[hosts[h].name_s] = { inactive_dt : host.inactive_dt, since : moment(host.inactive_dt).fromNow(), comment : hosts[h].comment_s };
 	}
   }
   return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_HOSTS};
@@ -325,7 +339,7 @@ function getStats(num, callback) {
 		var maxCount = 0;
 		
 		var hostSummaries = {};
-		var averages = {};
+		var averages = {inService : 0};
 		for (var name in nrpeChecks) {
 			for (var field in nrpeChecks[name].fields) {
 				averages[field] = {sum : 0, count : 0};
@@ -353,7 +367,7 @@ function getStats(num, callback) {
 			hostSummary['resultCount'] = hostSummary['resultCount'] + 1;
 			if (hostSummary['resultCount'] > maxCount) {
 				maxCount = hostSummary['resultCount'];
-	       }
+	        }
 			if (doc['error_t']) {
 				var w = moment(doc['tickDate_dt']).diff() / 10000;
 				console.log('errorWeight', w);
