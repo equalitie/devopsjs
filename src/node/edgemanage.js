@@ -32,8 +32,8 @@ program
   .option('-s --stats', 'current statistics')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-r, --rotate', 'do auto-rotation')
-  .option('-g, --advice', 'rotation advice')
+  .option('-r, --rotate [hours]', 'do auto-rotation [4]')
+  .option('-g, --advice [hours]', 'rotation advice [4]')
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-t, --testhost <host>', 'live test host')
@@ -58,7 +58,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-if (!program.comment && !program.advice && !program.stats && !program.writeall && !program.testhost) {
+if (!program.comment && !program.advice && !program.rotate && !program.stats && !program.writeall && !program.testhost) {
 	throw "You must enter a comment. use --help for help.";
 }
 
@@ -100,8 +100,12 @@ if (program.advice) {
 	getStats(program.advice, advise);
 }
 
+if (program.rotate) {
+	getStats(program.rotate, rotate);
+}
+
 if (program.stats) {
-	console.log(getHostStats());
+	console.log(getHostSummaries());
 }
 
 /** argument processing **/
@@ -175,36 +179,55 @@ function activate(hostIn) {
 	return;
 }
 
-function advise(err, ret) {
-//	console.log('** hostSummaries', ret.hostSummaries, '\n** averages', ret.averages);
-	var stats = getHostStats();
-	var averages = ret.averages;
-	var hostSummaries = ret.hostSummaries;
-	var oldestActive;
-	var oldestInactive;
+function advise(err, stats) {
+	var advice = getRotateAdvice(stats);
+	console.log(advice);
+	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "replace ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"'); 
+}
+
+function rotate(err, stats) {
+	var advice = getRotateAdvice(stats);
+	console.log('replacing ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"');
+	activate(advice.addInactive.name);
+	deactivate(advice.removeActive.name);
+}
+
+/** utilities **/
+
+function getRotateAdvice(stats) {
+	var summaries = getHostSummaries();
+	var averages = stats.averages;
+	var hostSummaries = stats.hostSummaries;
+
+	var removeActive;
+	var addInactive;
 	
-	for (var i in stats.activeHosts) { // get oldest active host to deactivate
-		var host = stats.activeHosts[i];
-		if (!oldestActive || (moment(host.active_dt).valueOf() < oldestActive.active_dt)) {
-			oldestActive = { name : i, stats : host};
+	for (var i in summaries.activeHosts) { // get oldest active host to deactivate
+		var host = summaries.activeHosts[i];
+		console.log(i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' + (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
+		if (!removeActive || (moment(host.active_dt).valueOf() > removeActive.stats.active_dt)) {
+			removeActive = { name : i, stats : host};
 		}
 	}
 	
-	for (var i in stats.inactiveHosts) { // get oldest inactive host to activate
-		var host = stats.inactiveHosts[i];
-		if (!oldestInactive || (moment(host.inactive_dt).valueOf() < oldestInactive.inactive_dt)) {
+	for (var i in summaries.inactiveHosts) { // get oldest inactive host to activate
+		var host = summaries.inactiveHosts[i];
+		if (!addInactive || (moment(host.inactive_dt).valueOf() > addInactive.stats.inactive_dt)) {
 			var rec = hostSummaries[i];
-			if (rec.errorWeight < 1) {
-				oldestInactive = { name : i, stats : host};
+
+			if (rec && rec.errorWeight < 1) {
+				addInactive = { name : i, stats : host};
+			} else {
+				console.log(i, rec);
 			}
 		}
 	}
-
-	console.log(process.argv[1] + ' --activate ' + oldestInactive.name + ' --deactivate ' + oldestActive.name + ' -c "' + oldestActive.name + ' ' + oldestActive.stats.since +  ' w ' + oldestInactive.name + ' ' + oldestInactive.stats.since + '"'); 
+	
+	return {removeActive : removeActive, addInactive : addInactive};
 }
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
-	var stats = getHostStats(hosts);
+	var stats = getHostSummaries(hosts);
 	if (stats.active < GLOBAL.MIN_HOSTS) {
 		throw "not enough available hosts; " + stats.active + ' (required: ' + GLOBAL.MIN_HOSTS + ')';
 	}
@@ -214,7 +237,7 @@ function getHosts() {
 	return require(hostsFile);
 }
 
-function getHostStats(hosts) {
+function getHostSummaries(hosts) {
   if (!hosts) {
 	hosts = require(hostsFile);
   }
@@ -252,8 +275,6 @@ function getHostStats(hosts) {
   return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_HOSTS};
 }
 	
-
-/** utilities **/
 
 function getHost(hostIn) {
 	var hosts = require(hostsFile);
@@ -293,7 +314,6 @@ function writeFlatHosts(hosts, writeAll, file) {
 		}
 		contents += line + '\n';		
 	}
-	console.log('writing to', file);
 	fs.writeFileSync(file, contents);
 }
 
@@ -314,6 +334,8 @@ function isAvailable(host) {
 }
 
 function getStats(num, callback) {
+	num = 0 + parseInt(num);
+	
 	var hosts = require(hostsFile);
 	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks();
 	
@@ -321,6 +343,7 @@ function getStats(num, callback) {
 	var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 	var getStatsQueue = queue();
 	var period = moment(moment() - moment().diff(num, units)).format() + 'Z'; // FIXME use Date.toISOString();
+
 	for (var n in nrpeChecks) {
 		for (var h in hosts) {
 			var host = hosts[h].name_s;
