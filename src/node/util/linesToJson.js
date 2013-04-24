@@ -10,6 +10,7 @@ lineReader.eachLine(filename, function(line, last) {
 	host.comment_s = 'Auto-imported';
 
 	host.active_b = true;
+	host.active_dt = host.lastUpdate_dt;
 	
 	if (/^##/.test(line)) {
 		host.active_b = false;
