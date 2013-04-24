@@ -26,19 +26,20 @@ var program = require('commander');
 var queue = require('queue-async');
 var moment = require('moment');
 
-var units = 'hours';
+var defaultUnits = 'hours';
+var defaultPeriod = 10;
 	
 program
   .option('-s --stats', 'current statistics')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-r, --rotate [hours]', 'do auto-rotation [4]')
-  .option('-g, --advice [hours]', 'rotation advice [4]')
+  .option('-r, --rotate [period]', 'do auto-rotation [10]')
+  .option('-g, --advice [period]', 'rotation advice [10]')
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host>', 'query latest host test results')
-  
+  .option('-v --verbose', 'verbose output')
   .option('--del <host>', 'delete from configuration')
   .option('--add <host>', 'add to configuration')
   .option('--writeall <file>', 'write all hosts to a flat file')
@@ -58,9 +59,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-if (!program.comment && !program.advice && !program.rotate && !program.stats && !program.writeall && !program.testhost) {
-	throw "You must enter a comment. use --help for help.";
-}
+var verbose = program.verbose === true;
 
 if (program.writeall) {
 	var hosts = getHosts();
@@ -77,31 +76,37 @@ if (program.testhost) {
 }
 
 if (program.activate) {
+	mustComment();
 	activate(program.activate);
 	console.log(program.activate + ' is now active');
 }
 
 if (program.deactivate) {
+	mustComment();
 	deactivate(program.deactivate);
 	console.log(program.deactivate + ' is now inactive');
 }
 
 if (program.online) {
+	mustComment();
 	setOnline(program.online);
 	console.log(program.online + ' is now online');
 }
 
 if (program.offline) {
+	mustComment();
 	setOffline(program.offline);
 	console.log(program.offline + ' is now offline');
 }
 
 if (program.advice) {
-	getStats(program.advice, advise);
+	var num = program.advice === true ? defaultPeriod : program.advice;
+	getStats(num, advise);
 }
 
 if (program.rotate) {
-	getStats(program.rotate, rotate);
+	var num = program.rotate === true ? defaultPeriod : program.rotate;
+	getStats(num, rotate);
 }
 
 if (program.stats) {
@@ -204,21 +209,34 @@ function getRotateAdvice(stats) {
 	
 	for (var i in summaries.activeHosts) { // get oldest active host to deactivate
 		var host = summaries.activeHosts[i];
-		console.log(i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' + (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
-		if (!removeActive || (moment(host.active_dt).valueOf() > removeActive.stats.active_dt)) {
+		if (verbose) {
+			console.log('removeActive', i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
+					+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
+		}
+			
+		if (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0)) {
 			removeActive = { name : i, stats : host};
+			if (verbose) {
+				console.log("candidate", moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+			}
 		}
 	}
 	
 	for (var i in summaries.inactiveHosts) { // get oldest inactive host to activate
 		var host = summaries.inactiveHosts[i];
-		if (!addInactive || (moment(host.inactive_dt).valueOf() > addInactive.stats.inactive_dt)) {
+		if (verbose) {
+			console.log(host.inactive_dt);
+			console.log('addInactive', i, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
+					+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt)) + 'err: ' + hostSummaries[i].errorWeight) : 'null');
+		}
+		if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
 			var rec = hostSummaries[i];
 
-			if (rec && rec.errorWeight < 1) {
+			if (rec.errorWeight < 1) {
 				addInactive = { name : i, stats : host};
-			} else {
-				console.log(i, rec);
+				if (verbose) {
+					console.log("candidate", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+				}
 			}
 		}
 	}
@@ -342,7 +360,7 @@ function getStats(num, callback) {
 	var solr = require('solr-client');
 	var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 	var getStatsQueue = queue();
-	var period = moment(moment() - moment().diff(num, units)).format() + 'Z'; // FIXME use Date.toISOString();
+	var period = moment(moment() - moment().diff(num, defaultUnits)).format() + 'Z'; // FIXME use Date.toISOString();
 
 	for (var n in nrpeChecks) {
 		for (var h in hosts) {
@@ -350,7 +368,7 @@ function getStats(num, callback) {
 		
 			getStatsQueue.defer(function(callback) {
 				var statsQuery = solrClient.createQuery()
-					.q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'desc'});
+					.q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'asc'});
 	
 				solrClient.search(statsQuery, callback);
 			}); 
@@ -394,9 +412,12 @@ function getStats(num, callback) {
 				maxCount = hostSummary['resultCount'];
 	        }
 			if (doc.error_t) {
-				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases basesd on time; recent is 60
-				console.log(host, doc.tickDate_dt, 'errorWeight', w);
-				hostSummary['errorWeight'] = hostSummary['errorWeight'] + w;
+				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases based on time; recent is ~1400
+				if (verbose) {
+					console.log(host + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' errorWeight', w);
+				}
+					
+				hostSummary.errorWeight = hostSummary.errorWeight + w;
 			} else {
 				for (var field in nrpeChecks[doc.aCheck_s].fields) {
 					if (doc[field]) {
@@ -418,3 +439,8 @@ function getStats(num, callback) {
 	});
 }
 
+function mustComment() {
+	if (!program.comment) {
+		throw "You must enter a comment. use --help for help.";
+	}
+}
