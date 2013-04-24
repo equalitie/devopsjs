@@ -350,7 +350,7 @@ function getStats(num, callback) {
 		
 			getStatsQueue.defer(function(callback) {
 				var statsQuery = solrClient.createQuery()
-					.q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'});
+					.q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'desc'});
 	
 				solrClient.search(statsQuery, callback);
 			}); 
@@ -393,9 +393,9 @@ function getStats(num, callback) {
 			if (hostSummary['resultCount'] > maxCount) {
 				maxCount = hostSummary['resultCount'];
 	        }
-			if (doc['error_t']) {
-				var w = moment(doc['tickDate_dt']).diff() / 10000;
-				console.log('errorWeight', w);
+			if (doc.error_t) {
+				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases basesd on time; recent is 60
+				console.log(host, doc.tickDate_dt, 'errorWeight', w);
 				hostSummary['errorWeight'] = hostSummary['errorWeight'] + w;
 			} else {
 				for (var field in nrpeChecks[doc.aCheck_s].fields) {
