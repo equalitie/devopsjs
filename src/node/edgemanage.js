@@ -25,6 +25,8 @@ var utils = require('./lib/util.js');
 var program = require('commander');
 var queue = require('queue-async');
 var moment = require('moment');
+var solr = require('solr-client');
+var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 
 var defaultUnits = 'hours';
 var defaultPeriod = 10;
@@ -105,6 +107,7 @@ if (program.advice) {
 }
 
 if (program.rotate) {
+	mustComment();
 	var num = program.rotate === true ? defaultPeriod : program.rotate;
 	getStats(num, rotate);
 }
@@ -127,7 +130,6 @@ function setOnline(hostIn) {
 	host.online_dt = new Date().toISOString();
 	host.comment_s = program.comment;
 	_writeHosts(hp.hosts);
-	writeFlatHosts(hp.hosts);
 	return;
 }
 
@@ -137,14 +139,14 @@ function setOffline(hostIn) {
 
 	if (isOffline(host)) {
 		throw "host is already offline";
-	} else {
-		host.active_b = false;
-		host.offline_b = true;
-		host.offline_dt = new Date().toISOString();
-		host.comment_s = program.comment;
-		_writeHosts(hp.hosts);
-		writeFlatHosts(hp.hosts);
 	}
+	
+	host.active_b = false;
+	host.offline_b = true;
+	host.offline_dt = new Date().toISOString();
+	host.comment_s = program.comment;
+	_writeHosts(hp.hosts);
+
 	return;
 }
 
@@ -156,13 +158,12 @@ function deactivate(hostIn) {
 		throw "host is offline";
 	} else if (isInactive(host)) {
 		throw "host is already inactive";
-	} else {
-		host.active_b = false;
-		host.inactive_dt = new Date().toISOString();
-		host.comment_s = program.comment;
-		_writeHosts(hp.hosts);
-		writeFlatHosts(hp.hosts);
 	}
+	
+	host.active_b = false;
+	host.inactive_dt = new Date().toISOString();
+	host.comment_s = program.comment;
+	_writeHosts(hp.hosts);
 	return;
 }
 
@@ -174,24 +175,29 @@ function activate(hostIn) {
 		throw "host is offline";
 	} else if (isActive(host)) {
 		throw "host is already online";
-	} else {
-		host.active_b = true;
-		host.active_dt = new Date().toISOString();
-		host.comment_s = program.comment;
-		_writeHosts(hp.hosts);
-		writeFlatHosts(hp.hosts);
 	}
+	host.active_b = true;
+	host.active_dt = new Date().toISOString();
+	host.comment_s = program.comment;
+	_writeHosts(hp.hosts);
 	return;
 }
 
 function advise(err, stats) {
 	var advice = getRotateAdvice(stats);
+	if (advice.removeActive === null || advice.addInactive === null) {
+		throw "Can't advise" + JSON.stringify(advice);
+	}
 	console.log(advice);
 	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "replace ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"'); 
 }
 
 function rotate(err, stats) {
 	var advice = getRotateAdvice(stats);
+	if (advice.removeActive === null || advice.addInactive === null) {
+		throw "Can't rotate" + JSON.stringify(advice);
+	}
+	
 	console.log('replacing ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"');
 	activate(advice.addInactive.name);
 	deactivate(advice.removeActive.name);
@@ -273,6 +279,7 @@ function getHostSummaries(hosts) {
   for (var h in hosts) { 
     total++;
 	var host = hosts[h];
+
 	if (isAvailable(host)) {
 	  available++;
 	} else{
@@ -308,8 +315,18 @@ function getHost(hostIn) {
 function _writeHosts(hosts) {
 	validateConfiguration(hosts);
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
+	var summary = {comment_s : program.comment, operator_s : process.env.USER, date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
+
+	solrClient.add(summary, function(err,obj){
+	  if(err){
+	    throw "commit ERROR: " + err;
+	  }
+	});
 }
 
+/** 
+ * write complete list of hosts
+ */
 function writeFlatHosts(hosts, writeAll, file) {
 	if (!file) {
 		file = flatHostsFile;
@@ -357,8 +374,6 @@ function getStats(num, callback) {
 	var hosts = require(hostsFile);
 	var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks();
 	
-	var solr = require('solr-client');
-	var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 	var getStatsQueue = queue();
 	var period = moment(moment() - moment().diff(num, defaultUnits)).format() + 'Z'; // FIXME use Date.toISOString();
 
