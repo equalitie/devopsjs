@@ -188,7 +188,6 @@ function advise(err, stats) {
 	if (advice.removeActive === null || advice.addInactive === null) {
 		throw "Can't advise" + JSON.stringify(advice);
 	}
-	console.log(advice);
 	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "replace ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"'); 
 }
 
@@ -210,6 +209,10 @@ function getRotateAdvice(stats) {
 	var averages = stats.averages;
 	var hostSummaries = stats.hostSummaries;
 
+	if (summaries.inactiveHosts < 1) {
+		throw 'no inactive hosts to rotate with';
+	}
+	
 	var removeActive;
 	var addInactive;
 	
@@ -228,12 +231,14 @@ function getRotateAdvice(stats) {
 		}
 	}
 	
+	var tries = summaries.inactive;
+	var lowestError = null;	// use this host if no other option
+	
 	for (var i in summaries.inactiveHosts) { // get oldest inactive host to activate
 		var host = summaries.inactiveHosts[i];
 		if (verbose) {
-			console.log(host.inactive_dt);
-			console.log('addInactive', i, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
-					+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt)) + 'err: ' + hostSummaries[i].errorWeight) : 'null');
+			console.log('addInactive', i + ' err: ' + hostSummaries[i].errorWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
+					+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt))) : 'null');
 		}
 		if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
 			var rec = hostSummaries[i];
@@ -243,8 +248,17 @@ function getRotateAdvice(stats) {
 				if (verbose) {
 					console.log("candidate", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
+			} else {
+				if (!lowestError || rec.errorWeight < lowestError.errorWeight) {
+					console.log('adding lowest errored host');
+					lowestError = i;
+				}
+				
 			}
 		}
+	}
+	if (!addInactive) {
+		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
 	
 	return {removeActive : removeActive, addInactive : addInactive};
@@ -314,11 +328,19 @@ function getHost(hostIn) {
 
 function _writeHosts(hosts) {
 	validateConfiguration(hosts);
+	
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
+	if (flatHostsFile) {
+		if (verbose) {
+			console.log('writing to ' + hostsFile);
+		}
+		writeFlatHosts(hosts);
+	}
+	
 	var sum = getHostSummaries(hosts);
 	var summary = {comment_s : program.comment, operator_s : process.env.SUDO_USER || process.env.USER
-	               , active_i: sum.active, inactive_i: sum.inactive, offline_i: sum.offline
-	               , date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
+       , active_i: sum.active, inactive_i: sum.inactive, offline_i: sum.offline
+       , date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
 	var docs = [summary];
 	var now = new Date().toISOString();
 	for (var i in hosts) {
