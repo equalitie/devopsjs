@@ -315,7 +315,10 @@ function getHost(hostIn) {
 function _writeHosts(hosts) {
 	validateConfiguration(hosts);
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
-	var summary = {comment_s : program.comment, operator_s : process.env.SUDO_USER || process.env.USER, date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
+	var sum = getHostSummaries(hosts);
+	var summary = {comment_s : program.comment, operator_s : process.env.SUDO_USER || process.env.USER
+	               , active_i: sum.active, inactive_i: sum.inactive, offline_i: sum.offline
+	               , date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
 	var docs = [summary];
 	var now = new Date().toISOString();
 	for (var i in hosts) {
