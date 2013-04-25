@@ -316,8 +316,24 @@ function _writeHosts(hosts) {
 	validateConfiguration(hosts);
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
 	var summary = {comment_s : program.comment, operator_s : process.env.SUDO_USER || process.env.USER, date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
-
-	solrClient.add(summary, function(err,obj){
+	var docs = [summary];
+	var now = new Date().toISOString();
+	for (var i in hosts) {
+		var host = hosts[i];
+	
+		var doc = {};
+		for (var d in host) {
+			if (host.hasOwnProperty(d)) {
+				doc[d] = host[d];
+			}
+		}
+			
+		doc.date_dt = now;
+		doc.class_s = 'host state';
+		doc.id = host.name_s + '/' + now;
+		docs.push(doc);
+	}
+	solrClient.add(docs, function(err,obj){
 	  if(err){
 	    throw "commit ERROR: " + err;
 	  }
