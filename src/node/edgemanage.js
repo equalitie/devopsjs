@@ -30,6 +30,7 @@ var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 
 var defaultUnits = 'hours';
 var defaultPeriod = 10;
+var TERMINAL_ERROR = 1400;
 	
 program
   .option('-s --stats', 'current statistics')
@@ -257,7 +258,8 @@ function getRotateAdvice(stats) {
 			}
 		}
 	}
-	if (!addInactive) {
+	
+	if (!addInactive && lowestError && lowestError.erroWeight < TERMINAL_ERROR) {
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
 	
@@ -468,7 +470,7 @@ function getStats(num, callback) {
 				maxCount = hostSummary['resultCount'];
 	        }
 			if (doc.error_t) {
-				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases based on time; recent is ~1400
+				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases based on time; recent is ~1400 - TERMINAL_ERROR
 				if (verbose) {
 					console.log(host + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' errorWeight', w);
 				}
