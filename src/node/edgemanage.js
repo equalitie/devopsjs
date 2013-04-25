@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 
+
+/** Defaults **/
+	
 GLOBAL.MIN_HOSTS = 6;
 GLOBAL.hostTestName = 'check_fail2ban';
 
+var defaultUnits = 'hours';
+var defaultPeriod = 10;
+var TERMINAL_ERROR = 1400;
+	
 
 var configBase;
 if (process.env.DEVOPSCONFIG) {
@@ -28,18 +35,14 @@ var moment = require('moment');
 var solr = require('solr-client');
 var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 
-var defaultUnits = 'hours';
-var defaultPeriod = 10;
-var TERMINAL_ERROR = 1400;
-	
 program
   .option('-s --stats', 'current statistics')
+  .option('-n, --online <host>', 'online from maintenance')
+  .option('-f, --offline <host>', 'offline for maintenance')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-r, --rotate [period]', 'do auto-rotation [10]')
-  .option('-g, --advice [period]', 'rotation advice [10]')
-  .option('-f, --offline <host>', 'offline for maintenance')
-  .option('-n, --online <host>', 'online from maintenance')
+  .option('-g, --advice [' + defaultPeriod + ']', 'rotation advice [10]')
+  .option('-r, --rotate [' + defaultPeriod + ']', 'do auto-rotation [10]')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host>', 'query latest host test results')
   .option('-v --verbose', 'verbose output')
@@ -64,42 +67,36 @@ program.parse(process.argv);
 
 var verbose = program.verbose === true;
 
-if (program.writeall) {
-	var hosts = getHosts();
-	writeFlatHosts(hosts, true, program.writeall);
-}
-
-if (program.testhost) {
-	var check = require('./lib/nrpe/check.js');
-	var test = require('./lib/nrpe/allchecks.js').getChecks(GLOBAL.hostTestName);
-
-	check.checkEdge(program.testhost, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
-		console.log(res);
-	});
-}
-
-if (program.activate) {
-	mustComment();
-	activate(program.activate);
-	console.log(program.activate + ' is now active');
-}
-
-if (program.deactivate) {
-	mustComment();
-	deactivate(program.deactivate);
-	console.log(program.deactivate + ' is now inactive');
+if (program.stats) {
+	console.log(getHostSummaries());
 }
 
 if (program.online) {
 	mustComment();
-	setOnline(program.online);
+	var hp = setOnline(program.online);
+	writeHosts(hp.hosts);
 	console.log(program.online + ' is now online');
 }
 
 if (program.offline) {
 	mustComment();
-	setOffline(program.offline);
+	var hp = setOffline(program.offline);
+	writeHosts(hp.hosts);
 	console.log(program.offline + ' is now offline');
+}
+
+if (program.activate) {
+	mustComment();
+	var hp = activate(program.activate);
+	writeHosts(hp.hosts);
+	console.log(program.activate + ' is now active');
+}
+
+if (program.deactivate) {
+	mustComment();
+	var hp = deactivate(program.deactivate);
+	writeHosts(hp.hosts);
+	console.log(program.deactivate + ' is now inactive');
 }
 
 if (program.advice) {
@@ -113,14 +110,24 @@ if (program.rotate) {
 	getStats(num, rotate);
 }
 
-if (program.stats) {
-	console.log(getHostSummaries());
+if (program.testhost) {
+	var check = require('./lib/nrpe/check.js');
+	var test = require('./lib/nrpe/allchecks.js').getChecks(GLOBAL.hostTestName);
+
+	check.checkEdge(program.testhost, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
+		console.log(res);
+	});
+}
+
+if (program.writeall) {
+	var hp = getHosts();
+	writeFlatHosts(hp.hosts, true, program.writeall);
 }
 
 /** argument processing **/
 
-function setOnline(hostIn) {
-	var hp = getHost(hostIn);
+function setOnline(hostIn, hosts) {
+	var hp = getHostFromHosts(hostIn, hosts);
 	var host = hp.host;
 
 	if (!isOffline(host)) {
@@ -130,12 +137,11 @@ function setOnline(hostIn) {
 	host.offline_b = false;
 	host.online_dt = new Date().toISOString();
 	host.comment_s = program.comment;
-	_writeHosts(hp.hosts);
-	return;
+	return hp;
 }
 
-function setOffline(hostIn) {
-	var hp = getHost(hostIn);
+function setOffline(hostIn, hosts) {
+	var hp = getHostFromHosts(hostIn, hosts);
 	var host = hp.host;
 
 	if (isOffline(host)) {
@@ -146,13 +152,27 @@ function setOffline(hostIn) {
 	host.offline_b = true;
 	host.offline_dt = new Date().toISOString();
 	host.comment_s = program.comment;
-	_writeHosts(hp.hosts);
 
-	return;
+	return hp;
 }
 
-function deactivate(hostIn) {
-	var hp = getHost(hostIn);
+function activate(hostIn, hosts) {
+	var hp = getHostFromHosts(hostIn, hosts);
+	var host = hp.host;
+
+	if (isOffline(host)) {
+		throw "host is offline";
+	} else if (isActive(host)) {
+		throw "host is already online";
+	}
+	host.active_b = true;
+	host.active_dt = new Date().toISOString();
+	host.comment_s = program.comment;
+	return hp;
+}
+
+function deactivate(hostIn, hosts) {
+	var hp = getHostFromHosts(hostIn, hosts);
 	var host = hp.host;
 
 	if (isOffline(host)) {
@@ -164,24 +184,7 @@ function deactivate(hostIn) {
 	host.active_b = false;
 	host.inactive_dt = new Date().toISOString();
 	host.comment_s = program.comment;
-	_writeHosts(hp.hosts);
-	return;
-}
-
-function activate(hostIn) {
-	var hp = getHost(hostIn);
-	var host = hp.host;
-
-	if (isOffline(host)) {
-		throw "host is offline";
-	} else if (isActive(host)) {
-		throw "host is already online";
-	}
-	host.active_b = true;
-	host.active_dt = new Date().toISOString();
-	host.comment_s = program.comment;
-	_writeHosts(hp.hosts);
-	return;
+	return hp;
 }
 
 function advise(err, stats) {
@@ -198,9 +201,10 @@ function rotate(err, stats) {
 		throw "Can't rotate" + JSON.stringify(advice);
 	}
 	
-	console.log('replacing ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"');
-	activate(advice.addInactive.name);
-	deactivate(advice.removeActive.name);
+	var hp = activate(advice.addInactive.name);
+	hp = deactivate(advice.removeActive.name, hp.hosts);
+	writeHosts(hp.hosts);
+	console.log('replaced ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since);
 }
 
 /** utilities **/
@@ -317,8 +321,12 @@ function getHostSummaries(hosts) {
 }
 	
 
-function getHost(hostIn) {
-	var hosts = require(hostsFile);
+/** get host and updated hosts. retrieves hosts if not passed. **/
+
+function getHostFromHosts(hostIn, hosts) {
+	if (!hosts) {
+		hosts = require(hostsFile);
+	}
 	for (var h in hosts) {
 		var host = hosts[h];
 		if (host.name_s === hostIn) {
@@ -328,7 +336,7 @@ function getHost(hostIn) {
 	throw "no such host: " + hostIn;
 }
 
-function _writeHosts(hosts) {
+function writeHosts(hosts) {
 	validateConfiguration(hosts);
 	
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
