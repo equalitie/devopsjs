@@ -315,7 +315,7 @@ function getHost(hostIn) {
 function _writeHosts(hosts) {
 	validateConfiguration(hosts);
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
-	var summary = {comment_s : program.comment, operator_s : process.env.USER, date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
+	var summary = {comment_s : program.comment, operator_s : process.env.SUDO_USER || process.env.USER, date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
 
 	solrClient.add(summary, function(err,obj){
 	  if(err){
