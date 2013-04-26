@@ -1,3 +1,6 @@
+GLOBAL.exception = function(s) {
+	console.log('*** EXCEPTION', s);
+}
 
 var util=require('./lib/util.js')
 var program = require('commander');

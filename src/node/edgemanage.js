@@ -45,7 +45,7 @@ program
   .option('-g, --advice [' + defaultPeriod + ']', 'rotation advice [10]')
   .option('-r, --rotate [' + defaultPeriod + ']', 'do auto-rotation [10]')
   .option('-t, --testhost <host>', 'live test host')
-  .option('-q, --query <host>', 'query latest host test results')
+  .option('-q, --query <host> [period]', 'query host test results')
   .option('-v --verbose', 'verbose output')
   .option('--writeall <file>', 'write all hosts to a flat file')
   .option('-z, --zonegen', 'execute zongene script')

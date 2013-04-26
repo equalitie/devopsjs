@@ -28,6 +28,7 @@ exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
 			} catch (e) {
 				res.status_s = 'EXCEPTION';
 				res.error_t = e + ':' + stdout;
+				GLOBAL.exception(res);
 			}
 			
 		}
