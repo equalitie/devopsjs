@@ -23,7 +23,13 @@ exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
 		if (aCheck.isError(error, stdout)) {
 			res.error_t = stdout;
 		} else {
-			aCheck.assign(res, stdout);
+			try {
+				aCheck.assign(res, stdout);
+			} catch (e) {
+				res.status_s = 'EXCEPTION';
+				res.error_t = e;
+			}
+			
 		}
 		callback(res);
 	});
