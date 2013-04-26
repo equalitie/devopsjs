@@ -27,7 +27,7 @@ exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
 				aCheck.assign(res, stdout);
 			} catch (e) {
 				res.status_s = 'EXCEPTION';
-				res.error_t = e;
+				res.error_t = e + ':' + stdout;
 			}
 			
 		}
