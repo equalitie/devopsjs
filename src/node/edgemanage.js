@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-
 /** Defaults **/
 	
-GLOBAL.MIN_HOSTS = 6;
 GLOBAL.hostTestName = 'check_fail2ban';
 
 var defaultUnits = 'hours';
@@ -25,6 +23,8 @@ try {
 }
 
 var flatHostsFile = configBase + GLOBAL.CONFIG.flatHostsFile;
+GLOBAL.MIN_EDGES = GLOBAL.CONFIG.minEdges || 6;
+
 var hostsFile = configBase + 'hosts.json';
 
 var fs = require('fs');
@@ -36,7 +36,8 @@ var solr = require('solr-client');
 var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 
 program
-  .option('-s --stats', 'current statistics')
+  .option('--add <host>', 'add to configuration')
+  .option('--del <host>', 'delete from configuration')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-a, --activate <host>', ' make host active')
@@ -46,13 +47,13 @@ program
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host>', 'query latest host test results')
   .option('-v --verbose', 'verbose output')
-  .option('--del <host>', 'delete from configuration')
-  .option('--add <host>', 'add to configuration')
   .option('--writeall <file>', 'write all hosts to a flat file')
   .option('-z, --zonegen', 'execute zongene script')
+  .option('-s --stats', 'current statistics')
+
   .option('--override', 'override validation error')
   .option('-c, --comment <\'description\'>', 'comment for the action')
-  .option('-i, --incident', 'file as an incident report');
+  .option('-i, --incident', 'file comment as an incident report');
 
 /* argument processing **/
 program.on('--help', function() {
@@ -66,10 +67,6 @@ program.on('--help', function() {
 program.parse(process.argv);
 
 var verbose = program.verbose === true;
-
-if (program.stats) {
-	console.log(getHostSummaries());
-}
 
 if (program.online) {
 	mustComment();
@@ -119,12 +116,17 @@ if (program.testhost) {
 	});
 }
 
+if (program.stats) {
+	console.log(getHostSummaries());
+}
+
+
 if (program.writeall) {
 	var hp = getHosts();
 	writeFlatHosts(hp.hosts, true, program.writeall);
 }
 
-/** argument processing **/
+/** argument execution **/
 
 function setOnline(hostIn, hosts) {
 	var hp = getHostFromHosts(hostIn, hosts);
@@ -272,8 +274,12 @@ function getRotateAdvice(stats) {
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
 	var stats = getHostSummaries(hosts);
-	if (stats.active < GLOBAL.MIN_HOSTS) {
-		throw "not enough available hosts; " + stats.active + ' (required: ' + GLOBAL.MIN_HOSTS + ')';
+	if (stats.active < GLOBAL.MIN_EDGES) {
+		if (program.override) {
+			console.log("overridding required hosts");
+		} else {
+			throw "not enough available hosts; " + stats.active + ' (required: ' + GLOBAL.MIN_EDGES + ')';
+		}
 	}
 }
 
@@ -317,7 +323,7 @@ function getHostSummaries(hosts) {
 		inactiveHosts[hosts[h].name_s] = { inactive_dt : host.inactive_dt, since : moment(host.inactive_dt).fromNow(), comment : hosts[h].comment_s };
 	}
   }
-  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_HOSTS};
+  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_EDGES};
 }
 	
 
