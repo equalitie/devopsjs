@@ -11,6 +11,7 @@ lineReader.eachLine(filename, function(line, last) {
 	host.name_s = name;
 	host.lastUpdate_dt = now;
 	host.comment_s = 'Auto-imported ' + now;
+	host.added_dt = now;
 	
 	if (name && !line.match(/^# .*/)) {
 		

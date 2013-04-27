@@ -7,7 +7,7 @@ GLOBAL.hostTestName = 'check_fail2ban';
 var defaultUnits = 'hours';
 var defaultPeriod = 10;
 var TERMINAL_ERROR = 1400;
-	
+var NOW = new Date().toISOString();
 
 var configBase;
 if (process.env.DEVOPSCONFIG) {
@@ -37,7 +37,7 @@ var solrClient = solr.createClient(GLOBAL.CONFIG.solrConfig);
 
 program
   .option('--add <host>', 'add to configuration')
-  .option('--del <host>', 'delete from configuration')
+  .option('--remove <host>', 'remove from configuration')
   .option('-n, --online <host>', 'online from maintenance')
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-a, --activate <host>', ' make host active')
@@ -68,32 +68,48 @@ program.parse(process.argv);
 
 var verbose = program.verbose === true;
 
+if (program.add) {
+	mustComment();
+	var hp = addHost(program.add);
+	writeHosts(hp.hosts, program.add);
+	console.log(program.add + ' is added');
+}
+
+if (program.remove) {
+	mustComment();
+	var hp = removeHost(program.remove, null, function(hp) {
+		writeHosts(hp.hosts, program.remove);
+	});
+	writeHosts(hp.hosts, program.remove);
+	console.log(program.remove + ' is removed');
+}
+
 if (program.online) {
 	mustComment();
 	var hp = setOnline(program.online);
-	writeHosts(hp.hosts);
-	console.log(program.online + ' is now online');
+	writeHosts(hp.hosts, program.online);
+	console.log(program.online + ' is online');
 }
 
 if (program.offline) {
 	mustComment();
 	var hp = setOffline(program.offline);
-	writeHosts(hp.hosts);
-	console.log(program.offline + ' is now offline');
+	writeHosts(hp.hosts, program.offline);
+	console.log(program.offline + ' is offline');
 }
 
 if (program.activate) {
 	mustComment();
 	var hp = activate(program.activate);
-	writeHosts(hp.hosts);
-	console.log(program.activate + ' is now active');
+	writeHosts(hp.hosts, program.activate);
+	console.log(program.activate + ' is active');
 }
 
 if (program.deactivate) {
 	mustComment();
 	var hp = deactivate(program.deactivate);
-	writeHosts(hp.hosts);
-	console.log(program.deactivate + ' is now inactive');
+	writeHosts(hp.hosts, program.deactivate);
+	console.log(program.deactivate + ' is inactive');
 }
 
 if (program.advice) {
@@ -120,16 +136,60 @@ if (program.stats) {
 	console.log(getHostSummaries());
 }
 
-
 if (program.writeall) {
 	var hp = getHosts();
 	writeFlatHosts(hp.hosts, true, program.writeall);
 }
 
-/** argument execution **/
+/** 
+ * argument execution
+ * 
+ * isolate the storage from the functions for testing
+ * 
+ **/
 
-function setOnline(hostIn, hosts) {
+function addHost(newHost, hosts) {
+	var hp = getHostFromHosts(newHost, hosts);
+	if (hp.host) {
+		throw "host already exists: " + newHost;
+	}
+
+	var host = { name_s : newHost, added_dt : NOW, lastUpdate_dt : NOW, comment_s : program.comment};
+	hp.hosts.push(host);
+	hp.host = host;
+	return hp;
+}
+
+/**
+ * 
+ * capture the remove event with the callback
+ * 
+ */
+function removeHost(removeHost, hosts, writeCallback) {
+	var hp = getHostFromHosts(removeHost, hosts);
+	if (!hp.host) {
+		throw "host doesn't' exist: " + removeHost;
+	}
+	hp.host.removed_dt = NOW;
+	writeCallback(hp);
+	var newHosts = [];
+	for (var i in hp.hosts) {
+		var host = hp.hosts[i];
+		if (!(host.name_s === removeHost)) {
+			newHosts.push(host);
+		}
+	}
+	hp.hosts = newHosts;
+	hp.host = null;
+	return hp;
+}
+
+function setOnline(hostIn) {
 	var hp = getHostFromHosts(hostIn, hosts);
+	if (!hp.host) {
+		throw "no such host: " + hostIn;
+	}
+	
 	var host = hp.host;
 
 	if (!isOffline(host)) {
@@ -144,6 +204,9 @@ function setOnline(hostIn, hosts) {
 
 function setOffline(hostIn, hosts) {
 	var hp = getHostFromHosts(hostIn, hosts);
+	if (!hp.host) {
+		throw "no such host: " + hostIn;
+	}
 	var host = hp.host;
 
 	if (isOffline(host)) {
@@ -160,6 +223,9 @@ function setOffline(hostIn, hosts) {
 
 function activate(hostIn, hosts) {
 	var hp = getHostFromHosts(hostIn, hosts);
+	if (!hp.host) {
+		throw "no such host: " + hostIn;
+	}
 	var host = hp.host;
 
 	if (isOffline(host)) {
@@ -175,6 +241,9 @@ function activate(hostIn, hosts) {
 
 function deactivate(hostIn, hosts) {
 	var hp = getHostFromHosts(hostIn, hosts);
+	if (!hp.host) {
+		throw "no such host: " + hostIn;
+	}
 	var host = hp.host;
 
 	if (isOffline(host)) {
@@ -205,7 +274,7 @@ function rotate(err, stats) {
 	
 	var hp = activate(advice.addInactive.name);
 	hp = deactivate(advice.removeActive.name, hp.hosts);
-	writeHosts(hp.hosts);
+	writeHosts(hp.hosts);	// FIXME: move storage to higher level
 	console.log('replaced ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since);
 }
 
@@ -244,23 +313,26 @@ function getRotateAdvice(stats) {
 	for (var i in summaries.inactiveHosts) { // get oldest inactive host to activate
 		var host = summaries.inactiveHosts[i];
 		if (verbose) {
-			console.log('addInactive', i + ' err: ' + hostSummaries[i].errorWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
+			if (!hostSummaries[i]) {
+				console.log('addInactive', i + ' no reports');
+			} else {
+				console.log('addInactive', i + ' err: ' + hostSummaries[i].errorWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
 					+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt))) : 'null');
+			}
 		}
 		if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
 			var rec = hostSummaries[i];
 
-			if (rec.errorWeight < 1) {
+			if (rec && rec.errorWeight < 1) { // it has had reports and they are perfect
 				addInactive = { name : i, stats : host};
 				if (verbose) {
 					console.log("candidate", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
 			} else {
-				if (!lowestError || rec.errorWeight < lowestError.errorWeight) {
+				if (!lowestError || (rec && rec.errorWeight < lowestError.errorWeight)) {	// it has had reports and they are not the worst
 					console.log('adding lowest errored host');
 					lowestError = i;
 				}
-				
 			}
 		}
 	}
@@ -325,7 +397,6 @@ function getHostSummaries(hosts) {
   }
   return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_EDGES};
 }
-	
 
 /** get host and updated hosts. retrieves hosts if not passed. **/
 
@@ -336,13 +407,13 @@ function getHostFromHosts(hostIn, hosts) {
 	for (var h in hosts) {
 		var host = hosts[h];
 		if (host.name_s === hostIn) {
-			return { hosts : hosts, host : host};
+			return { hosts : hosts, host : host, position: h};
 		}
 	}
-	throw "no such host: " + hostIn;
+	return { hosts : hosts};
 }
 
-function writeHosts(hosts) {
+function writeHosts(hosts, changedHost) {
 	validateConfiguration(hosts);
 	
 	fs.writeFileSync(hostsFile, JSON.stringify(hosts, null, 2));
@@ -358,10 +429,13 @@ function writeHosts(hosts) {
        , active_i: sum.active, inactive_i: sum.inactive, offline_i: sum.offline
        , date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
 	var docs = [summary];
-	var now = new Date().toISOString();
+
 	for (var i in hosts) {
 		var host = hosts[i];
-	
+		if (changedHost && !changedHost === host.name_s) {
+			continue;
+		}
+		
 		var doc = {};
 		for (var d in host) {
 			if (host.hasOwnProperty(d)) {
@@ -369,9 +443,9 @@ function writeHosts(hosts) {
 			}
 		}
 			
-		doc.date_dt = now;
+		doc.date_dt = NOW;
 		doc.class_s = 'host state';
-		doc.id = host.name_s + '/' + now;
+		doc.id = host.name_s + '/' + NOW;
 		docs.push(doc);
 	}
 	solrClient.add(docs, function(err,obj){
@@ -394,8 +468,8 @@ function writeFlatHosts(hosts, writeAll, file) {
 
 	var contents = writeAll ? '# complete list of hosts as of ' + new Date() + '\n' : "# do not edit this file directly, use edgemanage instead\n";
 	for (var h in hosts) {
-		var line = null;
 		var host = hosts[h];
+		var line = null;
 		var name = host.name_s;
 		if (isActive(host) || writeAll) {
 			line = name;
@@ -463,6 +537,7 @@ function getStats(num, callback) {
 	
 		for (var r in results) {
 			var response = results[r].response;
+			
 			for (var d in response.docs) {	// parse host results
 			var doc = response.docs[d];
 			var utc = moment.utc(doc.tickDate_dt);
