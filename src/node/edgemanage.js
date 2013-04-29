@@ -4,8 +4,8 @@
 	
 GLOBAL.hostTestName = 'check_fail2ban';
 
-var defaultUnits = 'hours';
 var defaultPeriod = 10;
+var defaultUnits = 'hours';
 var TERMINAL_ERROR = 1400;
 var NOW = new Date().toISOString();
 
@@ -263,7 +263,7 @@ function advise(err, stats) {
 	if (advice.removeActive === null || advice.addInactive === null) {
 		throw "Can't advise" + JSON.stringify(advice);
 	}
-	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "replace ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since + '"'); 
+	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
 }
 
 function rotate(err, stats) {
@@ -275,7 +275,7 @@ function rotate(err, stats) {
 	var hp = activate(advice.addInactive.name);
 	hp = deactivate(advice.removeActive.name, hp.hosts);
 	writeHosts(hp.hosts);	// FIXME: move storage to higher level
-	console.log('replaced ' + advice.removeActive.name + ' ' + advice.removeActive.stats.since +  ' w ' + advice.addInactive.name + ' ' + advice.addInactive.stats.since);
+	console.log(advice.summary);
 }
 
 /** utilities **/
@@ -291,6 +291,8 @@ function getRotateAdvice(stats) {
 	
 	var removeActive;
 	var addInactive;
+	var removeReason;
+	var addReason;
 	var highestError = null;
 	
 	for (var i in summaries.activeHosts) { // get oldest active host to deactivate
@@ -304,11 +306,13 @@ function getRotateAdvice(stats) {
 		if (rec && rec.errorWeight > 0 && (!highestError || rec.errorWeight > highestError.errorWeight)) {	// remove edge with highest error
 			removeActive = { name : i, stats : host};
 			highestError = rec;
+			removeReason = 'error (' + rec.errorWeight + ')';
 			if (verbose) {
 				console.log('remove candidate; error:', rec.errorWeight);
 			}
 		} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	// or if no errors, longest time
 			removeActive = { name : i, stats : host};
+			removeReason = 'time';
 			if (verbose) {
 				console.log('remove candidate; time:', moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 			}
@@ -333,12 +337,16 @@ function getRotateAdvice(stats) {
 
 			if (rec && rec.errorWeight < 1) { // it has had reports and they are perfect
 				addInactive = { name : i, stats : host};
+				addReason = 'time';
 				if (verbose) {
 					console.log("candidate; time: ", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
 			} else {
 				if (!lowestError || (rec && rec.errorWeight < lowestError.errorWeight)) {	// it has had reports and they are not the worst
-					console.log('remove candidate; lowest errored host:', rec.errorWeight);
+					if (verbose) {
+						console.log('lowest errored host:', rec ? rec.errorWeight : 'no records');
+					}
+						
 					lowestError = i;
 				}
 			}
@@ -346,10 +354,12 @@ function getRotateAdvice(stats) {
 	}
 	
 	if (!addInactive && lowestError && lowestError.erroWeight < TERMINAL_ERROR) {
+		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
 	
-	return {removeActive : removeActive, addInactive : addInactive};
+	return {removeActive : removeActive, addInactive : addInactive, removeReason : removeReason, addReason : addReason
+		, summary : 'replaced ' + removeActive.name + ' ' + removeActive.stats.since +  ' [' + removeReason + '] w ' + addInactive.name + ' ' + addInactive.stats.since + ' [' + addReason + ']'};
 }
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
