@@ -291,6 +291,7 @@ function getRotateAdvice(stats) {
 	
 	var removeActive;
 	var addInactive;
+	var highestError = null;
 	
 	for (var i in summaries.activeHosts) { // get oldest active host to deactivate
 		var host = summaries.activeHosts[i];
@@ -298,11 +299,18 @@ function getRotateAdvice(stats) {
 			console.log('removeActive', i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
 					+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
 		}
-			
-		if (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0)) {
+		var rec = hostSummaries[i];
+		
+		if (rec && rec.errorWeight > 0 && (!highestError || rec.errorWeight > highestError.errorWeight)) {	// remove edge with highest error
+			removeActive = { name : i, stats : host};
+			highestError = rec;
+			if (verbose) {
+				console.log('remove candidate; error:', rec.errorWeight);
+			}
+		} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	// or if no errors, longest time
 			removeActive = { name : i, stats : host};
 			if (verbose) {
-				console.log("candidate", moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+				console.log('remove candidate; time:', moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 			}
 		}
 	}
@@ -326,11 +334,11 @@ function getRotateAdvice(stats) {
 			if (rec && rec.errorWeight < 1) { // it has had reports and they are perfect
 				addInactive = { name : i, stats : host};
 				if (verbose) {
-					console.log("candidate", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+					console.log("candidate; time: ", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
 			} else {
 				if (!lowestError || (rec && rec.errorWeight < lowestError.errorWeight)) {	// it has had reports and they are not the worst
-					console.log('adding lowest errored host');
+					console.log('remove candidate; lowest errored host:', rec.errorWeight);
 					lowestError = i;
 				}
 			}
