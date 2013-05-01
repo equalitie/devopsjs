@@ -42,13 +42,12 @@ program
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-g, --advice [' + defaultPeriod + ']', 'rotation advice [10]')
-  .option('-r, --rotate [' + defaultPeriod + ']', 'do auto-rotation [10]')
+  .option('-g, --advice [' + defaultUnits + ']', 'rotation advice [' + defaultPeriod + ']')
+  .option('-r, --rotate [' + defaultUnits + ']', 'do auto-rotation [' + defaultPeriod + ']')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host> [period]', 'query host test results')
   .option('-v --verbose', 'verbose output')
   .option('--writeall <file>', 'write all hosts to a flat file')
-  .option('-z, --zonegen', 'execute zongene script')
   .option('-s --stats', 'current statistics')
 
   .option('--override', 'override validation error')
@@ -130,6 +129,10 @@ if (program.testhost) {
 	check.checkEdge(program.testhost, test, GLOBAL.hostTestName, utils.getTick(), function(res) {
 		console.log(res);
 	});
+}
+
+if (program.query) {
+	console.log(getHostSummaries());
 }
 
 if (program.stats) {
@@ -359,7 +362,7 @@ function getRotateAdvice(stats) {
 	}
 	
 	return {removeActive : removeActive, addInactive : addInactive, removeReason : removeReason, addReason : addReason
-		, summary : 'replaced ' + removeActive.name + ' ' + removeActive.stats.since +  ' [' + removeReason + '] w ' + addInactive.name + ' ' + addInactive.stats.since + ' [' + addReason + ']'};
+		, summary : 'replace ' + removeActive.name + ' ' + removeActive.stats.since +  ' [' + removeReason + '] w ' + addInactive.name + ' ' + addInactive.stats.since + ' [' + addReason + ']'};
 }
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
