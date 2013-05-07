@@ -6,7 +6,7 @@ GLOBAL.hostTestName = 'check_fail2ban';
 
 var defaultPeriod = 10;
 var defaultUnits = 'hours';
-var TERMINAL_ERROR = 1400;
+var errorthreshold = 1400;	//threshold for errored host
 var NOW = new Date().toISOString();
 
 var configBase;
@@ -22,8 +22,11 @@ try {
 	throw 'Could not require localConfig.js. Define DEVOPSCONFIG or run this program from its parent directory.';
 }
 
+if (!GLOBAL.CONFIG.minActive) {
+	throw "minActive not defined";
+}
+
 var flatHostsFile = configBase + GLOBAL.CONFIG.flatHostsFile;
-GLOBAL.MIN_EDGES = GLOBAL.CONFIG.minEdges || 6;
 
 var hostsFile = configBase + 'hosts.json';
 
@@ -356,7 +359,7 @@ function getRotateAdvice(stats) {
 		}
 	}
 	
-	if (!addInactive && lowestError && lowestError.erroWeight < TERMINAL_ERROR) {
+	if (!addInactive && lowestError && lowestError.erroWeight < errorthreshold) {
 		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
@@ -367,11 +370,25 @@ function getRotateAdvice(stats) {
 
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
 	var stats = getHostSummaries(hosts);
-	if (stats.active < GLOBAL.MIN_EDGES) {
+	if (stats.active < GLOBAL.CONFIG.minActive) {
 		if (program.override) {
 			console.log("overridding required hosts");
 		} else {
-			throw "not enough available hosts; " + stats.active + ' (required: ' + GLOBAL.MIN_EDGES + ')';
+			throw "not enough active hosts; " + stats.active + ' (required: ' + GLOBAL.CONFIG.minActive + ')';
+		}
+	}
+	if (GLOBAL.CONFIG.constantActive && stats.active != GLOBAL.CONFIG.constantActive) {
+		if (program.override) {
+			console.log("overridding required constant active");
+		} else {
+			throw "active hosts not required number; " + stats.active + ' (required: ' + GLOBAL.CONFIG.constantActive + ')';
+		}
+	}
+	if (GLOBAL.CONFIG.minInactive  && stats.inactive < GLOBAL.CONFIG.minInactive) {
+		if (program.override) {
+			console.log("overridding required inactive");
+		} else {
+			throw "not enough inactive hosts; " + stats.inactive + ' (required: ' + GLOBAL.CONFIG.minInactive + ')';
 		}
 	}
 }
@@ -416,7 +433,7 @@ function getHostSummaries(hosts) {
 		inactiveHosts[hosts[h].name_s] = { inactive_dt : host.inactive_dt, since : moment(host.inactive_dt).fromNow(), comment : hosts[h].comment_s };
 	}
   }
-  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.MIN_EDGES};
+  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.CONFIG.minActive};
 }
 
 /** get host and updated hosts. retrieves hosts if not passed. **/
@@ -580,7 +597,7 @@ function getStats(num, callback) {
 				maxCount = hostSummary['resultCount'];
 	        }
 			if (doc.error_t) {
-				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases based on time; recent is ~1400 - TERMINAL_ERROR
+				var w = Math.round(moment().diff(doc['tickDate_dt']) / 10000);	// decreases based on time; recent is ~1400 - errorthreshold
 				if (verbose) {
 					console.log(host + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' errorWeight', w);
 				}
