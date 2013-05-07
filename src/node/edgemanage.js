@@ -26,7 +26,10 @@ if (!GLOBAL.CONFIG.minActive) {
 	throw "minActive not defined";
 }
 
-var flatHostsFile = configBase + GLOBAL.CONFIG.flatHostsFile;
+var flatHostsFile = null;
+if (GLOBAL.CONFIG.flatHostsFile) {
+	flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : configBase) + GLOBAL.CONFIG.flatHostsFile;
+}	
 
 var hostsFile = configBase + 'hosts.json';
 
