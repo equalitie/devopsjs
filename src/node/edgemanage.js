@@ -73,6 +73,10 @@ program.parse(process.argv);
 
 var verbose = program.verbose === true;
 
+if (verbose) {
+	console.log('configBase is "' + configBase + '", flatHostsFile is "' + flatHostsFile + '"');
+}
+
 if (program.add) {
 	mustComment();
 	var hp = addHost(program.add);
