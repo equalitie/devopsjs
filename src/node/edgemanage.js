@@ -540,8 +540,14 @@ function isOffline(host) {
 	return host.offline_b;
 }
 
+/** 
+ * 
+ * Host is eligble to be active
+ * 
+ */
+
 function isAvailable(host) {
-	return (!isInactive(host) && !isOffline(host));
+	return (!isOffline(host));
 }
 
 function getStats(num, callback) {
