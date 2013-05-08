@@ -11,7 +11,7 @@ var NOW = new Date().toISOString();
 
 var configBase;
 if (process.env.DEVOPSCONFIG) {
-	configbase = process.env.DEVOPSCONFIG;
+	configBase = process.env.DEVOPSCONFIG;
 } else {
 	configBase = process.cwd() + '/config/';
 }	
@@ -19,7 +19,7 @@ if (process.env.DEVOPSCONFIG) {
 try {
 	require(configBase + '/localConfig.js');
 } catch (e) {
-	throw 'Could not require "' + configBase + '/localConfig.js" Define DEVOPSCONFIG or run this program from its parent directory.';
+	throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
 }
 
 if (!GLOBAL.CONFIG.minActive) {
