@@ -19,7 +19,7 @@ if (process.env.DEVOPSCONFIG) {
 try {
 	require(configBase + '/localConfig.js');
 } catch (e) {
-	throw 'Could not require localConfig.js. Define DEVOPSCONFIG or run this program from its parent directory.';
+	throw 'Could not require "' + configBase + '/localConfig.js" Define DEVOPSCONFIG or run this program from its parent directory.';
 }
 
 if (!GLOBAL.CONFIG.minActive) {
