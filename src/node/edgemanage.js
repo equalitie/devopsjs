@@ -17,7 +17,7 @@ if (process.env.DEVOPSCONFIG) {
 }	
 
 try {
-	require(configBase + '/localConfig.js');
+	require(configBase + 'localConfig.js');
 } catch (e) {
 	throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
 }
