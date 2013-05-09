@@ -197,7 +197,7 @@ function removeHost(removeHost, hosts, writeCallback) {
 	return hp;
 }
 
-function setOnline(hostIn) {
+function setOnline(hostIn, hosts) {
 	var hp = getHostFromHosts(hostIn, hosts);
 	if (!hp.host) {
 		throw "no such host: " + hostIn;
