@@ -48,8 +48,11 @@ program
   .option('-f, --offline <host>', 'offline for maintenance')
   .option('-a, --activate <host>', ' make host active')
   .option('-d, --deactivate <host>', 'make host inactive')
-  .option('-g, --advice [' + defaultUnits + ']', 'rotation advice [' + defaultPeriod + ']')
-  .option('-r, --rotate [' + defaultUnits + ']', 'do auto-rotation [' + defaultPeriod + ']')
+  .option('-g, --advice', 'rotation advice')
+  .option('-r, --rotate', 'do auto-rotation')
+  .option('--rin <host>', 'auto-rotate in host')
+  .option('--rout <host>', 'auto-rotate out host')
+  .option('--timespan <hours>', 'set timespan for advice/rotate [' + defaultPeriod + ' ' + defaultUnits + ']')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host> [period]', 'query host test results')
   .option('-v --verbose', 'verbose output')
@@ -122,13 +125,25 @@ if (program.deactivate) {
 }
 
 if (program.advice) {
-	var num = program.advice === true ? defaultPeriod : program.advice;
+	var num = program.timespan ? program.timespan : defaultPeriod;
 	getStats(num, advise);
 }
 
 if (program.rotate) {
 	mustComment();
-	var num = program.rotate === true ? defaultPeriod : program.rotate;
+	var num = program.timespan ? program.timespan : defaultPeriod;
+	getStats(num, rotate);
+}
+
+if (program.rin) {
+	mustComment();
+	var num = program.timespan ? program.timespan : defaultPeriod;
+	getStats(num, rotate);
+}
+
+if (program.rout) {
+	mustComment();
+	var num = program.timespan ? program.timespan : defaultPeriod;
 	getStats(num, rotate);
 }
 
@@ -306,28 +321,36 @@ function getRotateAdvice(stats) {
 	var addInactive;
 	var removeReason;
 	var addReason;
+
 	var highestError = null;
-	
 	for (var i in summaries.activeHosts) { // get oldest active host to deactivate
 		var host = summaries.activeHosts[i];
-		if (verbose) {
-			console.log('removeActive', i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
-					+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
-		}
-		var rec = hostSummaries[i];
-		
-		if (rec && rec.errorWeight > 0 && (!highestError || rec.errorWeight > highestError.errorWeight)) {	// remove edge with highest error
-			removeActive = { name : i, stats : host};
-			highestError = rec;
-			removeReason = 'error (' + rec.errorWeight + ')';
-			if (verbose) {
-				console.log('remove candidate; error:', rec.errorWeight);
+		if (program.rout) {
+			if (program.rout === i) {
+				removeActive = { name : i, stats : host};
+				removeReason = 'request out';
 			}
-		} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	// or if no errors, longest time
-			removeActive = { name : i, stats : host};
-			removeReason = 'time';
+		} else {
+			
 			if (verbose) {
-				console.log('remove candidate; time:', moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+				console.log('removeActive', i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
+						+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
+			}
+			var rec = hostSummaries[i];
+			
+			if (rec && rec.errorWeight > 0 && (!highestError || rec.errorWeight > highestError.errorWeight)) {	// remove edge with highest error
+				removeActive = { name : i, stats : host};
+				highestError = rec;
+				removeReason = 'error (' + rec.errorWeight + ')';
+				if (verbose) {
+					console.log('remove candidate; error:', rec.errorWeight);
+				}
+			} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	// or if no errors, longest time
+				removeActive = { name : i, stats : host};
+				removeReason = 'time';
+				if (verbose) {
+					console.log('remove candidate; time:', moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+				}
 			}
 		}
 	}
@@ -337,30 +360,38 @@ function getRotateAdvice(stats) {
 	
 	for (var i in summaries.inactiveHosts) { // get oldest inactive host to activate
 		var host = summaries.inactiveHosts[i];
-		if (verbose) {
-			if (!hostSummaries[i]) {
-				console.log('addInactive', i + ' no reports');
-			} else {
-				console.log('addInactive', i + ' err: ' + hostSummaries[i].errorWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
-					+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt))) : 'null');
-			}
-		}
-		if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
-			var rec = hostSummaries[i];
-
-			if (rec && rec.errorWeight < 1) { // it has had reports and they are perfect
+		if (program.rin) {
+			if (program.rin === i) {
 				addInactive = { name : i, stats : host};
-				addReason = 'time';
-				if (verbose) {
-					console.log("candidate; time: ", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+				addReason = 'request in';
+			}
+		} else {
+		
+			if (verbose) {
+				if (!hostSummaries[i]) {
+					console.log('addInactive', i + ' no reports');
+				} else {
+					console.log('addInactive', i + ' err: ' + hostSummaries[i].errorWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
+						+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt))) : 'null');
 				}
-			} else {
-				if (!lowestError || (rec && rec.errorWeight < lowestError.errorWeight)) {	// it has had reports and they are not the worst
+			}
+			if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
+				var rec = hostSummaries[i];
+	
+				if (rec && rec.errorWeight < 1) { // it has had reports and they are perfect
+					addInactive = { name : i, stats : host};
+					addReason = 'time';
 					if (verbose) {
-						console.log('lowest errored host:', rec ? rec.errorWeight : 'no records');
+						console.log("candidate; time: ", moment(removeActive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 					}
-						
-					lowestError = i;
+				} else {
+					if (!lowestError || (rec && rec.errorWeight < lowestError.errorWeight)) {	// it has had reports and they are not the worst
+						if (verbose) {
+							console.log('lowest errored host:', rec ? rec.errorWeight : 'no records');
+						}
+							
+						lowestError = i;
+					}
 				}
 			}
 		}
@@ -369,6 +400,22 @@ function getRotateAdvice(stats) {
 	if (!addInactive && lowestError && lowestError.erroWeight < errorthreshold) {
 		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
+	}
+	
+	if (program.rin && !addInactive) {
+		throw "Can't rotate in " + program.rin;
+	}
+	
+	if (program.rout && !removeActive) {
+		throw "Can't rotate out " + program.rout;
+	}
+	
+	if (!removeActive) {
+		throw "no host to inactivate";
+	}
+	
+	if (!addInactive) {
+		throw "no host to activate";
 	}
 	
 	return {removeActive : removeActive, addInactive : addInactive, removeReason : removeReason, addReason : addReason
