@@ -49,20 +49,24 @@ addHost : function(newHost, hosts) {
 
 /**
  * 
- * capture the remove event with the callback
+ * log the remove event with the callback
  * 
  */
-removeHost : function(removeHost, hosts, writeCallback) {
-	var hp = getHostFromHosts(removeHost, hosts);
+removeHost : function(remHost, hosts, writeCallback) {
+	var hp = getHostFromHosts(remHost, hosts);
 	if (!hp.host) {
-		throw "host doesn't' exist: " + removeHost;
+		throw "host doesn't' exist: " + remHost;
 	}
 	hp.host.removed_dt = NOW;
-	writeCallback(hp);
+	
+	if (writeCallback) {
+		writeCallback(hp);
+	}
+		
 	var newHosts = [];
 	for (var i in hp.hosts) {
 		var host = hp.hosts[i];
-		if (!(host.name_s === removeHost)) {
+		if (!(host.name_s === remHost)) {
 			newHosts.push(host);
 		}
 	}
@@ -249,6 +253,10 @@ writeHosts : function(hosts, changedHost) {
 
 getHostSummaries : function() {
 	return getHostSummaries();
+},
+
+getHosts : function() {
+	return getHosts();
 }
 
 }
@@ -258,7 +266,7 @@ hosts.config = config;
 module.exports = hosts;
 
 /**
-**	Utilities
+**	Implementations
 **
 **/
 	
@@ -488,15 +496,19 @@ function deactivate(hostIn, hosts) {
  */
 
 function getHosts() {
-	return require(hostsFile);
+	return require(config.hostsFile);
 }
-
 
 /** get host and updated hosts. retrieves hosts if not passed. * */
 
 function getHostFromHosts(hostIn, hosts) {
 	if (!hosts) {
-		hosts = require(config.hostsFile);
+		try {
+			hosts = require(config.hostsFile);
+		} catch (e) {
+			throw 'can\'t require ' + config.hostsFile + ' from ' + process.cwd();
+		}
+		
 	}
 	for (var h in hosts) {
 		var host = hosts[h];
