@@ -20,6 +20,6 @@
     "queue-async": "latest",
     "moment": "latest"
   }, "scripts": {
-    "test": "mocha test"
+    "test": "make test"
   }
 }
