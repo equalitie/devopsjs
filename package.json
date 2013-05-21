@@ -5,9 +5,12 @@
   "description": "dev & ops with widgets using nodejs, smw, cucumber bdd, nrpe and solr",
   "dependencies": {
     "cucumber": "latest",
+    "mocha": "latest",
+    "chai": "latest",
     "commander": "latest",
     "line-reader": "latest",
     "nodemw": "latest",
+    "colors": "latest",
     "zombie": "latest",
     "duplexer": "0.0.x",
     "require-analyzer": "0.5.x",
@@ -16,5 +19,7 @@
     "solr-client": "latest",
     "queue-async": "latest",
     "moment": "latest"
+  }, "scripts": {
+    "test": "mocha test"
   }
 }
