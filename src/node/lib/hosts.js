@@ -2,7 +2,6 @@ var fs = require('fs');
 var utils = require('./util.js');
 var queue = require('queue-async');
 var moment = require('moment');
-var solr = require('solr-client');
 var colors = require('colors');
 var solrClient;
 var verbose = 0;
@@ -198,6 +197,7 @@ getStats : function(num, callback) {
 				maxCount = hostSummary['resultCount'];
 	        }
 			var worry = 0;
+			console.log(doc);
 			var timeAgo = moment(doc['tickDate_dt']).fromNow();
 			var timeWeight = Math.round(moment().diff(doc['tickDate_dt']) / 10000);
 			if (doc.error_t) {
@@ -245,6 +245,10 @@ mustComment : function() {
 
 writeHosts : function(hosts, changedHost) {
 	return writeHosts(hosts, changedHost);
+},
+
+getHostSummaries : function() {
+	return getHostSummaries();
 }
 
 }
@@ -350,7 +354,7 @@ function getRotateAdvice(stats) {
 		}
 	}
 	
-	if (!addInactive && lowestError && lowestError.erroWeight < errorthreshold) {
+	if (!addInactive && lowestError && lowestError.erroWeight < config.errorthreshold) {
 		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
