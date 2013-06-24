@@ -1,29 +1,18 @@
-var bot = require('nodemw');
 var fs = require('fs');
 var utils = require( "./lib/util.js");
+var semwiki = require("./lib/semwiki.js");
 
-var wiki = getWiki();
+var wiki = semwiki.getWiki("../../"+utils.confFile, processTests);
 
-function getWiki() {
-  require("../../"+utils.confFile);
-  var wikiConfig = GLOBAL.CONFIG.wikiConfig;
-
-  var wikibot = new bot(wikiConfig);
-
-  wikibot.logIn(function() {
-    processTests(wikibot);
-  });
-}
-
-function processTests(wikibot) {
+function processTests() {
 
   var params = {
     action: 'ask',
     query: '[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item type'
   };
 
-	wikibot.api.call(params, function(info, next, data) {
-processTestItems(data);
+	semwiki.call(params, function(info, next, data) {
+    processTestItems(data);
   });
 
 //  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item page|sort=Test item type"}, processTestItems);
@@ -31,9 +20,7 @@ processTestItems(data);
 
 function processTestItems(data) {
   var features = {};
-debugger;
 
-var i = 0;
   for (var r in data.query.results) {
 //    var b = data.info.results[r]['printouts'];
     var b = data.query.results[r]['printouts'];
