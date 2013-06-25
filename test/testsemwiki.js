@@ -29,7 +29,7 @@ setup(function(done){
     });
 	});
   test("val", function testVal() {
-    var ticket = {"printouts":{"Assigned to":[{"fulltext":"User:Bot","fullurl":"https://wiki.equalit.ie/wiki/User:Bot"}],"Contact":[{"fulltext":"User:DavidM","fullurl":"https://wiki.equalit.ie/wiki/User:DavidM"}],"Date created":["1372032000"],"Description":["Ticket for testing bot."],"Ticket for":[],"Importance":["0-Low"],"Project":[{"fulltext":"Automation","fullurl":"https://wiki.equalit.ie/wiki/Automation"}],"Ticket status":["Created"],"Validator":[{"fulltext":"User:DavidM","fullurl":"https://wiki.equalit.ie/wiki/User:DavidM"}],"Modification date":["1372086131"]},"fulltext":"Ticket:Be a test bot","fullurl":"https://wiki.equalit.ie/wiki/Ticket:Be_a_test_bot"}
+    var ticket = {"status":["Validate"],"assignedTo":["User:Rodney Mosley","User:DavidM"],"validator":["User:DavidM"],"contact":["User:DavidM"],"dateRequired":[],"lastUpdate":["1364601600"],"importance":["0-Low"],"modificationDate":["1364661874"],"name":"Ticket:Research/System management","link":"https://wiki.equalit.ie/wiki/Ticket:Research/System_management"}
   expect(semwiki.val(ticket, 'Modification date')).to.be.notnull;
   });
 

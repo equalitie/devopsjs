@@ -1,6 +1,10 @@
 var semwiki = require('./lib/semwiki.js');
 var queue = require('queue-async');
 
+var doSend = true;
+if (!doSend) {
+  var nomo = require('node-monkey').start();
+}
 var configBase;
 if (process.env.DEVOPSCONFIG) {
   configBase = process.env.DEVOPSCONFIG;
@@ -9,6 +13,9 @@ if (process.env.DEVOPSCONFIG) {
 }
 
 var toSend = []; // buffered messages
+var allUsers; // cached users
+var emailFrom = GLOBAL.CONFIG.notify.emailFrom;
+var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
 try {
   require(configBase + 'localConfig.js');
@@ -27,6 +34,12 @@ function allTickets() {
     var getTicketsQueue = queue();
 
     getTicketsQueue.defer(function(callback) {
+      semwiki.getUsers(function(users) {
+        allUsers = users;
+        callback();
+      });
+    });
+    getTicketsQueue.defer(function(callback) {
       semwiki.getTickets('[[Category:Unresolved tickets]]', function(tickets) {
         for (var ticket in tickets) {
           addNotify(tickets[ticket]);
@@ -35,7 +48,6 @@ function allTickets() {
       });
     });
     getTicketsQueue.awaitAll(function(err) {
-console.log('send', toSend.length);
       sendMail();
     });
   });
@@ -47,78 +59,97 @@ function addNotify(ticket) {
     assignedTo : semwiki.val(ticket, 'Assigned to'),
     validator : semwiki.val(ticket, 'Validator'),
     contact : semwiki.val(ticket, 'Contact'),
+    dateRequired : semwiki.date(ticket, 'Date required'),
+    lastUpdate : semwiki.date(ticket, 'Last update'),
     importance : semwiki.val(ticket, 'Importance'),
-    modificationDate : semwiki.val(ticket, 'Modification date'),
+    modificationDate : semwiki.date(ticket, 'Modification date'),
     name : ticket.fulltext,
     link : ticket.fullurl,
+    tags: []
   }
-console.log(jt.name, jt.status);
+  if (jt.dateRequired[0] && jt.dateRequired[0].getTime() < new Date().getTime()) {
+    jt.tags.push('OVERDUE');
+  }
 
-  addMail(jt);
-}
+  jt.assignedTo.forEach(function (u) {
+    var user = getUser(u);
+    if (user) {
+      semwiki.val(user, 'Current activity').forEach(function (a) { if (a == jt.name) jt.tags.push('Current'); });
+      semwiki.val(user, 'Planned activity').forEach(function (a) { if (a == jt.name) jt.tags.push('Planned'); });
+    } else {
+      console.error("Missing user " + u);
+    }
+  });
 
-function addMail(jt) {
   toSend.push(jt);
 }
 
 function sendMail() {
-  var validate = {};
-  var update = {};
+  var action = {};
   var cc = {};
+  var actionTitle = '<h2>Action items</h2><br />\n';
+  var ccTitle = '<br />\n<h2>Watching items</h2><br />\n';
+console.log('LEN', toSend.length);
 
   toSend.forEach(function(jt) { // first break out if it's an action item or watching item
-    var message = '* <a href="' + jt.link + '">'+jt.name + '</a> <b>' + jt.importance + '</b> '; 
-    var actionTitle = '== Action items ==<br />\n';
-    var ccTitle = '<br />\n== Watching items ==<br />\n';
+    var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     if (jt.status == 'Validate') {
       jt.validator.forEach(function (v) {
-        validate[v] = (validate[v] || actionTitle) + message + ' <i>Validate</i><br />\n';
+        action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
       });
       jt.assignedTo.forEach(function(a) {
-       cc[a] = (cc[a] || actionTitle) + message + ' <i>Waiting for validation from ' + jt.validator + '</i><br />\n';
+       cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
       });
     } else {
       jt.assignedTo.forEach(function (a) {
-        update[a] = (update[a] || ccTitle) + message + ' <i>Update</i><br />\n';
+        action[a] = (action[a] || actionTitle) + '* <span style="font-style:italic; color: green">Update</span> ' + message + '<br />\n';
       });
     }
   });
-  var m = {}; // then create message texts in appropriate order
-  for (var v in validate) {
-    var message = validate[v];
-    m[v] = (m[v] || '') + message;
-  }
-console.log('<br />\n***M', m);
-  for (var v in update) {
-    var message = update[v];
-    m[v] = (m[v] || '') + message;
+  var m = {}; // then create grouped message texts in appropriate order
+  for (var v in action) {
+    m[v] = (m[v] || '') + action[v];
   }
   for (var v in cc) {
-    var message = cc[v];
-    m[v] = (m[v] || '') + message;
+    m[v] = (m[v] || '') + cc[v];
   }
   var nodemailer = require("nodemailer");
 
   var transport = nodemailer.createTransport("Sendmail", "/usr/sbin/sendmail");
 
   for (var u in m) {
-    console.log('<br />\n<br />\n***', u, JSON.stringify(m[u]));
-    var mailOptions = {
-        from: "eqwiki mailer <webs@equalit.ie>",
-        to: u + " <vid@zooid.org>",
-        subject: "Wiki ticket notifications", 
-        text: m[u].replace(/<.*?>/g, ''), // plaintext body
-        html: m[u] // html body
+    var addy = null, user = getUser(u);
+    if (user) {
+      addy = semwiki.val(user, 'Contact address')[0];
     }
+    console.log('\n\n***', u, addy, JSON.stringify(m[u]));
+    if (addy) {
+      var mailOptions = {
+          from: emailFrom,
+          to: u.replace(/^User:/, '') + ' <' + addy + '>',
+          subject: emailSubject,
+          text: m[u].replace(/<.*?>/g, ''),
+          html: m[u]
+      }
 
-    transport.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-        }else{
-            console.log("Message sent: " + response.message);
-        }
-    });
+      if (doSend) {
+        transport.sendMail(mailOptions, function(error, response) {
+          if (error){
+            console.error(error);
+          }
+        });
+      }
+    } else {
+      console.error('missing Contact address for ' + u);
+    }
   }
-  transport.close(); // shut down the connection pool, no more messages
+  transport.close(); 
+}
+
+function getUser(u) {
+  if (u.indexOf('User:')< 0) {
+    u = 'User:'+u;
+  }
+  return allUsers[u];
 }
 
