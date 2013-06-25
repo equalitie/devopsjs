@@ -38,7 +38,7 @@ var hosts = {
 addHost : function(newHost, hosts) {
 	var hp = getHostFromHosts(newHost, hosts);
 	if (hp.host) {
-		throw "host already exists: " + newHost;
+		throw Error("host already exists: " + newHost, hosts);
 	}
 
 	var host = { name_s : newHost, added_dt : NOW, lastUpdate_dt : NOW, comment_s : config.program.comment};
@@ -257,6 +257,10 @@ getHostSummaries : function() {
 
 getHosts : function() {
 	return getHosts();
+}, 
+
+writeHostsJson : function(hosts) {
+  return writeHostsJson(hosts);
 }
 
 }
@@ -519,10 +523,14 @@ function getHostFromHosts(hostIn, hosts) {
 	return { hosts : hosts};
 }
 
+function writeHostsJson(hosts) {
+  fs.writeFileSync(config.hostsFile, JSON.stringify(hosts, null, 2));
+}
+
 function writeHosts(hosts, changedHost) {
 	validateConfiguration(hosts);
 	
-	fs.writeFileSync(config.hostsFile, JSON.stringify(hosts, null, 2));
+	writeHostsJson(hosts);
 	if (config.flatHostsFile) {
 		if (verbose) {
 			console.log('writing to ' + config.flatHostsFile);
