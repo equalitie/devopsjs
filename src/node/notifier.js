@@ -14,14 +14,15 @@ if (process.env.DEVOPSCONFIG) {
 
 var toSend = []; // buffered messages
 var allUsers; // cached users
-var emailFrom = GLOBAL.CONFIG.notify.emailFrom;
-var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
 try {
   require(configBase + 'localConfig.js');
 } catch (e) {
   throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
 }
+
+var emailFrom = GLOBAL.CONFIG.notify.emailFrom;
+var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
 allTickets();
 
