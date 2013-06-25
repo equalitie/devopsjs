@@ -12,12 +12,14 @@
     "nodemw": "latest",
     "colors": "latest",
     "zombie": "latest",
+    "english-time": "latest",
     "duplexer": "0.0.x",
     "require-analyzer": "0.5.x",
     "JSONStream": "0.4.x",
     "request": "2.14.x",
     "solr-client": "latest",
     "queue-async": "latest",
+    "nodemailer": "latest",
     "moment": "latest"
   }, "scripts": {
     "test": "make test"

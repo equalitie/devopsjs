@@ -90,7 +90,6 @@ function sendMail() {
   var cc = {};
   var actionTitle = '<h2>Action items</h2><br />\n';
   var ccTitle = '<br />\n<h2>Watching items</h2><br />\n';
-console.log('LEN', toSend.length);
 
   toSend.forEach(function(jt) { // first break out if it's an action item or watching item
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
@@ -123,7 +122,7 @@ console.log('LEN', toSend.length);
     if (user) {
       addy = semwiki.val(user, 'Contact address')[0];
     }
-    console.log('\n\n***', u, addy, JSON.stringify(m[u]));
+//    console.log('\n\n***', u, addy, JSON.stringify(m[u]));
     if (addy) {
       var mailOptions = {
           from: emailFrom,
