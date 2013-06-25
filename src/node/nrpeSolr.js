@@ -4,8 +4,20 @@ GLOBAL.exception = function(s) {
 
 var util=require('./lib/util.js')
 var program = require('commander');
+var queue = require('queue-async');
+var hostLib = require('./lib/hosts.js');
+var fs = require('fs');
 
-var hosts = require('../../config/hosts.json');
+var configBase;
+if (process.env.DEVOPSCONFIG) {
+  configBase = process.env.DEVOPSCONFIG;
+} else {
+  configBase = process.cwd() + '/config/';
+}
+
+var hosts = require(configBase + 'hosts.json');
+require(configBase + 'localConfig.js');
+
 var store = require('./lib/solrNagios.js');
 var nrpe = require('./lib/nrpe/check.js');
 
@@ -18,7 +30,11 @@ program
   .option('-s --save', 'write results (defaults to no if a check or host is specified')
   .parse(process.argv);
 
-var save = program.save || (!program.check && !program.host);
+var verbose = program.verbose === true;
+
+hostLib = hostLib.setConfig(program, configBase + 'hosts.json', verbose, require('solr-client'));
+var doResolve = true; // resolve edge's current cluster
+var doSave = program.save || (!program.check && !program.host);
 var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks(program.check ? program.check : null);
 
 for (var key in nrpeChecks) {
@@ -49,14 +65,27 @@ if (numChecks < 1) {
 	throw "No hosts";
 }
 
-if (save) {
-	commitEdgeSummary(hosts, tick, store);
+if (doSave) {
+  if (doResolve) {
+    var bareHosts = [];
+    hosts.forEach(function(h) { bareHosts.push(h.name_s); });
+    var nom = require('./lib/nomination.js');
+    nom.resolve(bareHosts, GLOBAL.CONFIG.dnets, function(r) {
+      var resolved = {};
+      hosts.forEach(function(host) {
+        resolved[host.name_s] = nom.getConfig(host.name_s);
+      });
+ 	    commitEdgeSummary(hosts, tick, store, resolved);
+    });
+  } else {
+ 	  commitEdgeSummary(hosts, tick, store);
+  }
 }
 
 for (var checkName in nrpeChecks) {
 	for (var i = 0; i < hosts.length; i++) {
 		var res = nrpe.checkEdge(hosts[i].name_s, nrpeChecks[checkName], checkName, tick, function(res) {
-			if (save) {
+			if (doSave) {
 				addResult(res);
 			} else {
 				console.log(res);
@@ -68,18 +97,26 @@ for (var checkName in nrpeChecks) {
 function addResult(doc) {
   docs.push(doc);
   if (docs.length == (numChecks * hosts.length)) {
-    console.log("Committing " + JSON.stringify(docs));
     store.commit(docs);
   }
 }
 
-function commitEdgeSummary(hosts, tick, store) {
+function commitEdgeSummary(hosts, tick, store, resolved) {
   var hostSummary = [];
-  var nomination = '';
+  
   for (var i = 0; i < hosts.length; i++) {
     var host = hosts[i];
-    hostSummary.push({id: host.name_s + "/" + tick.tickTime, class_s: 'host summary', name_s: host.name, nomination_s: nomination, rotatedOut_s: host.rotatedOut, offline_s: host.offline, tickDate_dt : tick.tickDate});
+    var lookup = resolved ? resolved[host.name_s] : '';
+    if (lookup && GLOBAL.CONFIG.domain) {
+      lookup = lookup.replace(GLOBAL.CONFIG.domain, '');
+    }
+    if (lookup != host.dnet_s) {
+      host.dnet_s = lookup;
+      host.dnetChange_dt = tick.tickDate;
+    }
+    hostSummary.push({id: host.name_s + "/" + tick.tickTime, class_s: 'host summary', name_s: host.name_s, dnet_s: lookup, rotatedOut_s: host.rotatedOut, offline_s: host.offline, tickDate_dt : tick.tickDate});
   }
   store.commit(hostSummary);
+  hostLib.writeHostsJson(hosts);
 }
 
