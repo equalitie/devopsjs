@@ -115,7 +115,7 @@ function sendMail() {
   }
   var nodemailer = require("nodemailer");
 
-  var transport = nodemailer.createTransport("Sendmail", "/usr/sbin/sendmail");
+  var transport = GLOBAL.CONFIG.notify.mailTransport;
 
   for (var u in m) {
     var addy = null, user = getUser(u);
