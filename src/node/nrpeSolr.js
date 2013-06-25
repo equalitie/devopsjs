@@ -106,12 +106,12 @@ function commitEdgeSummary(hosts, tick, store, resolved) {
   
   for (var i = 0; i < hosts.length; i++) {
     var host = hosts[i];
-    var lookup = resolved ? resolved[host.name_s] : '';
+    var lookup = resolved ? resolved[host.name_s] || 'none' : '';
     if (lookup && GLOBAL.CONFIG.domain) {
       lookup = lookup.replace(GLOBAL.CONFIG.domain, '');
     }
     if (lookup !== host.dnet_s) {
-      host.dnet_s = lookup || 'none';
+      host.dnet_s = lookup;
       host.dnetChange_dt = tick.tickDate;
     }
     hostSummary.push({id: host.name_s + "/" + tick.tickTime, class_s: 'host summary', name_s: host.name_s, dnet_s: lookup, rotatedOut_s: host.rotatedOut, offline_s: host.offline, tickDate_dt : tick.tickDate});
