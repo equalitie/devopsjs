@@ -35,13 +35,20 @@ var semwiki = {
   getTickets : function(spec, callback) {
     var params = {
       action: 'ask',
-      query: '[[Category:Ticket tracker]]' + spec + '|?Assigned to|?Contact|?Date created|?Description|?Ticket for|?Importance|?Project|?Ticket status|?Validator|?Last update|?Importance|?Modification date|sort=Importance|limit=5000'
+      query: spec + '|?Assigned to|?Contact|?Date created|?Date required|?Description|?Ticket for|?Importance|?Project|?Ticket status|?Validator|?Last update|?Importance|?Modification date|sort=Ticket status,Importance|order=desc,desc|limit=5000'
     };
 
     semwiki.call(params, function(info, next, data) {
       callback(data.query.results);
     });
 
+  },
+  date : function(result, field){
+    var ret = [];
+    result.printouts[field].forEach(function (v) {
+      ret.push(v > 0 ? new Date(v * 1000) : null);
+    });
+    return ret;
   },
   val : function(result, field){
     var ret = [];
