@@ -304,7 +304,7 @@ function getRotateAdvice(stats) {
 			
 			if (verbose) {
 				console.log('removeActive'.yellow, i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
-						+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
+						+ (moment(host.active_dt).diff(removeActive.stats.active_dt) / 10000)) : 'null');
 			}
 			var rec = hostSummaries[i];
 			
