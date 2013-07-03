@@ -4,9 +4,7 @@ GLOBAL.exception = function(s) {
 
 var util=require('./lib/util.js')
 var program = require('commander');
-var queue = require('queue-async');
 var hostLib = require('./lib/hosts.js');
-var fs = require('fs');
 
 var configBase;
 if (process.env.DEVOPSCONFIG) {
@@ -30,9 +28,7 @@ program
   .option('-s --save', 'write results (defaults to no if a check or host is specified')
   .parse(process.argv);
 
-var verbose = program.verbose === true;
-
-hostLib = hostLib.setConfig(program, configBase + 'hosts.json', verbose, require('solr-client'));
+hostLib = hostLib.setConfig(program, configBase + 'hosts.json', require('solr-client'));
 var doResolve = true; // resolve edge's current cluster
 var doSave = program.save || (!program.check && !program.host);
 var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks(program.check ? program.check : null);

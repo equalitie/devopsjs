@@ -22,8 +22,7 @@ exports.query = function(callback) {
 }
 
 exports.commit = function(docs) {
-	console.log("commiting " + docs.length + " docs");
-	docs.forEach(function(f) { console.log(f.id + " ");});
+//	docs.forEach(function(f) { console.log(f.id + " ");});
     solrClient.add(docs, function(err,obj){
         if(err){
 					console.log(solrClient);

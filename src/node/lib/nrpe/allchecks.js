@@ -52,7 +52,7 @@ exports.getChecks = function(filter) {
 		var ret = {};
 		for (var i in checks) {
 			if (i.match(filter)) {
-				ret = checks[i];
+				ret[i] = checks[i];
 			}
 		}
 		return ret;

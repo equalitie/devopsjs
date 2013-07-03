@@ -17,7 +17,6 @@ exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
 					status = r;
 				}
 			});	
-			
 		}
 		res.status_s = status;
 		if (aCheck.isError(error, stdout)) {

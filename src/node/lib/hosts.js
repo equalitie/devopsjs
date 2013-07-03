@@ -4,15 +4,16 @@ var queue = require('queue-async');
 var moment = require('moment');
 var colors = require('colors');
 var solrClient;
-var verbose = 0;
+var verbose = false;
 var NOW = new Date().toISOString()
 
 var config = { 
 	hostTestName : 'check_fail2ban',
 	defaultPeriod : 10,
 	defaultUnits : 'hours',
-	errorthreshold : 1400	// threshold for errored host
+	errorThreshold : 15000	// threshold for disqualified host
 }
+var worryVals = {OK : 0, WARNING : 5, CRITICAL : 20, UNKNOWN : 100, ERROR : 100};
 
 /**
  * 
@@ -26,242 +27,171 @@ var hosts = {
    * Set invocation configuration. You probably want to do this.
    * 
    */
-  setConfig : function(program, hostsFile, verbose, store) {
-	config.hostsFile = hostsFile;
-	config.program = program;
-	verbose = verbose;
-	solrClient = store.createClient(GLOBAL.CONFIG.solrConfig);
+  setConfig : function(program, hostsFile, store) {
+    config.hostsFile = hostsFile;
+    config.program = program;
+    verbose = program.verbose;
+    solrClient = store.createClient(GLOBAL.CONFIG.solrConfig);
 
-	return this;
- },
+    return this;
+  },
 
-addHost : function(newHost, hosts) {
-	var hp = getHostFromHosts(newHost, hosts);
-	if (hp.host) {
-		throw Error("host already exists: " + newHost, hosts);
-	}
+  addHost : function(newHost, hosts) {
+    var hp = getHostFromHosts(newHost, hosts);
+    if (hp.host) {
+      throw Error("host already exists: " + newHost, hosts);
+    }
 
-	var host = { name_s : newHost, added_dt : NOW, lastUpdate_dt : NOW, comment_s : config.program.comment};
-	hp.hosts.push(host);
-	hp.host = host;
-	return hp;
-},
+    var host = { name_s : newHost, added_dt : NOW, lastUpdate_dt : NOW, comment_s : config.program.comment};
+    hp.hosts.push(host);
+    hp.host = host;
+    return hp;
+  },
 
-/**
- * 
- * log the remove event with the callback
- * 
- */
-removeHost : function(remHost, hosts, writeCallback) {
-	var hp = getHostFromHosts(remHost, hosts);
-	if (!hp.host) {
-		throw "host doesn't' exist: " + remHost;
-	}
-	hp.host.removed_dt = NOW;
-	
-	if (writeCallback) {
-		writeCallback(hp);
-	}
-		
-	var newHosts = [];
-	for (var i in hp.hosts) {
-		var host = hp.hosts[i];
-		if (!(host.name_s === remHost)) {
-			newHosts.push(host);
-		}
-	}
-	hp.hosts = newHosts;
-	hp.host = null;
-	return hp;
-},
+  /**
+   * 
+   * log the remove event with the callback
+   * 
+   */
+  removeHost : function(remHost, hosts, writeCallback) {
+    var hp = getHostFromHosts(remHost, hosts);
+    if (!hp.host) {
+      throw "host doesn't' exist: " + remHost;
+    }
+    hp.host.removed_dt = NOW;
+    
+    if (writeCallback) {
+      writeCallback(hp);
+    }
+      
+    var newHosts = [];
+    for (var i in hp.hosts) {
+      var host = hp.hosts[i];
+      if (!(host.name_s === remHost)) {
+        newHosts.push(host);
+      }
+    }
+    hp.hosts = newHosts;
+    hp.host = null;
+    return hp;
+  },
 
-setOnline : function(hostIn, hosts) {
-	var hp = getHostFromHosts(hostIn, hosts);
-	if (!hp.host) {
-		throw "no such host: " + hostIn;
-	}
-	
-	var host = hp.host;
+  setOnline : function(hostIn, hosts) {
+    var hp = getHostFromHosts(hostIn, hosts);
+    if (!hp.host) {
+      throw "no such host: " + hostIn;
+    }
+    
+    var host = hp.host;
 
-	if (!isOffline(host)) {
-		throw "host is not offline";
-	}
-				
-	host.offline_b = false;
-	host.online_dt = new Date().toISOString();
-	host.comment_s = config.program.comment;
-	return hp;
-},
+    if (!isOffline(host)) {
+      throw "host is not offline";
+    }
+          
+    host.offline_b = false;
+    host.online_dt = new Date().toISOString();
+    host.comment_s = config.program.comment;
+    return hp;
+  },
 
-setOffline : function(hostIn, hosts) {
-	var hp = getHostFromHosts(hostIn, hosts);
-	if (!hp.host) {
-		throw "no such host: " + hostIn;
-	}
-	var host = hp.host;
+  setOffline : function(hostIn, hosts) {
+    var hp = getHostFromHosts(hostIn, hosts);
+    if (!hp.host) {
+      throw "no such host: " + hostIn;
+    }
+    var host = hp.host;
 
-	if (isOffline(host)) {
-		throw "host is already offline";
-	}
-	
-	host.active_b = false;
-	host.offline_b = true;
-	host.offline_dt = new Date().toISOString();
-	host.comment_s = config.program.comment;
+    if (isOffline(host)) {
+      throw "host is already offline";
+    }
+    
+    host.active_b = false;
+    host.offline_b = true;
+    host.offline_dt = new Date().toISOString();
+    host.comment_s = config.program.comment;
 
-	return hp;
-},
+    return hp;
+  },
 
-activate : function(hostIn, hosts) {
-	return activate(hostIn, hosts);
-},
+  activate : function(hostIn, hosts) {
+    return activate(hostIn, hosts);
+  },
 
-deactivate : function(hostIn, hosts) {
-	return deactivate(hostIn, hosts);
-},
+  deactivate : function(hostIn, hosts) {
+    return deactivate(hostIn, hosts);
+  },
 
-advise : function(err, stats) {
-	var advice = getRotateAdvice(stats);
-	if (advice.removeActive === null || advice.addInactive === null) {
-		throw "Can't advise" + JSON.stringify(advice);
-	}
-	console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
-},
+  advise : function(err, stats) {
+    var advice = getRotateAdvice(stats);
+    if (advice.removeActive === null || advice.addInactive === null) {
+      throw "Can't advise" + JSON.stringify(advice);
+    }
+    console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
+  },
 
-rotate : function(err, stats) {
-	var advice = getRotateAdvice(stats);
-	if (advice.removeActive === null || advice.addInactive === null) {
-		throw "Can't rotate" + JSON.stringify(advice);
-	}
-	
-	var hp = activate(advice.addInactive.name);
-	hp = deactivate(advice.removeActive.name, hp.hosts);
-	writeHosts(hp.hosts);	// FIXME: move storage to higher level
-	console.log(advice.summary);
-},
+  rotate : function(err, stats) {
+    var advice = getRotateAdvice(stats);
+    if (advice.removeActive === null || advice.addInactive === null) {
+      throw "Can't rotate" + JSON.stringify(advice);
+    }
+    
+    var hp = activate(advice.addInactive.name);
+    hp = deactivate(advice.removeActive.name, hp.hosts);
+    writeHosts(hp.hosts);	// FIXME: move storage to higher level
+    console.log(advice.summary);
+  },
 
-getStats : function(num, callback) {
-	var worryVals = {OK : 0, WARNING : 10, CRITICAL : 30, UNKNOWN : 30};
-	num = 0 + parseInt(num);
-	
-	var hosts = require(config.hostsFile);
-	var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
-	
-	var getStatsQueue = queue();
-	var period = moment(moment() - moment().diff(num, config.defaultUnits)).format() + 'Z'; // FIXME use Date.toISOString();
+  getStats : function(num, callback) {
+    num = 0 + parseInt(num);
+    
+    var hosts = require(config.hostsFile);
+    var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
+    
+    var getStatsQueue = queue();
+    var period = moment(moment() - moment().diff(num, config.defaultUnits)).format() + 'Z'; // FIXME use Date.toISOString();
 
-	for (var n in nrpeChecks) {
-		for (var h in hosts) {
-			var host = hosts[h].name_s;
-		
-			getStatsQueue.defer(function(callback) {
-				var statsQuery = solrClient.createQuery()
-					.q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'asc'});
-	
-				solrClient.search(statsQuery, callback);
-			}); 
-		}
-	}
-	getStatsQueue.awaitAll(function(err, results) {
-		if (err) {
-			throw err;
-		}
-		
-		var maxCount = 0;
-		
-		var hostSummaries = {};
-		var averages = {inService : 0};
-		for (var name in nrpeChecks) {
-			for (var field in nrpeChecks[name].fields) {
-				averages[field] = {sum : 0, count : 0};
-			}
-		}
-	
-		for (var r in results) {
-			var response = results[r].response;
-			
-			for (var d in response.docs) {	// parse host results
-			var doc = response.docs[d];
-			var utc = moment.utc(doc.tickDate_dt);
-			var host = doc['edge_s'];
-	
-			var hostSummary = hostSummaries[host];
-			if (!hostSummary) {
-				hostSummary = {worryWeight : 0, resultCount : 0};
-				for (var name in nrpeChecks) {
-					for (var field in nrpeChecks[name].fields) {
-						hostSummary[field + 'Count'] = 0;
-					}
-				}
-				hostSummaries[host] = hostSummary;
-			}
-	
-			hostSummary['resultCount'] = hostSummary['resultCount'] + 1;
-			if (hostSummary['resultCount'] > maxCount) {
-				maxCount = hostSummary['resultCount'];
-	        }
-			var worry = 0;
-			console.log(doc);
-			var timeAgo = moment(doc['tickDate_dt']).fromNow();
-			var timeWeight = Math.round(moment().diff(doc['tickDate_dt']) / 10000);
-			if (doc.error_t) {
-				var worry = timeWeight;	// decreases based on time; recent is
-										// ~1400 - errorthreshold
-				if (verbose) {
-					console.log(host.red + ' from ' + timeAgo + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' worryWeight', worry);
-				}
-			} else {
-				for (var field in nrpeChecks[doc.aCheck_s].fields) {
-					if (doc[field]) {
-						hostSummary[field + 'Count'] = hostSummary[field + 'Count'] + doc[field];
-						averages[field]['sum'] = averages[field]['sum'] + doc[field];
-						averages[field]['count'] = averages[field]['count'] + 1;
-					}
-				}
-				if (doc.status_s != 'OK' && !worryVals[doc.status_s]) {
-					console.log('worryVals', worryVals);
-					throw 'Missing worryVal for "' + doc.status_s + '"';
-				}
+    for (var n in nrpeChecks) {
+      for (var h in hosts) {
+        var host = hosts[h].name_s;
+      
+        getStatsQueue.defer(function(callback) {
+          var statsQuery = solrClient.createQuery()
+            .q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'asc'});
+    
+          solrClient.search(statsQuery, callback);
+        }); 
+      }
+    }
+    getStatsQueue.awaitAll(function(err, results) {
+      if (err) {
+        throw err;
+      }
+      
+      callback(null, getHostStats(results, nrpeChecks));
+    });
+  }, 
 
-				worry = worryVals[doc.status_s] * timeWeight;
-				if (verbose) {
-					console.log(host.yellow + ' from ' + timeAgo + ': ' + doc.status_s + ' worryWeight', worry);
-				}
-			}
-			hostSummary.worryWeight = hostSummary.worryWeight + worry;
-		}
-	}
-	
-	for (var name in nrpeChecks) {
-		for (var field in nrpeChecks[name].fields) {
-			averages[field]['average'] = averages[field]['sum'] / averages[field]['count'];
-		}
-	}
-	callback(null, { averages: averages, hostSummaries : hostSummaries});
-	});
-}, 
+  mustComment : function() {
+    if (!config.program.comment) {
+      throw "You must enter a comment. use --help for help.";
+    }
+  },
 
-mustComment : function() {
-	if (!config.program.comment) {
-		throw "You must enter a comment. use --help for help.";
-	}
-},
+  writeHosts : function(hosts, changedHost) {
+    return writeHosts(hosts, changedHost);
+  },
 
-writeHosts : function(hosts, changedHost) {
-	return writeHosts(hosts, changedHost);
-},
+  getHostSummaries : function() {
+    return getHostSummaries();
+  },
 
-getHostSummaries : function() {
-	return getHostSummaries();
-},
+  getHosts : function() {
+    return getHosts();
+  }, 
 
-getHosts : function() {
-	return getHosts();
-}, 
-
-writeHostsJson : function(hosts) {
-  return writeHostsJson(hosts);
-}
+  writeHostsJson : function(hosts) {
+    return writeHostsJson(hosts);
+  }
 
 }
 
@@ -274,6 +204,79 @@ module.exports = hosts;
 **
 **/
 	
+function getHostStats(results, nrpeChecks) {
+		var averages = {inService : 0};
+		for (var name in nrpeChecks) {
+			for (var field in nrpeChecks[name].fields) {
+				averages[field] = {sum : 0, count : 0};
+			}
+		}
+	
+    var hostStats = {}, maxCount = 0;
+		for (var r in results) {
+			var response = results[r].response;
+			
+			for (var d in response.docs) {	// parse host results
+			var doc = response.docs[d];
+			var utc = moment.utc(doc.tickDate_dt);
+			var host = doc['edge_s'];
+	
+			var hostStat = hostStats[host];
+			if (!hostStat) {
+				hostStat = {worryWeight : 0, resultCount : 0, worries: []};
+				for (var name in nrpeChecks) {
+					for (var field in nrpeChecks[name].fields) {
+						hostStat[field + 'Count'] = 0;
+					}
+				}
+				hostStats[host] = hostStat;
+			}
+	
+			hostStat['resultCount'] = hostStat['resultCount'] + 1;
+			if (hostStat['resultCount'] > maxCount) {
+				maxCount = hostStat['resultCount'];
+      }
+			var worry = 0;
+			var timeAgo = moment(doc['tickDate_dt']).fromNow();
+			var timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2));
+			if (doc.error_t) {
+				worry = timeWeight * worryVals['ERROR'];
+        hostStat.worries.push({ error_t: error_t, weight: timeWeight});
+				if (verbose) {
+					console.log(host.red + ' from ' + timeAgo + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' worryWeight', timeWeight, ':', worry);
+				}
+			} else {
+				for (var field in nrpeChecks[doc.aCheck_s].fields) {
+					if (doc[field]) {
+						hostStat[field + 'Count'] = hostStat[field + 'Count'] + doc[field];
+						averages[field]['sum'] = averages[field]['sum'] + doc[field];
+						averages[field]['count'] = averages[field]['count'] + 1;
+					}
+				}
+				if (doc.status_s != 'OK' && !worryVals[doc.status_s]) {
+					console.log('worryVals', worryVals);
+					throw 'Missing worryVal for "' + doc.status_s + '"';
+				}
+
+        if (worryVals[doc.status_s] > 0) {
+				  worry = worryVals[doc.status_s] * timeWeight;
+          hostStat.worries.push({status_s : doc.status_s, weight: worry});
+        }
+				if (verbose) {
+					console.log(host.yellow + ' from ' + timeAgo + ': ' + doc.status_s + ' worryWeight', timeWeight, ':', worry);
+				}
+			}
+			hostStat.worryWeight = hostStat.worryWeight + worry;
+		}
+	}
+	
+	for (var name in nrpeChecks) {
+		for (var field in nrpeChecks[name].fields) {
+			averages[field]['average'] = averages[field]['sum'] / averages[field]['count'];
+		}
+	}
+  return { averages: averages, hostSummaries : hostStats }
+}
 
 function getRotateAdvice(stats) {
 	var summaries = getHostSummaries();
@@ -366,7 +369,7 @@ function getRotateAdvice(stats) {
 		}
 	}
 	
-	if (!addInactive && lowestError && lowestError.erroWeight < config.errorthreshold) {
+	if (!addInactive && lowestError && lowestError.erroWeight < config.errorThreshold) {
 		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}

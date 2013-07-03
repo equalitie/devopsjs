@@ -1,0 +1,2218 @@
+[
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good1.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good1.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 225 bytes/s | TOTAL=225;100000;200000 IN=92;; OUT=133;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 225,
+          "_version_": 1439485121738571800
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 531,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 225 bytes/s | TOTAL=225;100000;200000 IN=92;; OUT=133;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 225,
+          "_version_": 1439486189973274600
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 559,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 357 bytes/s | TOTAL=357;100000;200000 IN=139;; OUT=218;; TIME=33;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 357,
+          "_version_": 1439493608711389200
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 551,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 565 bytes/s | TOTAL=565;100000;200000 IN=229;; OUT=336;; TIME=19;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 565,
+          "_version_": 1439493656517017600
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 582,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 372 bytes/s | TOTAL=372;100000;200000 IN=145;; OUT=227;; TIME=25;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 372,
+          "_version_": 1439495297943208000
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 536,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 838 bytes/s | TOTAL=838;100000;200000 IN=350;; OUT=488;; TIME=7;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 838,
+          "_version_": 1439495305030533000
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 540,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 484 bytes/s | TOTAL=484;100000;200000 IN=204;; OUT=280;; TIME=14;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 484,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 563,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 324 bytes/s | TOTAL=324;100000;200000 IN=126;; OUT=198;; TIME=29;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 324,
+          "_version_": 1439496371894747100
+        },
+        {
+          "id": "good1.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 578,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 238 bytes/s | TOTAL=238;100000;200000 IN=93;; OUT=145;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 238,
+          "_version_": 1439497593905217500
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good2.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good2.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 34575 bytes/s | TOTAL=34575;250000;250000 IN=23641;; OUT=10934;; TIME=43;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 34575,
+          "_version_": 1439485121738571800
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 692,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 34575 bytes/s | TOTAL=34575;250000;250000 IN=23641;; OUT=10934;; TIME=43;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 34575,
+          "_version_": 1439486189973274600
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 753,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 17650 bytes/s | TOTAL=17650;250000;250000 IN=12035;; OUT=5615;; TIME=218;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 17650,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 765,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 35248 bytes/s | TOTAL=35248;250000;250000 IN=24098;; OUT=11150;; TIME=46;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 35248,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 807,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 38616 bytes/s | TOTAL=38616;250000;250000 IN=26341;; OUT=12275;; TIME=30;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 38616,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 683,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 48793 bytes/s | TOTAL=48793;250000;250000 IN=33158;; OUT=15635;; TIME=6;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 48793,
+          "_version_": 1439495305030533000
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 740,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 35197 bytes/s | TOTAL=35197;250000;250000 IN=24060;; OUT=11137;; TIME=57;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 35197,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 821,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 22726 bytes/s | TOTAL=22726;250000;250000 IN=15494;; OUT=7232;; TIME=154;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 22726,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "good2.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 747,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "good2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 21534 bytes/s | TOTAL=21534;250000;250000 IN=14712;; OUT=6822;; TIME=117;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 21534,
+          "_version_": 1439497593906266000
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal1.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121738571800
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 709,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1664 bytes/s | TOTAL=1664;350000;1048576 IN=593;; OUT=1071;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1664,
+          "_version_": 1439486189974323200
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 859,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 282 bytes/s | TOTAL=282;350000;1048576 IN=127;; OUT=155;; TIME=34;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 282,
+          "_version_": 1439493608713486300
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 671,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 9182 bytes/s | TOTAL=9182;350000;1048576 IN=493;; OUT=8689;; TIME=19;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 9182,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 781,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1204 bytes/s | TOTAL=1204;350000;1048576 IN=459;; OUT=745;; TIME=26;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1204,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 690,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1072 bytes/s | TOTAL=1072;350000;1048576 IN=455;; OUT=617;; TIME=6;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1072,
+          "_version_": 1439495305030533000
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 687,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1454 bytes/s | TOTAL=1454;350000;1048576 IN=707;; OUT=747;; TIME=28;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1454,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 801,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 993 bytes/s | TOTAL=993;350000;1048576 IN=272;; OUT=721;; TIME=30;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 993,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "marginal1.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 772,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 447 bytes/s | TOTAL=447;350000;1048576 IN=205;; OUT=242;; TIME=22;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 447,
+          "_version_": 1439497593906266000
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal2.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 707,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1745 bytes/s | TOTAL=1745;350000;1048576 IN=814;; OUT=931;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1745,
+          "_version_": 1439486189973274600
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 761,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 463 bytes/s | TOTAL=463;350000;1048576 IN=202;; OUT=261;; TIME=33;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 463,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 738,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 527 bytes/s | TOTAL=527;350000;1048576 IN=227;; OUT=300;; TIME=19;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 527,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 749,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 889 bytes/s | TOTAL=889;350000;1048576 IN=249;; OUT=640;; TIME=25;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 889,
+          "_version_": 1439495297943208000
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 697,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 856 bytes/s | TOTAL=856;350000;1048576 IN=378;; OUT=478;; TIME=7;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 856,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 708,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 372 bytes/s | TOTAL=372;350000;1048576 IN=160;; OUT=212;; TIME=27;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 372,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 745,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 349 bytes/s | TOTAL=349;350000;1048576 IN=146;; OUT=203;; TIME=30;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 349,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "marginal2.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 769,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 165 bytes/s | TOTAL=165;350000;1048576 IN=70;; OUT=95;; TIME=53;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 165,
+          "_version_": 1439497593906266000
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad1.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad1.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 899,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 3806 bytes/s | TOTAL=3806;350000;1048576 IN=3612;; OUT=194;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 3806,
+          "_version_": 1439486189975371800
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 719,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1742 bytes/s | TOTAL=1742;350000;1048576 IN=1546;; OUT=196;; TIME=33;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1742,
+          "_version_": 1439493608711389200
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 645,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2095 bytes/s | TOTAL=2095;350000;1048576 IN=1817;; OUT=278;; TIME=19;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2095,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 761,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1848 bytes/s | TOTAL=1848;350000;1048576 IN=1585;; OUT=263;; TIME=25;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1848,
+          "_version_": 1439495297943208000
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 742,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2742 bytes/s | TOTAL=2742;350000;1048576 IN=2054;; OUT=688;; TIME=7;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2742,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 737,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 19022 bytes/s | TOTAL=19022;350000;1048576 IN=11428;; OUT=7594;; TIME=28;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 19022,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 882,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1871 bytes/s | TOTAL=1871;350000;1048576 IN=1676;; OUT=195;; TIME=16;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1871,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "bad1.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 776,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad1.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2506 bytes/s | TOTAL=2506;350000;1048576 IN=2238;; OUT=268;; TIME=53;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2506,
+          "_version_": 1439497593906266000
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad2.testing AND aCheck_s:check_tcptraffic AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad2.testing/check_tcptraffic/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 841,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 3728 bytes/s | TOTAL=3728;350000;1048576 IN=3549;; OUT=179;; TIME=39;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 3728,
+          "_version_": 1439486189975371800
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 790,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1716 bytes/s | TOTAL=1716;350000;1048576 IN=1519;; OUT=197;; TIME=34;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1716,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 753,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1986 bytes/s | TOTAL=1986;350000;1048576 IN=1723;; OUT=263;; TIME=20;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1986,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 899,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 1679 bytes/s | TOTAL=1679;350000;1048576 IN=1475;; OUT=204;; TIME=26;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 1679,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 930,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 3001 bytes/s | TOTAL=3001;350000;1048576 IN=2360;; OUT=641;; TIME=6;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 3001,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 763,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2099 bytes/s | TOTAL=2099;350000;1048576 IN=1911;; OUT=188;; TIME=28;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2099,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 892,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2084 bytes/s | TOTAL=2084;350000;1048576 IN=1980;; OUT=104;; TIME=27;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2084,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "bad2.testing/check_tcptraffic/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 891,
+          "aCheck_s": "check_tcptraffic",
+          "edge_s": "bad2.testing",
+          "stdout_s": "TCPTRAFFIC OK - eth0 2419 bytes/s | TOTAL=2419;350000;1048576 IN=2252;; OUT=167;; TIME=53;;\n",
+          "status_s": "OK",
+          "bytesPerSecond_i": 2419,
+          "_version_": 1439497593907314700
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 0,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good1.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good1.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "good1.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 555,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439486189973274600
+        },
+        {
+          "id": "good1.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 552,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=2;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 2,
+          "listeners_i": 9,
+          "_version_": 1439493608711389200
+        },
+        {
+          "id": "good1.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 585,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439493656517017600
+        },
+        {
+          "id": "good1.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 568,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439495297942159400
+        },
+        {
+          "id": "good1.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 563,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439495305030533000
+        },
+        {
+          "id": "good1.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 560,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "good1.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 553,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439496371894747100
+        },
+        {
+          "id": "good1.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 569,
+          "aCheck_s": "check_connections",
+          "edge_s": "good1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=0;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 0,
+          "listeners_i": 9,
+          "_version_": 1439497593905217500
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 0,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good2.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good2.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "good2.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 737,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=8;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 8,
+          "listeners_i": 9,
+          "_version_": 1439486189974323200
+        },
+        {
+          "id": "good2.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 770,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=6;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 6,
+          "listeners_i": 9,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "good2.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 785,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=5;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 5,
+          "listeners_i": 9,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "good2.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 794,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=7;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 7,
+          "listeners_i": 9,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "good2.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 709,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=7;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 7,
+          "listeners_i": 9,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "good2.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 737,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 7 established connections. | established=7;; waiting=6;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 7,
+          "waiting_i": 6,
+          "listeners_i": 9,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "good2.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 857,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=7;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 7,
+          "listeners_i": 9,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "good2.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 743,
+          "aCheck_s": "check_connections",
+          "edge_s": "good2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=6;; listeners=9;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 6,
+          "listeners_i": 9,
+          "_version_": 1439497593905217500
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal1.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal1.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 781,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=8;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 8,
+          "listeners_i": 7,
+          "_version_": 1439486189974323200
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 863,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=5;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 5,
+          "listeners_i": 7,
+          "_version_": 1439493608713486300
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 779,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=5;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 5,
+          "listeners_i": 7,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 805,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=7;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 7,
+          "listeners_i": 7,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 787,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=8;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 8,
+          "listeners_i": 7,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 783,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=8;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 8,
+          "listeners_i": 7,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 810,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 7 established connections. | established=7;; waiting=9;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 7,
+          "waiting_i": 9,
+          "listeners_i": 7,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "marginal1.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 800,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=6;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 6,
+          "listeners_i": 7,
+          "_version_": 1439497593907314700
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal2.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal2.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 745,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=8;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 8,
+          "listeners_i": 7,
+          "_version_": 1439486189974323200
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 739,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=6;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 6,
+          "listeners_i": 7,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 741,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=7;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 7,
+          "listeners_i": 7,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 723,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=7;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 7,
+          "listeners_i": 7,
+          "_version_": 1439495297943208000
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 705,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=7;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 7,
+          "listeners_i": 7,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 734,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=6;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 6,
+          "listeners_i": 7,
+          "_version_": 1439495364416635000
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 706,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=6;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 6,
+          "listeners_i": 7,
+          "_version_": 1439496371894747100
+        },
+        {
+          "id": "marginal2.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 3709,
+          "aCheck_s": "check_connections",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=6;; listeners=7;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 6,
+          "listeners_i": 7,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad1.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad1.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "bad1.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 917,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=5;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 5,
+          "listeners_i": 11,
+          "_version_": 1439486189975371800
+        },
+        {
+          "id": "bad1.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 731,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439493608711389200
+        },
+        {
+          "id": "bad1.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 769,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=5;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 5,
+          "listeners_i": 11,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "bad1.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 794,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=7;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 7,
+          "listeners_i": 11,
+          "_version_": 1439495297944256500
+        },
+        {
+          "id": "bad1.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 845,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 3 established connections. | established=3;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 3,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "bad1.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 797,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "bad1.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 872,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=5;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 5,
+          "listeners_i": 11,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "bad1.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 760,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad1.testing",
+          "stdout_s": "CONNECTIONS OK - There are 4 established connections. | established=4;; waiting=7;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 4,
+          "waiting_i": 7,
+          "listeners_i": 11,
+          "_version_": 1439497593906266000
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad2.testing AND aCheck_s:check_connections AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad2.testing/check_connections/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121737523200
+        },
+        {
+          "id": "bad2.testing/check_connections/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 809,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439486189974323200
+        },
+        {
+          "id": "bad2.testing/check_connections/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 801,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=10;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 10,
+          "listeners_i": 11,
+          "_version_": 1439493608712437800
+        },
+        {
+          "id": "bad2.testing/check_connections/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 811,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=8;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 8,
+          "listeners_i": 11,
+          "_version_": 1439493656518066200
+        },
+        {
+          "id": "bad2.testing/check_connections/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 923,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "bad2.testing/check_connections/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 944,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=6;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 6,
+          "listeners_i": 11,
+          "_version_": 1439495305031581700
+        },
+        {
+          "id": "bad2.testing/check_connections/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 821,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 5 established connections. | established=5;; waiting=7;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 5,
+          "waiting_i": 7,
+          "listeners_i": 11,
+          "_version_": 1439495364417683500
+        },
+        {
+          "id": "bad2.testing/check_connections/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 900,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=5;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 5,
+          "listeners_i": 11,
+          "_version_": 1439496371895795700
+        },
+        {
+          "id": "bad2.testing/check_connections/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 883,
+          "aCheck_s": "check_connections",
+          "edge_s": "bad2.testing",
+          "stdout_s": "CONNECTIONS OK - There are 6 established connections. | established=6;; waiting=7;; listeners=11;;\n",
+          "status_s": "OK",
+          "established_i": 6,
+          "waiting_i": 7,
+          "listeners_i": 11,
+          "_version_": 1439497593907314700
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good1.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good1.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121736474600
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1629,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439486189976420400
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1630,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439493608714535000
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1651,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1639,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1644,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1641,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1641,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "good1.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1625,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=4;; ssh=3;;  | HTTP=4;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 4,
+          "sshBans_i": 3,
+          "_version_": 1439497593907314700
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:good2.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "good2.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121736474600
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1804,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=4;;  | HTTP=7;; ssh=4;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 4,
+          "_version_": 1439486189976420400
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1863,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=4;;  | HTTP=7;; ssh=4;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 4,
+          "_version_": 1439493608715583500
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1878,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=4;;  | HTTP=7;; ssh=4;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 4,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1829,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439495297946353700
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1879,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1841,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1822,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "good2.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1806,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "good2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=4;;  | HTTP=7;; ssh=4;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 4,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 0,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal1.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal1.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121736474600
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1751,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439486189976420400
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1763,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439493608714535000
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1763,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1729,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=11;; ssh=3;;  | HTTP=11;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 11,
+          "sshBans_i": 3,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1753,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=11;; ssh=3;;  | HTTP=11;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 11,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1740,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=11;; ssh=3;;  | HTTP=11;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 11,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1736,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "marginal1.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1720,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:marginal2.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "marginal2.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121735426000
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1865,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439486189977469000
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1840,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439493608714535000
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1888,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1814,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1858,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1823,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1868,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "marginal2.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1802,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "marginal2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=7;; ssh=3;;  | HTTP=7;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 7,
+          "sshBans_i": 3,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad1.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad1.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121735426000
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1781,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439486189976420400
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1681,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439493608714535000
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1935,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1716,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1763,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1736,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=10;; ssh=3;;  | HTTP=10;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 10,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1772,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=9;; ssh=3;;  | HTTP=9;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 9,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "bad1.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1755,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad1.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=9;; ssh=3;;  | HTTP=9;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 9,
+          "sshBans_i": 3,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  },
+  {
+    "responseHeader": {
+      "status": 0,
+      "QTime": 1,
+      "params": {
+        "sort": "tickDate_dt asc",
+        "q": "edge_s:bad2.testing AND aCheck_s:check_fail2ban AND tickDate_dt:[2013-07-02T20:56:11-04:00Z TO NOW]",
+        "wt": "json"
+      }
+    },
+    "response": {
+      "numFound": 9,
+      "start": 0,
+      "docs": [
+        {
+          "id": "bad2.testing/check_fail2ban/1372799986317",
+          "tickDate_dt": "2013-07-02T21:19:46.317Z",
+          "execTime_i": 287,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "status_s": "UNKNOWN",
+          "error_t": "",
+          "_version_": 1439485121735426000
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372801001771",
+          "tickDate_dt": "2013-07-02T21:36:41.771Z",
+          "execTime_i": 1709,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=9;; ssh=3;;  | HTTP=9;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 9,
+          "sshBans_i": 3,
+          "_version_": 1439486189976420400
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372808076917",
+          "tickDate_dt": "2013-07-02T23:34:36.917Z",
+          "execTime_i": 1668,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439493608714535000
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372808122376",
+          "tickDate_dt": "2013-07-02T23:35:22.376Z",
+          "execTime_i": 1939,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439493656519114800
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372809687937",
+          "tickDate_dt": "2013-07-03T00:01:27.937Z",
+          "execTime_i": 1774,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495297945305000
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372809694586",
+          "tickDate_dt": "2013-07-03T00:01:34.586Z",
+          "execTime_i": 1824,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495305032630300
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372809751105",
+          "tickDate_dt": "2013-07-03T00:02:31.105Z",
+          "execTime_i": 1870,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439495364419780600
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372810712088",
+          "tickDate_dt": "2013-07-03T00:18:32.088Z",
+          "execTime_i": 1705,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439496371896844300
+        },
+        {
+          "id": "bad2.testing/check_fail2ban/1372811875657",
+          "tickDate_dt": "2013-07-03T00:37:55.657Z",
+          "execTime_i": 1753,
+          "aCheck_s": "check_fail2ban",
+          "edge_s": "bad2.testing",
+          "stdout_s": "fail2ban OK - Fail2ban is pingable. Bans: HTTP=8;; ssh=3;;  | HTTP=8;; ssh=3;; \n",
+          "status_s": "OK",
+          "httpBans_i": 8,
+          "sshBans_i": 3,
+          "_version_": 1439497593908363300
+        }
+      ]
+    }
+  }
+]
