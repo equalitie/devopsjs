@@ -238,7 +238,7 @@ function getHostStats(results, nrpeChecks) {
       }
 			var worry = 0;
 			var timeAgo = moment(doc['tickDate_dt']).fromNow();
-			var timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2));
+			var timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2)); // decrease over time
 			if (doc.error_t) {
 				worry = timeWeight * worryVals['ERROR'];
         hostStat.worries.push({ error_t: error_t, weight: timeWeight});
@@ -369,7 +369,7 @@ function getRotateAdvice(stats) {
 		}
 	}
 	
-	if (!addInactive && lowestError && lowestError.erroWeight < config.errorThreshold) {
+	if (!addInactive && lowestError && lowestError.worryWeight < config.errorThreshold) {
 		addReason = 'low error';
 		addInactive = { name : lowestError, stats : summaries.inactiveHosts[lowestError]};
 	}
