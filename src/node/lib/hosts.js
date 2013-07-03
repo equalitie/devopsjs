@@ -205,69 +205,58 @@ module.exports = hosts;
 **/
 	
 function getHostStats(results, nrpeChecks) {
-		var averages = {inService : 0};
-		for (var name in nrpeChecks) {
-			for (var field in nrpeChecks[name].fields) {
-				averages[field] = {sum : 0, count : 0};
-			}
-		}
-	
-    var hostStats = {}, maxCount = 0;
-		for (var r in results) {
-			var response = results[r].response;
-			
-			for (var d in response.docs) {	// parse host results
-			var doc = response.docs[d];
-			var utc = moment.utc(doc.tickDate_dt);
-			var host = doc['edge_s'];
-	
-			var hostStat = hostStats[host];
-			if (!hostStat) {
-				hostStat = {worryWeight : 0, resultCount : 0, worries: []};
-				for (var name in nrpeChecks) {
-					for (var field in nrpeChecks[name].fields) {
-						hostStat[field + 'Count'] = 0;
-					}
-				}
-				hostStats[host] = hostStat;
-			}
-	
-			hostStat['resultCount'] = hostStat['resultCount'] + 1;
-			if (hostStat['resultCount'] > maxCount) {
-				maxCount = hostStat['resultCount'];
-      }
-			var worry = 0;
-			var timeAgo = moment(doc['tickDate_dt']).fromNow();
-			var timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2)); // decrease over time
-			if (doc.error_t) {
-				worry = timeWeight * worryVals['ERROR'];
-        hostStat.worries.push({ error_t: doc.error_t, weight: timeWeight});
-				if (verbose) {
-					console.log(host.red + ' from ' + timeAgo + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' worryWeight', timeWeight, ':', worry);
-				}
-			} else {
-				for (var field in nrpeChecks[doc.aCheck_s].fields) {
-					if (doc[field]) {
-						hostStat[field + 'Count'] = hostStat[field + 'Count'] + doc[field];
-						averages[field]['sum'] = averages[field]['sum'] + doc[field];
-						averages[field]['count'] = averages[field]['count'] + 1;
-					}
-				}
-				if (doc.status_s != 'OK' && !worryVals[doc.status_s]) {
-					console.log('worryVals', worryVals);
-					throw 'Missing worryVal for "' + doc.status_s + '"';
-				}
+  var averages = {inService : 0};
+  for (var name in nrpeChecks) {
+    for (var field in nrpeChecks[name].fields) {
+      averages[field] = {sum : 0, count : 0};
+    }
+  }
 
-        if (worryVals[doc.status_s] > 0) {
-				  worry = worryVals[doc.status_s] * timeWeight;
-          hostStat.worries.push({status_s : doc.status_s, weight: worry});
+  var hostStats = {}, maxCount = 0;
+  for (var r in results) {
+    var response = results[r].response;
+    
+    for (var d in response.docs) {	// parse host results
+      var doc = response.docs[d];
+      var status = doc.status_s, utc = moment.utc(doc.tickDate_dt), host = doc['edge_s'], hostStat = hostStats[host];
+      if (!hostStat) {
+        hostStat = {worryWeight : 0, resultCount : 0, worries: []};
+        for (var name in nrpeChecks) {
+          for (var field in nrpeChecks[name].fields) {
+            hostStat[field + 'Count'] = 0;
+          }
         }
-				if (verbose) {
-					console.log(host.yellow + ' from ' + timeAgo + ': ' + doc.status_s + ' worryWeight', timeWeight, ':', worry);
-				}
-			}
-			hostStat.worryWeight = hostStat.worryWeight + worry;
-		}
+        hostStats[host] = hostStat;
+      }
+  
+      hostStat['resultCount'] = hostStat['resultCount'] + 1;
+      if (hostStat['resultCount'] > maxCount) {
+        maxCount = hostStat['resultCount'];
+      }
+      var msg = status, worry = 0, timeAgo = moment(doc['tickDate_dt']).fromNow(), timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2)); // decrease over time
+      if (doc.error_t) {
+        msg = doc.error_t.replace('CHECK_NRPE: ', '').trim();
+      }
+      for (var field in nrpeChecks[doc.aCheck_s].fields) {
+        if (doc[field]) {
+          hostStat[field + 'Count'] = hostStat[field + 'Count'] + doc[field];
+          averages[field]['sum'] = averages[field]['sum'] + doc[field];
+          averages[field]['count'] = averages[field]['count'] + 1;
+        }
+      }
+      if (status != 'OK' && !worryVals[status]) {
+        throw 'Missing worryVal for "' + status + '"';
+      }
+
+      if (worryVals[status] > 0) {
+        worry = worryVals[status] * timeWeight;
+        hostStat.worries.push({status_s : status, weight: worry});
+      }
+      hostStat.worryWeight = hostStat.worryWeight + worry;
+      if (verbose) {
+        console.log(host.yellow + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '∑', hostStat.worryWeight);
+      }
+    }
 	}
 	
 	for (var name in nrpeChecks) {
@@ -304,7 +293,7 @@ function getRotateAdvice(stats) {
 			
 			if (verbose) {
 				console.log('removeActive'.yellow, i, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
-						+ (moment(host.active_dt).diff(removeActive.stats.active_dt))) : 'null');
+						+ Math.round(moment(host.active_dt).diff(removeActive.stats.active_dt)/10000)) : 'null');
 			}
 			var rec = hostSummaries[i];
 			
@@ -343,7 +332,7 @@ function getRotateAdvice(stats) {
 					console.log('addInactive'.yellow, i + ' no reports');
 				} else {
 					console.log('addInactive'.yellow, i + ' err: '.red + hostSummaries[i].worryWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
-						+ (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt))) : 'null');
+						+ Math.round(moment(host.inactive_dt).diff(addInactive.stats.inactive_dt)/10000)) : 'null');
 				}
 			}
 			if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
