@@ -204,6 +204,15 @@ module.exports = hosts;
 **
 **/
 	
+/**
+ * Generate stats for edges
+ *
+ * @param {results} array of Solr edge queries
+ * @param {nrpeChecks} checks used for these edges from lib/nrpe/allChecks.js
+ * @return {Object} averages, hostSummaries
+ * @api private
+ */
+
 function getHostStats(results, nrpeChecks) {
   var averages = {inService : 0};
   for (var name in nrpeChecks) {
