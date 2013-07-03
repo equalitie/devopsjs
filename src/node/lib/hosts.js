@@ -241,7 +241,7 @@ function getHostStats(results, nrpeChecks) {
 			var timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2)); // decrease over time
 			if (doc.error_t) {
 				worry = timeWeight * worryVals['ERROR'];
-        hostStat.worries.push({ error_t: error_t, weight: timeWeight});
+        hostStat.worries.push({ error_t: doc.error_t, weight: timeWeight});
 				if (verbose) {
 					console.log(host.red + ' from ' + timeAgo + ': ' + doc.error_t.replace('CHECK_NRPE: ', '').trim() + ' ' + doc.tickDate_dt + ' worryWeight', timeWeight, ':', worry);
 				}
