@@ -1,7 +1,5 @@
 require('./lib/util.js').config();
 
-var notify = require('./lib/notify.js');
-
 var program = require('commander');
 
 program
@@ -17,6 +15,7 @@ var fs = require('fs');
 
 setInterval(function() {
   var files = fs.readdirSync(dir);
+  var notify = require('./lib/notify.js');
   files.forEach(function(f) {
     query = '[[' + f + ']]';
     notify.processTickets(query);
