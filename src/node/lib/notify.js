@@ -44,14 +44,15 @@ function addNotify(ticket) {
     contact : semwiki.val(ticket, 'Contact'),
     dateRequired : semwiki.date(ticket, 'Date required'),
     lastUpdate : semwiki.date(ticket, 'Last update'),
-    lastProvider : semwiki.date(ticket, 'Last provider'),
-    lastComment : semwiki.date(ticket, 'Last comment'),
+    lastProvider : semwiki.val(ticket, 'Last provider'),
+    lastComment : semwiki.val(ticket, 'Last comment'),
     importance : semwiki.val(ticket, 'Importance'),
     modificationDate : semwiki.date(ticket, 'Modification date'),
     name : ticket.fulltext,
     link : ticket.fullurl,
     tags: []
   }
+console.log(jt, 'TICKET', ticket);
   if (jt.dateRequired[0] && jt.dateRequired[0].getTime() < new Date().getTime()) {
     jt.tags.push('OVERDUE');
   }
@@ -74,7 +75,7 @@ function addressNotifications() {
 
   toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
-    message = message + ' ' + jt.lastUpdate + ' ' + jt.lastProvider + (jt.lastComment ? ';' + jt.lastComment : '');
+    message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
     if (jt.status == 'Validate') {
       jt.validator.forEach(function (v) {
         action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
