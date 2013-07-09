@@ -1,17 +1,6 @@
 #!/usr/bin/env node
 
-var configBase;
-if (process.env.DEVOPSCONFIG) {
-	configBase = process.env.DEVOPSCONFIG;
-} else {
-	configBase = process.cwd() + '/config/';
-}	
-
-try {
-	require(configBase + 'localConfig.js');
-} catch (e) {
-	throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
-}
+require('./lib/util.js').config();
 
 if (!GLOBAL.CONFIG.minActive) {
 	throw "minActive not defined";
@@ -19,7 +8,7 @@ if (!GLOBAL.CONFIG.minActive) {
 
 var flatHostsFile = null;
 if (GLOBAL.CONFIG.flatHostsFile) {
-	flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : configBase) + GLOBAL.CONFIG.flatHostsFile;
+	flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : GLOBAL.CONFIG.configBase) + GLOBAL.CONFIG.flatHostsFile;
 }	
 
 var program = require('commander');
@@ -58,10 +47,10 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-hostLib = hostLib.setConfig(program, configBase + 'hosts.json', require('solr-client'));
+hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.json', require('solr-client'));
 
 if (program.verbose) {
-	console.log('configBase is "' + configBase + '", flatHostsFile is "' + flatHostsFile + '"');
+	console.log('configBase is "' + GLOBAL.CONFIG.configBase + '", flatHostsFile is "' + flatHostsFile + '"');
 }
 
 if (program.add) {

@@ -30,7 +30,8 @@ exports.processTickets =function(ticketQuery) {
       });
     });
     getTicketsQueue.awaitAll(function(err) {
-      sendMail();
+      
+      sendNotifications(addressNotifications());
     });
   });
 }
@@ -66,13 +67,10 @@ function addNotify(ticket) {
   toSend.push(jt);
 }
 
-function sendMail() {
-  var action = {};
-  var cc = {};
-  var actionTitle = '<h2>Action items</h2><br />\n';
-  var ccTitle = '<br />\n<h2>Watching items</h2><br />\n';
+function addressNotifications() {
+  var action = {}, cc = {}, actionTitle = '<h2>Action items</h2><br />\n', ccTitle = '<br />\n<h2>Watching items</h2><br />\n';
 
-  toSend.forEach(function(jt) { // first break out if it's an action item or watching item
+  toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     if (jt.status == 'Validate') {
       jt.validator.forEach(function (v) {
@@ -88,33 +86,37 @@ function sendMail() {
     }
   });
   var m = {}; // then create grouped message texts in appropriate order
-  for (var v in action) {
-    m[v] = (m[v] || '') + action[v];
+  for (var user in action) {
+    m[user] = (m[user] || '') + action[user];
   }
-  for (var v in cc) {
-    m[v] = (m[v] || '') + cc[v];
+  for (var user in cc) {
+    m[user] = (m[user] || '') + cc[user];
   }
-  var nodemailer = require("nodemailer");
+  return m;
+}
 
-  var transport = GLOBAL.CONFIG.notify.mailTransport;
+function sendNotifications(notifications) {
 
-  for (var u in m) {
+  var transport = GLOBAL.CONFIG.notify.notifyTransport;
+
+  for (var u in notifications) {
     var addy = null, user = getUser(u);
     if (user) {
       addy = semwiki.val(user, 'Contact address')[0];
     }
 //    console.log('\n\n***', u, addy, JSON.stringify(m[u]));
+    var note = notifications[u];
     if (addy) {
-      var mailOptions = {
+      var messageOptions = {
           from: emailFrom,
           to: u.replace(/^User:/, '') + ' <' + addy + '>',
           subject: emailSubject,
-          text: m[u].replace(/<.*?>/g, ''),
-          html: m[u]
+          text: note.replace(/<.*?>/g, ''),
+          html: note
       }
 
-      if (!DEBUG) {
-        transport.sendMail(mailOptions, function(error, response) {
+      if (!GLOBAL.CONFIG.DEBUG) {
+        transport.sendNotification(messageOptions, function(error, response) {
           if (error){
             console.error(error);
           }
