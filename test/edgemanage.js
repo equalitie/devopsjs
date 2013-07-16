@@ -24,7 +24,6 @@ var program = {verbose:0};
 GLOBAL.CONFIG = { minActive: 6, flatHostsFile : 'edges.test', solrConfig : { host: 'testinghost', core: 'testingcore'} }
 
 var testHostsFile = process.cwd() + '/test/work/testHosts.json';
-fs.writeFileSync(testHostsFile, JSON.stringify(getTestHosts(), null, 2));
 
 var expect = require('chai').expect,
 	hostLib = require('../src/node/lib/hosts.js').setConfig(program, testHostsFile, mockSolr);
@@ -153,73 +152,3 @@ suite("edgemanage tests", function() {
 });
 
 
-function getTestHosts() {
-	return [
-	  {
-	    "name_s": "good1.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  },		  
-	  {
-	    "name_s": "good2.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  },		  
-	  {
-	    "name_s": "marginal1.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  },		  
-	  {
-	    "name_s": "marginal2.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  },		  
-	  {
-	    "name_s": "bad1.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  },		  
-	  {
-	    "name_s": "bad2.testing",
-	    "lastUpdate_dt": "2013-04-25T21:05:48.889Z",
-	    "comment_s": "testing host",
-	    "active_b": true,
-	    "active_dt": "2013-05-15T02:34:49.268Z",
-	    "inactive_dt": "2013-05-21T14:29:45.661Z",
-	    "offline_b": false,
-	    "offline_dt": "2013-04-26T15:15:30.822Z",
-	    "online_dt": "2013-05-15T02:34:49.077Z"
-	  }
-	];				 
-}

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-require('./lib/util.js').config();
+var utils = require('./lib/util.js');
+utils.config();
 
 if (!GLOBAL.CONFIG.minActive) {
 	throw "minActive not defined";
@@ -54,14 +55,14 @@ if (program.verbose) {
 }
 
 if (program.add) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.addHost(program.add);
 	hostLib.writeHosts(hp.hosts, program.add);
 	console.log(program.add + ' is added');
 }
 
 if (program.remove) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.removeHost(program.remove, null, function(hp) {
 		hostLib.writeHosts(hp.hosts, program.remove);
 	});
@@ -70,28 +71,28 @@ if (program.remove) {
 }
 
 if (program.online) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.setOnline(program.online);
 	hostLib.writeHosts(hp.hosts, program.online);
 	console.log(program.online + ' is online');
 }
 
 if (program.offline) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.setOffline(program.offline);
 	hostLib.writeHosts(hp.hosts, program.offline);
 	console.log(program.offline + ' is offline');
 }
 
 if (program.activate) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.activate(program.activate);
 	hostLib.writeHosts(hp.hosts, program.activate);
 	console.log(program.activate + ' is active');
 }
 
 if (program.deactivate) {
-	hostLib.mustComment();
+	mustComment();
 	var hp = hostLib.deactivate(program.deactivate);
 	hostLib.writeHosts(hp.hosts, program.deactivate);
 	console.log(program.deactivate + ' is inactive');
@@ -103,19 +104,19 @@ if (program.advice) {
 }
 
 if (program.rotate) {
-	hostLib.mustComment();
+	mustComment();
 	var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
 	hostLib.getStats(num, hostLib.rotate);
 }
 
 if (program.rin) {
-	hostLib.mustComment();
+	mustComment();
 	var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
 	hostLib.getStats(num, hostLib.rotate);
 }
 
 if (program.rout) {
-	hostLib.mustComment();
+	mustComment();
 	var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
 	hostLib.getStats(num, hostLib.rotate);
 }
@@ -130,14 +131,21 @@ if (program.testhost) {
 }
 
 if (program.query) {
-	console.log(hostLib.getHostSummaries());
+	console.log(hostLib.getHostsSummary());
 }
 
 if (program.stats) {
-	console.log(hostLib.getHostSummaries());
+	console.log(hostLib.getHostsSummary());
 }
 
 if (program.writeall) {
 	var hp = hostLib.getHosts();
 	hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
 }
+
+function  mustComment () {
+  if (!program.comment) {
+    throw "You must enter a comment. use --help for help.";
+  }
+}
+
