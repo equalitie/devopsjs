@@ -25,7 +25,7 @@ var semwiki = {
   getUsers : function(callback) {
     var params = {
       action: 'ask',
-      query: '[[Category:User]]|?Contact address|?Current activity|?Planned activity|?Modification date|sort=Modification date'
+      query: '[[Category:User]]|?Contact address|?Current activity|?Planned activity|?Modification date|?Watchwords|sort=Modification date'
     };
 
     semwiki.call(params, function(info, next, data) {
