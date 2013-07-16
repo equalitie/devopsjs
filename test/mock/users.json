@@ -1,0 +1,27 @@
+{
+  "User:Base bot": {
+    "printouts": {
+      "Contact address": [
+        "botaddy@testmail"
+      ],
+      "Current activity": [
+        {
+          "fulltext": "Ticket:Be a test bot",
+          "fullurl": "https://testwiki/wiki/Ticket:Be_a_test_bot"
+        }
+      ],
+      "Planned activity": [
+        {
+          "fulltext": "Ticket:Be a test bot",
+          "fullurl": "https://testwiki/wiki/Ticket:Be_a_test_bot"
+        }
+      ],
+      "Modification date": [
+        "1372086087"
+      ],
+      "Watchwords": []
+    },
+    "fulltext": "User:Base bot",
+    "fullurl": "https://testwiki/wiki/User:Base bot"
+  }
+}

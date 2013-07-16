@@ -1,0 +1,53 @@
+{
+  "printouts": {
+    "Assigned to": [
+      {
+        "fulltext": "User:Bot A",
+        "fullurl": "https://testwiki/wiki/User:Bot A"
+      }
+    ],
+    "Contact": [
+      {
+        "fulltext": "User:Bot C",
+        "fullurl": "https://testwiki/wiki/User:Bot 1"
+      }
+    ],
+    "Date created": [],
+    "Date required": [],
+    "Description": [
+      "testing description"
+    ],
+    "Ticket for": [ ],
+    "Importance": [
+      "9-Unassigned"
+    ],
+    "Project": [],
+    "Ticket status": [
+      "Update"
+    ],
+    "Validator": [
+      {
+        "fulltext": "User:Bot V",
+        "fullurl": "https://testwiki/wiki/User:Bot V"
+      }
+    ],
+    "Last update": [
+      "1369671707"
+    ],
+    "Last provider": [
+      {
+        "fulltext": "Bot P",
+        "fullurl": "https://testwiki/wiki/Bot P"
+      }
+    ],
+    "Last comment": [
+      "test last comment"
+    ],
+    "Modification date": [
+      "1372958256"
+    ]
+  },
+  "fulltext": "Ticket:Base ticket",
+  "fullurl": "https://testwiki/wiki/Ticket:Base_ticket"
+}
+
