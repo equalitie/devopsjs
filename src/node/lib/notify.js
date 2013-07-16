@@ -1,6 +1,12 @@
 var semwiki = require('./semwiki.js');
 var queue = require('queue-async');
 
+/**
+* Notification lib
+* currently built around semwiki
+* Transport is configurable
+*/
+
 var emailFrom = GLOBAL.CONFIG.notify.emailFrom;
 var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
@@ -10,7 +16,7 @@ var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 *
 **/
 
-exports.processTickets = function(ticketQuery) {
+exports.processTickets = function(ticketQuery, callback) {
   var getWikiQueue = queue();
   getWikiQueue.defer(function(callback) {
     semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, callback);
@@ -33,8 +39,7 @@ exports.processTickets = function(ticketQuery) {
       });
     });
     getTicketsQueue.awaitAll(function(err) {
-      
-      sendNotifications(composeNotifications(notifier));
+      callback(notifier);
     });
   });
 }
@@ -43,8 +48,9 @@ exports.processTickets = function(ticketQuery) {
 * get notifier with these users
 **/
 
-exports.getNotifier = function() {
+exports.getNotifier = function(users) {
   notifier.reset();
+  notifier.allUsers = users;
   return notifier;
 }
 
@@ -60,16 +66,47 @@ exports.composeNotifications = function(notifier) {
   notifier.toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
+/**
+* Action item for validator, notify for updater
+*/ 
     if (jt.status == 'Validate') {
+      var seen = {};
       jt.validator.forEach(function (v) {
         action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
+        seen[v] = 1;
       });
       jt.assignedTo.forEach(function(a) {
-       cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
+        if (!seen[a]) {
+          cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
+        }
       });
-    } else {
+/**
+* Notify assignee
+**/
+    } else if (jt.status == 'Update') {
+      var seen = {};
       jt.assignedTo.forEach(function (a) {
         action[a] = (action[a] || actionTitle) + '* <span style="font-style:italic; color: green">Update</span> ' + message + '<br />\n';
+        seen[a] = 1;
+      });
+      jt.validator.forEach(function (v) {
+        if (!seen[v]) {
+          action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
+        }
+      });
+/**
+* notify both
+**/
+    } else {
+      var seen = {};
+      jt.validator.forEach(function (v) {
+        cc[v] = (cc[v] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
+        seen[v] = 1;
+      });
+      jt.assignedTo.forEach(function(a) {
+        if (!seen[a]) {
+          cc[a] = (cc[a] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
+        }
       });
     }
   });
@@ -87,17 +124,16 @@ exports.composeNotifications = function(notifier) {
 * Send notifications according to configured GLOBAL.CONFIG.notify
 */
 
-exports.sendNotifications = function(notifier) {
+exports.sendNotifications = function(notifications) {
 
   var transport = GLOBAL.CONFIG.notify.notifyTransport;
 
-  for (var u in notifier.notifications) {
+  for (var u in notifications) {
     var addy = null, user = notifier.getUser(u);
     if (user) {
       addy = semwiki.val(user, 'Contact address')[0];
     }
-//    console.log('\n\n***', u, addy, JSON.stringify(m[u]));
-    var note = notifier.notifications[u];
+    var note = notifications[u];
     if (addy) {
       var messageOptions = {
           from: emailFrom,
@@ -129,8 +165,8 @@ var notifier = {
   toSend : [], allUsers : {},
 
   reset : function() {
-    toSend = []; 
-   allUsers = {};
+    this.toSend = []; 
+    this.allUsers = {};
   },
 
 /**

@@ -2,14 +2,14 @@
   "printouts": {
     "Assigned to": [
       {
-        "fulltext": "User:Bot A",
-        "fullurl": "https://testwiki/wiki/User:Bot A"
+        "fulltext": "User:BotU",
+        "fullurl": "https://testwiki/wiki/User:BotU"
       }
     ],
     "Contact": [
       {
-        "fulltext": "User:Bot C",
-        "fullurl": "https://testwiki/wiki/User:Bot 1"
+        "fulltext": "User:BotU",
+        "fullurl": "https://testwiki/wiki/User:BotU"
       }
     ],
     "Date created": [],
@@ -23,12 +23,12 @@
     ],
     "Project": [],
     "Ticket status": [
-      "Update"
+      "BaseStatus"
     ],
     "Validator": [
       {
-        "fulltext": "User:Bot V",
-        "fullurl": "https://testwiki/wiki/User:Bot V"
+        "fulltext": "User:BotV",
+        "fullurl": "https://testwiki/wiki/User:BotV"
       }
     ],
     "Last update": [
@@ -36,8 +36,8 @@
     ],
     "Last provider": [
       {
-        "fulltext": "Bot P",
-        "fullurl": "https://testwiki/wiki/Bot P"
+        "fulltext": "BotU",
+        "fullurl": "https://testwiki/wiki/BotU"
       }
     ],
     "Last comment": [
@@ -47,7 +47,7 @@
       "1372958256"
     ]
   },
-  "fulltext": "Ticket:Base ticket",
-  "fullurl": "https://testwiki/wiki/Ticket:Base_ticket"
+  "fulltext": "Ticket:BaseTicket",
+  "fullurl": "https://testwiki/wiki/Ticket:BaseTicket"
 }
 
