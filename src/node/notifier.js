@@ -15,7 +15,7 @@ if (program.page) {
   query = '[[' + program.page + ']]';
 } 
 
-notify.processTickets(query, function(notifier) {
+notify.processTickets(query, function(err, notifier) {
   var p = notify.composeNotifications(notifier);
   notify.sendNotifications(p);
 });

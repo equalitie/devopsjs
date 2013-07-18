@@ -9,8 +9,20 @@ exports.getTick = function() {
 *
 **/
 
+var configBase;
+
+exports.getConfigBase = function() {
+  return configBase;
+}
+
+exports.slashedDir = function(d) {
+  if (d.match(/.*\/$/)) {
+    return d;
+  }
+  return d + '/';
+}
+
 exports.config = function() {
-  var configBase;
   if (process.env.DEVOPSCONFIG) {
     configBase = process.env.DEVOPSCONFIG;
   } else {

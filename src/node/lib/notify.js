@@ -16,7 +16,7 @@ var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 *
 **/
 
-exports.processTickets = function(ticketQuery, callback) {
+exports.processTickets = function(pageQuery, callback) {
   var getWikiQueue = queue();
   getWikiQueue.defer(function(callback) {
     semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, callback);
@@ -24,14 +24,16 @@ exports.processTickets = function(ticketQuery, callback) {
   getWikiQueue.awaitAll(function(err) {
     var getTicketsQueue = queue();
 
-    getTicketsQueue.defer(function(callback) {
-      semwiki.getUsers(function(users) {
-        notifier.allUsers = users;
-        callback();
+    if (!notifier.allUsers) {
+      getTicketsQueue.defer(function(callback) {
+        semwiki.getUsers(function(users) {
+          notifier.allUsers = users;
+          callback();
+        });
       });
-    });
+    }
     getTicketsQueue.defer(function(callback) {
-      semwiki.getTickets(ticketQuery, function(tickets) {
+      semwiki.getTickets(pageQuery, function(tickets) {
         for (var ticket in tickets) {
           notifier.addNotify(tickets[ticket]);
         }
@@ -39,7 +41,7 @@ exports.processTickets = function(ticketQuery, callback) {
       });
     });
     getTicketsQueue.awaitAll(function(err) {
-      callback(notifier);
+      callback(err, notifier);
     });
   });
 }
@@ -162,7 +164,7 @@ exports.sendNotifications = function(notifications) {
 **/
 
 var notifier = {
-  toSend : [], allUsers : {},
+  toSend : [], allUsers : null,
 
   reset : function() {
     this.toSend = []; 
@@ -197,6 +199,7 @@ var notifier = {
       lastComment : semwiki.val(ticket, 'Last comment'),
       importance : semwiki.val(ticket, 'Importance'),
       modificationDate : semwiki.date(ticket, 'Modification date'),
+      modificationDateSeconds : semwiki.dateSeconds(ticket, 'Modification date'),
       name : ticket.fulltext,
       link : ticket.fullurl,
       tags: []

@@ -11,11 +11,15 @@ var loggedIn = false;
 
 var semwiki = {
   getWiki : function(wikiConfig, callback) {
-    wikibot = new bot(wikiConfig);
-    wikibot.logIn(function() {
-      loggedIn = true;
-      callback();
-    });
+		if (!loggedIn) {
+      wikibot = new bot(wikiConfig);
+      wikibot.logIn(function() {
+        loggedIn = true;
+				callback();
+      });
+		} else {
+			callback();
+		}
   }, 
 
   call : function(params, callback) {
@@ -32,10 +36,13 @@ var semwiki = {
       callback(data.query.results);
     });
   },
+	getWikibot : function() {
+		return wikibot;
+	},
   getTickets : function(spec, callback) {
     var params = {
       action: 'ask',
-      query: spec + '|?Assigned to|?Contact|?Date created|?Date required|?Description|?Ticket for|?Importance|?Project|?Ticket status|?Validator|?Last update|?Last provider|?Last comment|?Importance|?Modification date|sort=Ticket status,Importance|order=desc,desc|limit=5000'
+      query: spec + '|?Assigned to|?Contact|?Date created|?Date required|?Description|?Ticket for|?Importance|?Project|?Ticket status|?Validator|?Last update|?Last provider|?Last comment|?Importance|?Modification date|sort=Modification date|order=desc,desc'
     };
 
     semwiki.call(params, function(info, next, data) {
@@ -50,6 +57,16 @@ var semwiki = {
     }
     result.printouts[field].forEach(function (v) {
       ret.push(v > 0 ? new Date(v * 1000) : null);
+    });
+    return ret;
+  },
+  dateSeconds : function(result, field){
+    var ret = [];
+    if (!result.printouts[field]) {
+      return ret;
+    }
+    result.printouts[field].forEach(function (v) {
+      ret.push(v > 0 ? v * 1000  : null);
     });
     return ret;
   },
