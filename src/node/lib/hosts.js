@@ -126,7 +126,11 @@ var hosts = {
     if (advice.removeActive === null || advice.addInactive === null) {
       throw "Can't advise" + JSON.stringify(advice);
     }
-    console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
+    if (advice.notTime) {
+      console.log(advice.notTime.message);
+    } else { 
+      console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
+    }
   },
 
   rotate : function(err, stats) {
@@ -134,11 +138,15 @@ var hosts = {
     if (advice.removeActive === null || advice.addInactive === null) {
       throw "Can't rotate" + JSON.stringify(advice);
     }
-    
-    var hp = activate(advice.addInactive.name);
-    hp = deactivate(advice.removeActive.name, hp.hosts);
-    writeHosts(hp.hosts);	// FIXME: move storage to higher level
-    console.log(advice.summary);
+    if (advice.notTime) {
+      console.log(advice.notTime.message);
+    } else { 
+      
+      var hp = activate(advice.addInactive.name);
+      hp = deactivate(advice.removeActive.name, hp.hosts);
+      writeHosts(hp.hosts);	// FIXME: move storage to higher level
+      console.log(advice.summary);
+   }
   },
 
   getStats : function(num, callback) {
@@ -284,8 +292,18 @@ function getRotateAdvice(hostSummaries, hosts) {
 		throw "no host to activate";
 	}
 	
-	return {removeActive : activeAdvice.host, addInactive : inactiveAdvice.host, removeReason : activeAdvice.reason, addReason : inactiveAdvice.reason
+	var ret = {removeActive : activeAdvice.host , addInactive : inactiveAdvice.host
+    , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason
 		, summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
+
+  if (!GLOBAL.CONFIG.rotationTimeMinutes) {
+    throw ("GLOBAL.CONFIG.rotationTimeMinutes not defined");
+  }
+  var diff = moment().diff(moment(activeAdvice.host.stats.active_dt), 'minutes');
+  if ((activeAdvice.host.stats.worry < 1) && (diff < GLOBAL.CONFIG.rotationTimeMinutes)) {
+    ret.notTime = { message: 'no rotationTimeMinutes requirement to rotate (config ' + GLOBAL.CONFIG.rotationTimeMinutes + ' vs ' + diff + ' minutes)'};
+  }
+  return ret;
 }
 
 function getAddInactive(hosts, hostSummaries) {
@@ -344,6 +362,7 @@ function getRemoveActive(hosts, hostSummaries) {
 	var highestError = null;
 	for (var i in hosts.activeHosts) { // get oldest or most problematic active host to deactivate
 		var host = hosts.activeHosts[i];
+    host.worry = 0 + hostSummaries[i].worryWeight;
 		if (config.program.rout) {
 			if (config.program.rout === i) {
 				removeActive = { name : i, stats : host};
