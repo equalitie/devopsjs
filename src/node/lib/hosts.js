@@ -3,6 +3,10 @@ var utils = require('./util.js');
 var queue = require('queue-async');
 var moment = require('moment');
 var colors = require('colors');
+if (!process.stdout.isTTY) {
+  colors.mode = 'none';
+}
+
 var solrClient;
 var verbose = false;
 var NOW = new Date().toISOString()
