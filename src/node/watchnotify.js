@@ -29,13 +29,13 @@ var iterations = 0;
 var query;
 try {
   nextSince = require(conf + 'notifyTimestamp.json');
+  console.log('retrieved nextSince', nextSince);
   query = getQuery(nextSince);
 } catch (e) {
   query = '[[Modification date::+]]|limit=1';
 }
 setInterval(function() {
   if (!running) {
-console.log(query);
     iterations++;
     if (program.iterations > 0 && iterations > program.iterations) {
       process.exit();
@@ -45,7 +45,7 @@ console.log(query);
       notifier.toSend.forEach(function(t) {
         if (nextSince == null || moment(t.modificationDate[0]).isAfter(nextSince)) {
           nextSince = t.modificationDate[0];
-console.log('new nextSince', nextSince);
+          console.log('new nextSince', nextSince);
         }
       });
       var p = notify.composeNotifications(notifier);

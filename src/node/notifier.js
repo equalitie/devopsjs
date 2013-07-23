@@ -9,7 +9,7 @@ program
 
 program.parse(process.argv);
 
-var query = '[[Category:Unresolved tickets]]';
+var query = '[[Category:Unresolved tickets]]|limit=500';
 
 if (program.page) {
   query = '[[' + program.page + ']]';

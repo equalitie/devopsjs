@@ -26,6 +26,16 @@ var semwiki = {
     wikibot.api.call(params, callback);
   },
 
+  getExpandedText : function(text, title, callback) {
+    var q = { action: 'expandtemplates', text: text, generatexml: 1 }
+    if (title) { q.title = title };
+    wikibot.api.call(q, function(data, next, raw) {
+      var ret = raw.expandtemplates[Object.keys(raw.expandtemplates)[0]];
+      callback && callback(ret);
+    }, 'POST');
+  },
+
+
   getUsers : function(callback) {
     var params = {
       action: 'ask',

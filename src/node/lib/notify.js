@@ -12,35 +12,40 @@ var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
 /**
 *
-*  Get current tickets and users from wiki according to query, then process them
+*  Get current pages focusing on tickets, and users if not configured, from wiki according to query, then process them
 *
 **/
 
 exports.processTickets = function(pageQuery, callback) {
   var getWikiQueue = queue();
-  getWikiQueue.defer(function(callback) {
-    semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, callback);
+  getWikiQueue.defer(function(cb) {
+    semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, cb);
   });
   getWikiQueue.awaitAll(function(err) {
-    var getTicketsQueue = queue();
+    var getPagesQueue = queue(1);
 
     if (!notifier.allUsers) {
-      getTicketsQueue.defer(function(callback) {
+      getPagesQueue.defer(function(cb) {
         semwiki.getUsers(function(users) {
           notifier.allUsers = users;
-          callback();
+          cb();
         });
       });
     }
-    getTicketsQueue.defer(function(callback) {
-      semwiki.getTickets(pageQuery, function(tickets) {
-        for (var ticket in tickets) {
-          notifier.addNotify(tickets[ticket]);
-        }
-        callback();
+    getPagesQueue.defer(function(cb) {
+      semwiki.getTickets(pageQuery, function(pages) {
+        var c = 0, g = Object.keys(pages).length;
+        for (var page in pages) {
+          (function(page) {
+          semwiki.getExpandedText('{{:'+page+'}}', null, function(text) {
+            notifier.addCandidate(pages[page], text);
+            if (++c == g) { cb(); }
+          });
+        }(page));
+        } 
       });
     });
-    getTicketsQueue.awaitAll(function(err) {
+    getPagesQueue.awaitAll(function(err) {
       callback(err, notifier);
     });
   });
@@ -63,51 +68,62 @@ exports.getNotifier = function(users) {
 */
 
 exports.composeNotifications = function(notifier) {
-  var action = {}, cc = {}, actionTitle = '<h2>Action items</h2><br />\n', ccTitle = '<br />\n<h2>Watching items</h2><br />\n';
+  var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
   notifier.toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
-/**
-* Action item for validator, notify for updater
-*/ 
-    if (jt.status == 'Validate') {
-      var seen = {};
-      jt.validator.forEach(function (v) {
-        action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
-        seen[v] = 1;
-      });
-      jt.assignedTo.forEach(function(a) {
-        if (!seen[a]) {
-          cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
-        }
-      });
-/**
-* Notify assignee
-**/
-    } else if (jt.status == 'Update') {
-      var seen = {};
-      jt.assignedTo.forEach(function (a) {
-        action[a] = (action[a] || actionTitle) + '* <span style="font-style:italic; color: green">Update</span> ' + message + '<br />\n';
-        seen[a] = 1;
-      });
-      jt.validator.forEach(function (v) {
-        if (!seen[v]) {
+/** * Action item for validator, notify for updater */ 
+    if (jt.categories.indexOf('Ticket tracker') > -1) {
+      if (jt.status == 'Validate') {
+        var seen = {};
+        jt.validator.forEach(function (v) {
           action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
-        }
-      });
-/**
-* notify both
-**/
-    } else {
-      var seen = {};
-      jt.validator.forEach(function (v) {
-        cc[v] = (cc[v] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
-        seen[v] = 1;
-      });
-      jt.assignedTo.forEach(function(a) {
-        if (!seen[a]) {
-          cc[a] = (cc[a] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
+          seen[v] = 1;
+        });
+        jt.assignedTo.forEach(function(a) {
+          if (!seen[a]) {
+            cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
+          }
+        });
+/** * Notify assignee **/
+      } else if (jt.status == 'Update') {
+        var seen = {};
+        jt.assignedTo.forEach(function (a) {
+          action[a] = (action[a] || actionTitle) + '* <span style="font-style:italic; color: green">Update</span> ' + message + '<br />\n';
+          seen[a] = 1;
+        });
+        jt.validator.forEach(function (v) {
+          if (!seen[v]) {
+            action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
+          }
+        });
+/** * notify both **/
+      } else {
+        var seen = {};
+        jt.validator.forEach(function (v) {
+          cc[v] = (cc[v] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
+          seen[v] = 1;
+        });
+        jt.assignedTo.forEach(function(a) {
+          if (!seen[a]) {
+            cc[a] = (cc[a] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
+          }
+        });
+      }
+    }
+/** * check for watchwords **/
+    var t = jt.text.replace(/<[^>]*>/g, '').toLowerCase();
+    for (var u in notifier.allUsers) {
+      var user = notifier.allUsers[u];
+      semwiki.val(user, 'Watchwords').forEach(function(w) {
+        var re = new RegExp(w, 'gi');
+        if (t.search(re)) {
+          var message = '';
+          while (match = re.exec(t)) {
+            message += '…' + t.substring(Math.max(match.index - 15, 0), Math.min(match.index + w.length + 15, t.length)) + '… ';
+          }
+          watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + message + '<br />\n';
         }
       });
     }
@@ -118,6 +134,9 @@ exports.composeNotifications = function(notifier) {
   }
   for (var user in cc) {
     m[user] = (m[user] || '') + cc[user];
+  }
+  for (var user in watch) {
+    m[user] = (m[user] || '') + watch[user];
   }
   return m;
 }
@@ -184,24 +203,33 @@ var notifier = {
 
 
 /**
-* Store a notification out of this ticket
+* Process text in page and add to candidates
 */
 
-  addNotify : function(ticket) {
+  addCandidate : function(page, text) {
+    var m = text.match(new RegExp(/\[\[category:[^\]]*]]/gi));
+    var cats = [];
+    if (m) {
+      m.forEach(function(c) {
+        cats.push(c.replace(/.*:/, '').replace(']]', ''));
+      });
+    }
     var jt = {
-      status : semwiki.val(ticket, 'Ticket status'),
-      assignedTo : semwiki.val(ticket, 'Assigned to'),
-      validator : semwiki.val(ticket, 'Validator'),
-      contact : semwiki.val(ticket, 'Contact'),
-      dateRequired : semwiki.date(ticket, 'Date required'),
-      lastUpdate : semwiki.date(ticket, 'Last update'),
-      lastProvider : semwiki.val(ticket, 'Last provider'),
-      lastComment : semwiki.val(ticket, 'Last comment'),
-      importance : semwiki.val(ticket, 'Importance'),
-      modificationDate : semwiki.date(ticket, 'Modification date'),
-      modificationDateSeconds : semwiki.dateSeconds(ticket, 'Modification date'),
-      name : ticket.fulltext,
-      link : ticket.fullurl,
+      status : semwiki.val(page, 'Ticket status'),
+      assignedTo : semwiki.val(page, 'Assigned to'),
+      validator : semwiki.val(page, 'Validator'),
+      contact : semwiki.val(page, 'Contact'),
+      dateRequired : semwiki.date(page, 'Date required'),
+      lastUpdate : semwiki.date(page, 'Last update'),
+      lastProvider : semwiki.val(page, 'Last provider'),
+      lastComment : semwiki.val(page, 'Last comment'),
+      importance : semwiki.val(page, 'Importance'),
+      modificationDate : semwiki.date(page, 'Modification date'),
+      modificationDateSeconds : semwiki.dateSeconds(page, 'Modification date'),
+      name : page.fulltext,
+      link : page.fullurl,
+      text : text,
+      categories : cats,
       tags: []
     }
     if (jt.dateRequired[0] && jt.dateRequired[0].getTime() < new Date().getTime()) {
@@ -221,3 +249,4 @@ var notifier = {
     this.toSend.push(jt);
   }
 }
+
