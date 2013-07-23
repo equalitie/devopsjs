@@ -73,7 +73,7 @@ exports.composeNotifications = function(notifier) {
   notifier.toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
-/** * Action item for validator, notify for updater */ 
+/** Action item for validator, notify for updater */ 
     if (jt.categories.indexOf('Ticket tracker') > -1) {
       if (jt.status == 'Validate') {
         var seen = {};
@@ -86,7 +86,7 @@ exports.composeNotifications = function(notifier) {
             cc[a] = (cc[a] || ccTitle) + '* <i>Needs validation from ' + jt.validator.toString().replace(/User:/, '') + '</i> ' + message + '<br />\n';
           }
         });
-/** * Notify assignee **/
+/** Notify assignee **/
       } else if (jt.status == 'Update') {
         var seen = {};
         jt.assignedTo.forEach(function (a) {
@@ -98,7 +98,7 @@ exports.composeNotifications = function(notifier) {
             action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
           }
         });
-/** * notify both **/
+/** notify both **/
       } else {
         var seen = {};
         jt.validator.forEach(function (v) {
@@ -112,18 +112,18 @@ exports.composeNotifications = function(notifier) {
         });
       }
     }
-/** * check for watchwords **/
+/** check for watchwords **/
     var t = jt.text.replace(/<[^>]*>/g, '').toLowerCase();
     for (var u in notifier.allUsers) {
       var user = notifier.allUsers[u];
       semwiki.val(user, 'Watchwords').forEach(function(w) {
         var re = new RegExp(w, 'gi');
-        if (t.search(re)) {
-          var message = '';
+        if (t.search(re) > -1) {
+          var matches = '';
           while (match = re.exec(t)) {
-            message += '…' + t.substring(Math.max(match.index - 15, 0), Math.min(match.index + w.length + 15, t.length)) + '… ';
+            matches += ' …' + t.substring(Math.max(match.index - 15, 0), Math.min(match.index + w.length + 15, t.length)) + '…';
           }
-          watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + message + '<br />\n';
+          watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + matches + '<br />\n';
         }
       });
     }
