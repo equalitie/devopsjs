@@ -71,7 +71,8 @@ exports.composeNotifications = function(notifier) {
   var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
   notifier.toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
-    var message = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a> <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
+    var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a>'
+    var message =  linktext + ' <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
 /** Action item for validator, notify for updater */ 
     if (jt.categories.indexOf('Ticket tracker') > -1) {
@@ -123,7 +124,7 @@ exports.composeNotifications = function(notifier) {
           while (match = re.exec(t)) {
             matches += ' …' + t.substring(Math.max(match.index - 15, 0), Math.min(match.index + w.length + 15, t.length)) + '…';
           }
-          watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + matches + '<br />\n';
+          watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + linktext + ': ' + matches + '<br />\n';
         }
       });
     }
