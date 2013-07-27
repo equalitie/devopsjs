@@ -132,6 +132,7 @@ var hosts = {
     }
     if (advice.notTime) {
       console.log(advice.notTime.message);
+      process.exit(1);
     } else { 
       console.log(process.argv[1] + ' --activate ' + advice.addInactive.name + ' --deactivate ' + advice.removeActive.name + ' -c "' + advice.summary + '"'); 
     }
@@ -144,6 +145,7 @@ var hosts = {
     }
     if (advice.notTime) {
       console.log(advice.notTime.message);
+      process.exit(1);
     } else { 
       
       var hp = activate(advice.addInactive.name);

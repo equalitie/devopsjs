@@ -36,6 +36,7 @@ exports.processTickets = function(pageQuery, callback) {
       semwiki.getTickets(pageQuery, function(pages) {
         var c = 0, g = Object.keys(pages).length;
         for (var page in pages) {
+console.log(page);
           (function(page) {
           semwiki.getExpandedText('{{:'+page+'}}', null, function(text) {
             notifier.addCandidate(pages[page], text);
@@ -70,7 +71,7 @@ exports.getNotifier = function(users) {
 exports.composeNotifications = function(notifier) {
   var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
-  notifier.toSend.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
+  notifier.toProcess.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
     var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a>'
     var message =  linktext + ' <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
@@ -184,10 +185,10 @@ exports.sendNotifications = function(notifications) {
 **/
 
 var notifier = {
-  toSend : [], allUsers : null,
+  toProcess : [], allUsers : null,
 
   reset : function() {
-    this.toSend = []; 
+    this.toProcess = []; 
     this.allUsers = {};
   },
 
@@ -247,7 +248,7 @@ var notifier = {
       }
     });
 
-    this.toSend.push(jt);
+    this.toProcess.push(jt);
   }
 }
 

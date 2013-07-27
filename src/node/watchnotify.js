@@ -42,7 +42,7 @@ setInterval(function() {
     }
     running = true;
     notify.processTickets(query, function(err, notifier) {
-      notifier.toSend.forEach(function(t) {
+      notifier.toProcess.forEach(function(t) {
         if (nextSince == null || moment(t.modificationDate[0]).isAfter(nextSince)) {
           nextSince = t.modificationDate[0];
           console.log('new nextSince', nextSince);
@@ -50,9 +50,9 @@ setInterval(function() {
       });
       var p = notify.composeNotifications(notifier);
       notify.sendNotifications(p);
-      if (notifier.toSend.length > 0) {
+      if (notifier.toProcess.length > 0) {
         query = getQuery(nextSince);
-        notifier.toSend = [];
+        notifier.toProcess = [];
         fs.writeFileSync(utils.slashedDir(conf) + 'notifyTimestamp.json', JSON.stringify(nextSince));
       }
       running = false;
