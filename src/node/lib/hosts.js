@@ -297,17 +297,22 @@ function getRotateAdvice(hostSummaries, hosts) {
 	if (!inactiveAdvice.host) {
 		throw "no host to activate";
 	}
-	
-	var ret = {removeActive : activeAdvice.host , addInactive : inactiveAdvice.host
+
+	var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host
     , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason
 		, summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
-  if (!GLOBAL.CONFIG.rotationTimeMinutes) {
-    throw ("GLOBAL.CONFIG.rotationTimeMinutes not defined");
-  }
-  var diff = moment().diff(moment(activeAdvice.host.stats.active_dt), 'minutes');
-  if ((activeAdvice.host.stats.worry < 1) && (diff < GLOBAL.CONFIG.rotationTimeMinutes)) {
-    ret.notTime = { message: 'no rotationTimeMinutes requirement to rotate (config ' + GLOBAL.CONFIG.rotationTimeMinutes + ' vs ' + diff + ' minutes)'};
+  /** Should we rotate even if it's not time **/
+  var doRotate = config.program.rout || config.program.rin || config.program.force || activeAdvice.host.stats.worry > 0;
+	
+  if (!doRotate) {
+    if (!GLOBAL.CONFIG.rotationTimeMinutes) {
+      throw ("GLOBAL.CONFIG.rotationTimeMinutes not defined");
+    }
+    var diff = moment().diff(moment(activeAdvice.newest.stats.active_dt), 'minutes');
+    if (diff < GLOBAL.CONFIG.rotationTimeMinutes) {
+      ret.notTime = { message: 'no rotationTimeMinutes requirement to rotate (config ' + GLOBAL.CONFIG.rotationTimeMinutes + ' vs ' + diff + ' minutes)'};
+    }
   }
   return ret;
 }
@@ -364,8 +369,7 @@ function getAddInactive(hosts, hostSummaries) {
 }
 
 function getRemoveActive(hosts, hostSummaries) {
-  var removeActive, removeReason;
-	var highestError = null;
+  var removeActive, removeReason, newest, highestError = null;
 	for (var i in hosts.activeHosts) { // get oldest or most problematic active host to deactivate
 		var host = hosts.activeHosts[i];
     host.worry = 0 + hostSummaries[i].worryWeight;
@@ -381,23 +385,25 @@ function getRemoveActive(hosts, hostSummaries) {
 			}
 			var rec = hostSummaries[i];
 			
-			if (rec && rec.worryWeight > 0 && (!highestError || rec.worryWeight > highestError.worryWeight)) {	// remove edge with highest error
+			if (rec && rec.worryWeight > 0 && (!highestError || rec.worryWeight > highestError.worryWeight)) {	/** remove edge with highest error **/
 				removeActive = { name : i, stats : host};
 				highestError = rec;
 				removeReason = 'worry (' + rec.worryWeight + ')';
 				if (verbose) {
 					console.log('remove candidate; worry:'.blue, rec.worryWeight);
 				}
-			} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	// or if no errors, longest time
+			} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	/** or if no errors, longest time **/
 				removeActive = { name : i, stats : host};
 				removeReason = 'time';
 				if (verbose) {
 					console.log('remove candidate; time:'.blue, moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
+			} else if (!newest || moment(host.active_dt).diff(newest.stats.active_dt) > 0) {	/** log the newest rotated **/
+				newest = { name : i, stats : host};
 			}
 		}
 	}
-  return { host : removeActive, reason : removeReason };
+  return { host : removeActive, reason : removeReason, newest: newest };
 }
 	
 function getHostsSummary(hosts) {
