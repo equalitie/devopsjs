@@ -547,12 +547,16 @@ function writeHosts(hosts, changedHost) {
 	validateConfiguration(hosts);
 	
 	writeHostsJson(hosts);
-	if (config.flatHostsFile) {
+	if (GLOBAL.CONFIG.flatHostsFile) {
 		if (verbose) {
-			console.log('writing to ' + config.flatHostsFile);
+			console.log('writing to ' + GLOBAL.CONFIG.flatHostsFile);
 		}
-		writeFlatHosts(hosts);
-	}
+		writeFlatHosts(hosts, false, GLOBAL.CONFIG.flatHostsFile);
+	} else {
+    if (verbose) {
+      console.log('no flatHostsFile defined');
+    }
+  }
 	
 	var sum = getHostsSummary(hosts);
 	var summary = {comment_s : config.program.comment, operator_s : process.env.SUDO_USER || process.env.USER
