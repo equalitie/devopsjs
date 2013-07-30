@@ -303,7 +303,7 @@ function getRotateAdvice(hostSummaries, hosts) {
 		, summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
   /** Should we rotate even if it's not time **/
-  var doRotate = config.program.rout || config.program.rin || config.program.force || activeAdvice.host.stats.worry > 0;
+  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > 0;
 	
   if (!doRotate) {
     if (!GLOBAL.CONFIG.rotationTimeMinutes) {
@@ -318,9 +318,8 @@ function getRotateAdvice(hostSummaries, hosts) {
 }
 
 function getAddInactive(hosts, hostSummaries) {
-  var addReason, addInactive;
-	var tries = hosts.inactive;
-	var lowestError = null;	// use this host if no other option
+  var addReason, addInactive, tries = hosts.inactive,
+	  lowestError = null;	// use this host if no other option
 	
 	for (var i in hosts.inactiveHosts) { // get oldest inactive host to activate
 		var host = hosts.inactiveHosts[i];
