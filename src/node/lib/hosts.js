@@ -283,7 +283,7 @@ function getRotateAdvice(hostSummaries, hosts) {
   var inactiveAdvice = getAddInactive(hosts, hostSummaries);
 	
 	if (config.program.rin && !inactiveAdvice.host) {
-		throw "Can't rotate in " + program.rin;
+		throw "Can't rotate in " + config.program.rin;
 	}
 	
 	if (config.program.rout && !activeAdvice.host) {
