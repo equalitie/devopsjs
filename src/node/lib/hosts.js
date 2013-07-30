@@ -447,21 +447,21 @@ function getHostsSummary(hosts) {
 function validateConfiguration(hosts) {	// make sure the resulting config makes sense
 	var stats = getHostsSummary(hosts);
 	if (stats.active < GLOBAL.CONFIG.minActive) {
-		if (program.override) {
+		if (config.program.override) {
 			console.log("overridding required hosts");
 		} else {
 			throw "not enough active hosts; " + stats.active + ' (required: ' + GLOBAL.CONFIG.minActive + ')';
 		}
 	}
 	if (GLOBAL.CONFIG.constantActive && stats.active != GLOBAL.CONFIG.constantActive) {
-		if (program.override) {
+		if (config.program.override) {
 			console.log("overridding required constant active");
 		} else {
 			throw "active hosts not required number; " + stats.active + ' (required: ' + GLOBAL.CONFIG.constantActive + ')';
 		}
 	}
 	if (GLOBAL.CONFIG.minInactive  && stats.inactive < GLOBAL.CONFIG.minInactive) {
-		if (program.override) {
+		if (config.program.override) {
 			console.log("overridding required inactive");
 		} else {
 			throw "not enough inactive hosts; " + stats.inactive + ' (required: ' + GLOBAL.CONFIG.minInactive + ')';
