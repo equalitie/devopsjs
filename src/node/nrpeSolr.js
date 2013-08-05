@@ -1,25 +1,21 @@
+'use strict';
+
 GLOBAL.exception = function(s) {
 	console.log('*** EXCEPTION', s);
 }
 
-var util=require('./lib/util.js')
 var program = require('commander');
 var hostLib = require('./lib/hosts.js');
 
-var configBase;
-if (process.env.DEVOPSCONFIG) {
-  configBase = process.env.DEVOPSCONFIG;
-} else {
-  configBase = process.cwd() + '/config/';
-}
+var utils = require('./lib/util.js');
+utils.config();
 
-var hosts = require(configBase + 'hosts.json');
-require(configBase + 'localConfig.js');
+var hosts = require(GLOBAL.CONFIG.configBase + 'hosts.json');
 
-var store = require('./lib/solrNagios.js');
+var store = utils.getStore();
 var nrpe = require('./lib/nrpe/check.js');
 
-var tick = util.getTick();
+var tick = utils.getTick();
 var numChecks = 0;
 
 program
@@ -28,7 +24,7 @@ program
   .option('-s --save', 'write results (defaults to no if a check or host is specified')
   .parse(process.argv);
 
-hostLib = hostLib.setConfig(program, configBase + 'hosts.json', require('solr-client'));
+hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase+ 'hosts.json', require('solr-client'));
 var doResolve = true; // resolve edge's current cluster
 var doSave = program.save || (!program.check && !program.host);
 var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks(program.check ? program.check : null);

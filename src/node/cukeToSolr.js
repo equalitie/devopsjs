@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 // transform cucumber json output into solr results
+// TODO port to ElasticSearch
 
 var inputStream = process.stdin
   , data = '';

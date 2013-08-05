@@ -7,7 +7,7 @@ if (!process.stdout.isTTY) {
   colors.mode = 'none';
 }
 
-var solrClient;
+var storeClient;
 var verbose = false;
 var NOW = new Date().toISOString()
 
@@ -35,7 +35,7 @@ var hosts = {
     config.hostsFile = hostsFile;
     config.program = program;
     verbose = program.verbose;
-    solrClient = store.createClient(GLOBAL.CONFIG.solrConfig);
+    storeClient = store.createClient(GLOBAL.CONFIG.solrConfig);
 
     return this;
   },
@@ -169,10 +169,10 @@ var hosts = {
         var host = hosts[h].name_s;
       
         getStatsQueue.defer(function(callback) {
-          var statsQuery = solrClient.createQuery()
+          var statsQuery = storeClient.createQuery()
             .q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'asc'});
     
-          solrClient.search(statsQuery, callback);
+          storeClient.search(statsQuery, callback);
         }); 
       }
     }
@@ -581,7 +581,7 @@ function writeHosts(hosts, changedHost) {
 		doc.id = host.name_s + '/' + NOW;
 		docs.push(doc);
 	}
-	solrClient.add(docs, function(err,obj){
+	storeClient.add(docs, function(err,obj){
 	  if(err){
 	    throw "commit ERROR: " + err;
 	  }

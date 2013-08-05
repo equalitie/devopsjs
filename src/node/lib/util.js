@@ -5,11 +5,11 @@ exports.getTick = function() {
 /**
 *
 * Loads configuration based on current environmental setting of DEVOPSCONFIG base. 
-* sets DEVOPS_DEBUG 
+* checks for DEVOPS_DEBUG 
 *
 **/
 
-var configBase;
+var configBase, store;
 
 exports.getConfigBase = function() {
   return configBase;
@@ -43,3 +43,12 @@ exports.config = function() {
   }
 }
 
+exports.getStore = function() {
+  if (!configBase) {
+    throw "Not configured";
+  }
+  if (!store) {
+    store = require('./solrNagios.js');
+  }
+  return store;
+}
