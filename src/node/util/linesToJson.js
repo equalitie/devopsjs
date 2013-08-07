@@ -8,22 +8,22 @@ lineReader.eachLine(filename, function(line, last) {
 	var host = {};
 	var now = new Date().toISOString();
 	var name = line.replace(/^#[^a-z]*/, '').replace(/#.*/, '');
-	host.name_s = name;
-	host.lastUpdate_dt = now;
-	host.comment_s = 'Auto-imported ' + now;
-	host.added_dt = now;
+	host.hostname = name;
+	host.comment = 'Auto-imported ' + now;
+	host.added = now;
 	
 	if (name && !line.match(/^# .*/)) {
 		
 		if (/^##/.test(line)) {
-			host.inactive_dt = now;
+			host.lastInactive = now;
+			host.state = 'inactive';
 		} else if (/^#/.test(line)) {
-			host.offline_b = true;
-			host.offline_dt = now;
-			host.comment_s = last_comment;
+			host.state = 'offline';
+			host.lastOffline = now;
+			host.comment = last_comment;
 		} else {
-			host.active_b = true;
-			host.active_dt = now;
+			host.state = 'active';
+			host.lastActive = now;
 		}
 		
 		hosts.push(host);

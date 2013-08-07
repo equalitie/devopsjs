@@ -7,7 +7,6 @@ if (!process.stdout.isTTY) {
   colors.mode = 'none';
 }
 
-var storeClient;
 var verbose = false;
 var NOW = new Date().toISOString()
 
@@ -31,11 +30,10 @@ var hosts = {
    * Set invocation configuration. You probably want to do this.
    * 
    */
-  setConfig : function(program, hostsFile, store) {
+  setConfig : function(program, hostsFile) {
     config.hostsFile = hostsFile;
     config.program = program;
     verbose = program.verbose;
-    storeClient = store.createClient(GLOBAL.CONFIG.solrConfig);
 
     return this;
   },
@@ -46,7 +44,7 @@ var hosts = {
       throw Error("host already exists: " + newHost, hosts);
     }
 
-    var host = { name_s : newHost, added_dt : NOW, lastUpdate_dt : NOW, comment_s : config.program.comment};
+    var host = { hostname : newHost, added : NOW, comment : config.program.comment};
     hp.hosts.push(host);
     hp.host = host;
     return hp;
@@ -62,7 +60,7 @@ var hosts = {
     if (!hp.host) {
       throw "host doesn't' exist: " + remHost;
     }
-    hp.host.removed_dt = NOW;
+    hp.host.removed = NOW;
     
     if (writeCallback) {
       writeCallback(hp);
@@ -71,7 +69,7 @@ var hosts = {
     var newHosts = [];
     for (var i in hp.hosts) {
       var host = hp.hosts[i];
-      if (!(host.name_s === remHost)) {
+      if (!(host.hostname === remHost)) {
         newHosts.push(host);
       }
     }
@@ -92,9 +90,9 @@ var hosts = {
       throw "host is not offline";
     }
           
-    host.offline_b = false;
-    host.online_dt = new Date().toISOString();
-    host.comment_s = config.program.comment;
+    host.state = 'inactive';
+    host.lastOnline = new Date().toISOString();
+    host.comment = config.program.comment;
     return hp;
   },
 
@@ -109,10 +107,9 @@ var hosts = {
       throw "host is already offline";
     }
     
-    host.active_b = false;
-    host.offline_b = true;
-    host.offline_dt = new Date().toISOString();
-    host.comment_s = config.program.comment;
+    host.state = 'offline';
+    host.lastOffline = new Date().toISOString();
+    host.comment = config.program.comment;
 
     return hp;
   },
@@ -161,27 +158,44 @@ var hosts = {
     var hosts = require(config.hostsFile);
     var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
     
-    var getStatsQueue = queue();
-    var period = moment(moment() - moment().diff(num, config.defaultUnits)).format() + 'Z'; // FIXME use Date.toISOString();
-
+    var qchecks = [], qhosts = [];
     for (var n in nrpeChecks) {
-      for (var h in hosts) {
-        var host = hosts[h].name_s;
-      
-        getStatsQueue.defer(function(callback) {
-          var statsQuery = storeClient.createQuery()
-            .q({edge_s : host, aCheck_s : n, tickDate_dt : '[' + period + ' TO NOW]'}).sort({tickDate_dt:'asc'});
-    
-          storeClient.search(statsQuery, callback);
-        }); 
-      }
+      qchecks.push(n);
     }
-    getStatsQueue.awaitAll(function(err, results) {
-      if (err) {
-        throw err;
-      }
       
-      callback(null, getHostStats(results, nrpeChecks));
+    for (var h in hosts) {
+      qhosts.push(hosts[h].hostname);
+    }
+    var q = { 
+      size : 500,
+      "query": { 
+        "filtered": { 
+          "query": { 
+            "bool": { 
+              "must": [
+                  {
+                    "match" : { "checkName" : qchecks.join(' ') }
+                  },
+                  {
+                    "match" : { "hostname" : qhosts.join(' ') }
+                  }
+              ]
+            } 
+          }, 
+          "filter": {
+            "range": { 
+              "@timestamp": { 
+                "gt": "now-9m" 
+              } 
+            } 
+          } 
+        } 
+      } 
+    }
+
+    GLOBAL.CONFIG.getStore().search({ _index : 'devopsjs', _type : 'hostCheck'}, q, function(err, res) {
+      if (err) {throw err; }
+      callback(null, getHostStats(res.hits.hits, nrpeChecks));
     });
   }, 
 
@@ -217,7 +231,7 @@ module.exports = hosts;
 /**
  * Generate stats for edges
  *
- * @param {results} array of Solr edge queries
+ * @param {results} array of edge queries
  * @param {nrpeChecks} checks used for these edges from lib/nrpe/allChecks.js
  * @return {Object} hostSummaries
  * @api private
@@ -225,44 +239,40 @@ module.exports = hosts;
 
 function getHostStats(results, nrpeChecks) {
   var hostStats = {}, maxCount = 0;
-  for (var r in results) {
-    var response = results[r].response;
-    
-    for (var d in response.docs) {	// parse host results
-      var doc = response.docs[d];
-      var status = doc.status_s, utc = moment.utc(doc.tickDate_dt), host = doc['edge_s'], hostStat = hostStats[host];
-      if (!hostStat) {
-        hostStat = {worryWeight : 0, resultCount : 0, worries: []};
-        for (var name in nrpeChecks) {
-          for (var field in nrpeChecks[name].fields) {
-            hostStat[field + 'Count'] = 0;
-          }
+  for (var d in results) {	// parse host results
+    var doc = results[d]._source;
+    var status = doc.status, utc = moment.utc(doc['@timestamp']), host = doc['hostname'], hostStat = hostStats[host];
+    if (!hostStat) {
+      hostStat = {worryWeight : 0, resultCount : 0, worries: []};
+      for (var name in nrpeChecks) {
+        for (var field in nrpeChecks[name].fields) {
+          hostStat[field + 'Count'] = 0;
         }
-        hostStats[host] = hostStat;
       }
-  
-      hostStat['resultCount'] = hostStat['resultCount'] + 1;
-      if (hostStat['resultCount'] > maxCount) {
-        maxCount = hostStat['resultCount'];
-      }
-      var msg = status, worry = 0, timeAgo = moment(doc['tickDate_dt']).fromNow(), timeWeight = Math.round(10000/((moment().diff(doc.tickDate_dt) / 10000)/2)); // decrease over time
-      if (doc.error_t) {
-        msg = doc.error_t.replace('CHECK_NRPE: ', '').trim();
-      }
-      if (status != 'OK' && !worryVals[status]) {
-        throw 'Missing worryVal for "' + status + '"';
-      }
-
-      if (worryVals[status] > 0) {
-        worry = worryVals[status] * timeWeight;
-        hostStat.worries.push({status_s : status, weight: worry});
-      }
-      hostStat.worryWeight = hostStat.worryWeight + worry;
-      if (verbose) {
-        console.log(host.yellow + ' ' + doc.aCheck_s.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '∑', hostStat.worryWeight);
-      }
+      hostStats[host] = hostStat;
     }
-	}
+
+    hostStat['resultCount'] = hostStat['resultCount'] + 1;
+    if (hostStat['resultCount'] > maxCount) {
+      maxCount = hostStat['resultCount'];
+    }
+    var msg = status, worry = 0, timeAgo = moment(doc['@timestamp']).fromNow(), timeWeight = Math.round(10000/((moment().diff(doc['@timestamp']) / 10000)/2)); // decrease over time
+    if (doc.error) {
+      msg = doc.error.replace('CHECK_NRPE: ', '').trim();
+    }
+    if (status != 'OK' && !worryVals[status]) {
+      throw 'Missing worryVal for "' + status + '"';
+    }
+
+    if (worryVals[status] > 0) {
+      worry = worryVals[status] * timeWeight;
+      hostStat.worries.push({state : status, weight: worry});
+    }
+    hostStat.worryWeight = hostStat.worryWeight + worry;
+    if (verbose) {
+      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '∑', hostStat.worryWeight);
+    }
+  }
 	
   return hostStats;
 }
@@ -309,7 +319,7 @@ function getRotateAdvice(hostSummaries, hosts) {
     if (!GLOBAL.CONFIG.rotationTimeMinutes) {
       throw ("GLOBAL.CONFIG.rotationTimeMinutes not defined");
     }
-    var diff = moment().diff(moment(activeAdvice.newest.stats.active_dt), 'minutes');
+    var diff = moment().diff(moment(activeAdvice.newest.stats.lastActive), 'minutes');
     if (diff < GLOBAL.CONFIG.rotationTimeMinutes) {
       ret.notTime = { message: 'no rotationTimeMinutes requirement to rotate (config ' + GLOBAL.CONFIG.rotationTimeMinutes + ' vs ' + diff + ' minutes)'};
     }
@@ -334,18 +344,18 @@ function getAddInactive(hosts, hostSummaries) {
 				if (!hostSummaries[i]) {
 					console.log('addInactive eval'.yellow, i + ' no reports');
 				} else {
-					console.log('addInactive eval'.yellow, i + ' worry: '.red + hostSummaries[i].worryWeight, addInactive ? (host.inactive_dt + ' vs ' + addInactive.stats.inactive_dt + ': ' 
-						+ Math.round(moment(host.inactive_dt).diff(addInactive.stats.inactive_dt)/10000)) : 'initial');
+					console.log('addInactive eval'.yellow, i + ' worry: '.red + hostSummaries[i].worryWeight, addInactive ? (host.lastInactive + ' vs ' + addInactive.stats.lastInactive + ': ' 
+						+ Math.round(moment(host.lastInactive).diff(addInactive.stats.lastInactive)/10000)) : 'initial');
 				}
 			}
-			if (!addInactive || (moment(host.inactive_dt).diff(addInactive.stats.inactive_dt) < 0)) {
+			if (!addInactive || (moment(host.lastInactive).diff(addInactive.stats.lastInactive) < 0)) {
 				var rec = hostSummaries[i];
 	
 				if (rec && rec.worryWeight < 1) { // it has had reports and they are perfect
 					addInactive = { name : i, stats : host};
 					addReason = 'time';
 					if (verbose) {
-						console.log("add candidate; time: ".green, moment(addInactive.stats.inactive_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+						console.log("add candidate; time: ".green, moment(addInactive.stats.lastInactive).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 					}
 				} else {
 					if (!lowestError || (rec && rec.worryWeight < lowestError.worryWeight)) {	// it has had reports and they are not the worst
@@ -371,7 +381,7 @@ function getRemoveActive(hosts, hostSummaries) {
   var removeActive, removeReason, newest, highestError = null;
 	for (var i in hosts.activeHosts) { // get oldest or most problematic active host to deactivate
 		var host = hosts.activeHosts[i];
-    host.worry = 0 + hostSummaries[i].worryWeight;
+    host.worry = hostSummaries[i] ? hostSummaries[i].worryWeight : config.errorThreshold; // if host doesn't have records it's a worry
 		if (config.program.rout) {
 			if (config.program.rout === i) {
 				removeActive = { name : i, stats : host};
@@ -379,8 +389,8 @@ function getRemoveActive(hosts, hostSummaries) {
 			}
 		} else {
 			if (verbose) {
-				console.log('removeActive eval'.yellow, i, ' worry: '.red + hostSummaries[i].worryWeight, removeActive ? (host.active_dt + ' vs ' + removeActive.stats.active_dt + ': ' 
-						+ Math.round(moment(host.active_dt).diff(removeActive.stats.active_dt)/10000)) : 'initial');
+				console.log('removeActive eval'.yellow, i, ' worry: '.red + host.worry, removeActive ? (host.lastActive + ' vs ' + removeActive.stats.lastActive + ': ' 
+						+ Math.round(moment(host.lastActive).diff(removeActive.stats.lastActive)/10000)) : 'initial');
 			}
 			var rec = hostSummaries[i];
 			
@@ -391,13 +401,13 @@ function getRemoveActive(hosts, hostSummaries) {
 				if (verbose) {
 					console.log('remove candidate; worry:'.blue, rec.worryWeight);
 				}
-			} else if (!highestError && (!removeActive || (moment(host.active_dt).diff(removeActive.stats.active_dt) < 0))) {	/** or if no errors, longest time **/
+			} else if (!highestError && (!removeActive || (moment(host.lastActive).diff(removeActive.stats.lastActive) < 0))) {	/** or if no errors, longest time **/
 				removeActive = { name : i, stats : host};
 				removeReason = 'time';
 				if (verbose) {
-					console.log('remove candidate; time:'.blue, moment(removeActive.stats.active_dt).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+					console.log('remove candidate; time:'.blue, moment(removeActive.stats.lastActive).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
-			} else if (!newest || moment(host.active_dt).diff(newest.stats.active_dt) > 0) {	/** log the newest rotated **/
+			} else if (!newest || moment(host.lastActive).diff(newest.stats.lastActive) > 0) {	/** log the newest rotated **/
 				newest = { name : i, stats : host};
 			}
 		}
@@ -431,14 +441,14 @@ function getHostsSummary(hosts) {
 	}
 	if (isActive(host)) {
 		active++;
-		activeHosts[hosts[h].name_s] = { active_dt : host.active_dt, since : moment(host.active_dt).fromNow(), commment : hosts[h].comment_s };
+		activeHosts[hosts[h].hostname] = { lastActive : host.lastActive, since : moment(host.lastActive).fromNow(), commment : hosts[h].comment };
 	}
 	if (isOffline(host)) {
 		offline++;
-		offlineHosts[hosts[h].name_s] = { offline_dt : host.offline_dt, since : moment(host.offline_dt).fromNow(), comment : hosts[h].comment_s };
+		offlineHosts[hosts[h].hostname] = { lastOffline : host.lastOffline, since : moment(host.lastOffline).fromNow(), comment : hosts[h].comment };
 	} else if (isInactive(host)) {
 		inactive++;
-		inactiveHosts[hosts[h].name_s] = { inactive_dt : host.inactive_dt, since : moment(host.inactive_dt).fromNow(), comment : hosts[h].comment_s };
+		inactiveHosts[hosts[h].hostname] = { lastInactive : host.lastInactive, since : moment(host.lastInactive).fromNow(), comment : hosts[h].comment };
 	}
   }
   return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.CONFIG.minActive};
@@ -481,9 +491,9 @@ function activate(hostIn, hosts) {
 	} else if (isActive(host)) {
 		throw "host is already online";
 	}
-	host.active_b = true;
-	host.active_dt = new Date().toISOString();
-	host.comment_s = config.program.comment;
+  host.state = 'active';
+	host.lastActive = new Date().toISOString();
+	host.comment = config.program.comment;
 	return hp;
 }
 
@@ -500,9 +510,9 @@ function deactivate(hostIn, hosts) {
 		throw "host is already inactive";
 	}
 	
-	host.active_b = false;
-	host.inactive_dt = new Date().toISOString();
-	host.comment_s = config.program.comment;
+	host.state = 'inactive';
+	host.lastInactive = new Date().toISOString();
+	host.comment = config.program.comment;
 	return hp;
 }
 	
@@ -531,7 +541,7 @@ function getHostFromHosts(hostIn, hosts) {
 	}
 	for (var h in hosts) {
 		var host = hosts[h];
-		if (host.name_s === hostIn) {
+		if (host.hostname === hostIn) {
 			return { hosts : hosts, host : host, position: h};
 		}
 	}
@@ -558,14 +568,14 @@ function writeHosts(hosts, changedHost) {
   }
 	
 	var sum = getHostsSummary(hosts);
-	var summary = {comment_s : config.program.comment, operator_s : process.env.SUDO_USER || process.env.USER
-       , active_i: sum.active, inactive_i: sum.inactive, offline_i: sum.offline
-       , date_dt : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
+	var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER
+       , lastActive: sum.active, lastInactive: sum.inactive, lastOffline: sum.offline
+       , '@timestamp' : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
 	var docs = [summary];
 
 	for (var i in hosts) {
 		var host = hosts[i];
-		if (changedHost && !changedHost === host.name_s) {
+		if (changedHost && !changedHost == host.hostname) {
 			continue;
 		}
 		
@@ -576,12 +586,11 @@ function writeHosts(hosts, changedHost) {
 			}
 		}
 			
-		doc.date_dt = NOW;
-		doc.class_s = 'host state';
-		doc.id = host.name_s + '/' + NOW;
+		doc['@timestamp'] = NOW;
+		doc.id = host.hostname + '/' + NOW;
 		docs.push(doc);
 	}
-	storeClient.add(docs, function(err,obj){
+	GLOBAL.CONFIG.getStore().index({_index : 'devopsjs', _type : 'hostSummary'}, docs, function(err,obj){
 	  if(err){
 	    throw "commit ERROR: " + err;
 	  }
@@ -603,11 +612,11 @@ function writeFlatHosts(hosts, writeAll, file) {
 	for (var h in hosts) {
 		var host = hosts[h];
 		var line = null;
-		var name = host.name_s;
+		var name = host.hostname;
 		if (isActive(host) || writeAll) {
 			line = name;
 		} else if (isOffline(host)) {
-			line = '# ' + host.comment_s + '\n#' + name;
+			line = '# ' + host.comment + '\n#' + name;
 		} else { // inactive
 			line = '## ' + name;
 		}
@@ -617,15 +626,15 @@ function writeFlatHosts(hosts, writeAll, file) {
 }
 
 function isInactive(host) {
-	return !host.active_b;
+	return host.state == 'inactive';
 }
 
 function isActive(host) {
-	return host.active_b;
+	return host.state == 'active';
 }
 
 function isOffline(host) {
-	return host.offline_b;
+	return host.state == 'offline';
 }
 
 /**

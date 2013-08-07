@@ -48,7 +48,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.json', require('solr-client'));
+hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.json');
 
 if (program.verbose) {
 	console.log('configBase is "' + GLOBAL.CONFIG.configBase + '", flatHostsFile is "' + flatHostsFile + '"');

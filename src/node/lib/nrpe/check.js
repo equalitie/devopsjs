@@ -1,32 +1,33 @@
-exports.checkEdge = function(edge, aCheck, checkName, tick, callback) {
+exports.checkHost = function(host, aCheck, checkName, tick, callback) {
 	var exec=require('child_process').exec;
-	var cmd = '/usr/lib/nagios/plugins/check_nrpe -H ' + edge + ' -c ' + checkName;
+	var cmd = '/usr/lib/nagios/plugins/check_nrpe -H ' + host + ' -c ' + checkName;
 
 	var e = exec(cmd, function (error, stdout, stderr) {
 		var res = {};
-		res.id = edge + "/" + checkName + "/" + tick.tickTime;
-		res.tickDate_dt = tick.tickDate;
-		res.execTime_i = new Date().getTime() - tick.tickTime;
-		res.aCheck_s = checkName;
-		res.edge_s = edge;
+		res.id = host + "/" + checkName + "/" + tick.tickTime;
+		res['@timestamp'] = tick.tickDate;
+		res.execTime = new Date().getTime() - tick.tickTime;
+		res.checkName = checkName;
+		res.hostname = host;
 		var status = "UNKNOWN";
 		if (stdout) {
-			res.stdout_s = stdout;
+			res.stdout = stdout;
 			['OK', 'WARNING', 'CRITICAL', 'UNKNOWN'].forEach(function(r) { 
 				if (stdout.indexOf(r) > -1) {
 					status = r;
 				}
 			});	
 		}
-		res.status_s = status;
+		res.status = status;
 		if (aCheck.isError(error, stdout)) {
-			res.error_t = stdout;
+			res.error = stdout;
 		} else {
 			try {
-				aCheck.assign(res, stdout);
+				var check = aCheck.assign(stdout);
+        res[checkName] = check;
 			} catch (e) {
-				res.status_s = 'EXCEPTION';
-				res.error_t = e + ':' + stdout;
+				res.status = 'EXCEPTION';
+				res.error = e + ':' + stdout;
 				GLOBAL.exception(res);
 			}
 			
