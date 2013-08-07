@@ -41,14 +41,8 @@ exports.config = function() {
   } catch (e) {
     throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
   }
+  GLOBAL.CONFIG.getStore = function() {
+    return store || require('./elasticSearchStore.js');
+  }
 }
 
-exports.getStore = function() {
-  if (!configBase) {
-    throw "Not configured";
-  }
-  if (!store) {
-    store = require('./solrNagios.js');
-  }
-  return store;
-}
