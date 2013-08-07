@@ -2,26 +2,31 @@
   "name": "devopsjs",
   "version": "0.0.1",
   "author": "Vid",
-  "description": "dev & ops with widgets using nodejs, smw, cucumber bdd, nrpe and solr",
+  "description": "dev & autonomic ops with visualization using node.js, SMW, BDD, NRPE and ElasticSearch",
   "dependencies": {
     "cucumber": "latest",
-    "mocha": "latest",
-    "chai": "latest",
     "commander": "latest",
     "line-reader": "latest",
     "nodemw": "latest",
     "colors": "latest",
     "zombie": "latest",
-    "english-time": "latest",
     "duplexer": "0.0.x",
     "require-analyzer": "0.5.x",
-    "JSONStream": "0.4.x",
     "request": "2.14.x",
-    "solr-client": "latest",
+    "elasticsearch": "latest",
     "queue-async": "latest",
     "nodemailer": "latest",
-    "moment": "latest"
+    "timekeeper": "latest",
+    "moment": "latest",
+    "geoip": "latest"
+  }, "optionalDependencies": {
+    "mocha": "latest",
+    "chai": "latest"
+  }, "directories": {
+    "bin" : "./bin",
+    "test" : "./test"
   }, "scripts": {
     "test": "make test"
   }
 }
+
