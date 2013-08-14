@@ -15,6 +15,7 @@ console.log('inserting', docs.length, options._type);
     tc.push({ index : options});
     tc.push(d);
   });
+console.log(tc);
   es.bulk(tc, function (err, data) {
     if (err) {
       console.log('on', options, docs);

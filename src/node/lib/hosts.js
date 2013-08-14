@@ -570,9 +570,14 @@ function writeHosts(hosts, changedHost) {
 	var sum = getHostsSummary(hosts);
 	var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER
        , lastActive: sum.active, lastInactive: sum.inactive, lastOffline: sum.offline
-       , '@timestamp' : new Date().toISOString(), class_s : 'edgemanage_test', id : new Date().getTime()};
-	var docs = [summary];
-
+       , '@timestamp' : NOW, 'program': config.program};
+	GLOBAL.CONFIG.getStore().index({_index : 'devopsjs', _type : 'edgeManage'}, summary, function(err,obj){
+	  if(err){
+	    throw "commit ERROR: " + err;
+	  }
+	});
+    
+  var docs = [];
 	for (var i in hosts) {
 		var host = hosts[i];
 		if (changedHost && !changedHost == host.hostname) {
