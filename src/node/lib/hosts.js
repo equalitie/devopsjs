@@ -157,43 +157,8 @@ var hosts = {
     
     var hosts = require(config.hostsFile);
     var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
-    
-    var qchecks = [], qhosts = [];
-    for (var n in nrpeChecks) {
-      qchecks.push(n);
-    }
-      
-    for (var h in hosts) {
-      qhosts.push(hosts[h].hostname);
-    }
-    var q = { 
-      size : 500,
-      "query": { 
-        "filtered": { 
-          "query": { 
-            "bool": { 
-              "must": [
-                  {
-                    "match" : { "checkName" : qchecks.join(' ') }
-                  },
-                  {
-                    "match" : { "hostname" : qhosts.join(' ') }
-                  }
-              ]
-            } 
-          }, 
-          "filter": {
-            "range": { 
-              "@timestamp": { 
-                "gt": "now-9m" 
-              } 
-            } 
-          } 
-        } 
-      } 
-    }
 
-    GLOBAL.CONFIG.getStore().search({ _index : 'devopsjs', _type : 'hostCheck'}, q, function(err, res) {
+    GLOBAL.CONFIG.getStore().getChecks(hosts, nrpeChecks, function(err, res) {
       if (err) {throw err; }
       callback(null, getHostStats(res.hits.hits, nrpeChecks));
     });
@@ -414,7 +379,7 @@ function getRemoveActive(hosts, hostSummaries) {
 	}
   return { host : removeActive, reason : removeReason, newest: newest };
 }
-	
+
 function getHostsSummary(hosts) {
   if (!hosts) {
 	hosts = require(config.hostsFile);
