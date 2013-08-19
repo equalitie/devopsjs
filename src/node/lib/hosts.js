@@ -345,8 +345,13 @@ function getAddInactive(hosts, hostSummaries) {
 function getRemoveActive(hosts, hostSummaries) {
   var removeActive, removeReason, newest, highestError = null;
 	for (var i in hosts.activeHosts) { // get oldest or most problematic active host to deactivate
+
 		var host = hosts.activeHosts[i];
     host.worry = hostSummaries[i] ? hostSummaries[i].worryWeight : config.errorThreshold; // if host doesn't have records it's a worry
+
+    if (!newest || moment(host.lastActive).diff(newest.stats.lastActive) > 0) {	/** log the newest rotated **/
+      newest = { name : i, stats : host};
+    }
 		if (config.program.rout) {
 			if (config.program.rout === i) {
 				removeActive = { name : i, stats : host};
@@ -372,10 +377,8 @@ function getRemoveActive(hosts, hostSummaries) {
 				if (verbose) {
 					console.log('remove candidate; time:'.blue, moment(removeActive.stats.lastActive).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 				}
-			} else if (!newest || moment(host.lastActive).diff(newest.stats.lastActive) > 0) {	/** log the newest rotated **/
-				newest = { name : i, stats : host};
-			}
-		}
+			} 		
+    }
 	}
   return { host : removeActive, reason : removeReason, newest: newest };
 }
