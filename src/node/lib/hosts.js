@@ -273,6 +273,10 @@ function getRotateAdvice(hostSummaries, hosts) {
 		throw "no host to activate";
 	}
 
+  if (hostSummaries[inactiveAdvice.host.name].worryWeight > hostSummaries[activeAdvice.host.name].worryWeight) {
+    throw 'inactive host ('+ hostSummaries[inactiveAdvice.host.name].worryWeight + ') has greater worry than active host (' + hostSummaries[activeAdvice.host.name].worryWeight + ')';
+  }
+
 	var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host
     , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason
 		, summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
@@ -304,7 +308,6 @@ function getAddInactive(hosts, hostSummaries) {
 				addReason = 'request in';
 			}
 		} else {
-		
 			if (verbose) {
 				if (!hostSummaries[i]) {
 					console.log('addInactive eval'.yellow, i + ' no reports');
@@ -323,7 +326,8 @@ function getAddInactive(hosts, hostSummaries) {
 						console.log("add candidate; time: ".green, moment(addInactive.stats.lastInactive).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 					}
 				} else {
-					if (!lowestError || (rec && rec.worryWeight < lowestError.worryWeight)) {	// it has had reports and they are not the worst
+          var curLowest = lowestError ? hostSummaries[lowestError] : { worryWeight: config.errorThreshold}; // FIXME
+					if (!lowestError || (rec && (rec.worryWeight < curLowest.worryWeight))) {	// it has had reports and they are not the worst
 						if (verbose) {
 							console.log('lowest errored host:'.yellow, rec ? rec.worryWeight : 'no records');
 						}
@@ -335,9 +339,10 @@ function getAddInactive(hosts, hostSummaries) {
 		}
 	}
 	
-	if (!addInactive && lowestError && lowestError.worryWeight < config.errorThreshold) {
-		addReason = 'lowest error';
+	if (!addInactive && lowestError) {
+		addReason = 'lowest worry (' + hostSummaries[lowestError].worryWeight + ')';
 		addInactive = { name : lowestError, stats : hosts.inactiveHosts[lowestError]};
+		console.log('selecting lowest errored host');
 	}
   return { host : addInactive, reason: addReason};
 }
