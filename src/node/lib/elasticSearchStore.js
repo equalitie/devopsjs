@@ -9,13 +9,13 @@ var elasticsearch = require('elasticsearch')
 
 exports.index = function(options, docs, callback) {
   if (!Array.isArray(docs)) { docs = [docs] };
-console.log('inserting', docs.length, options._type);
+//console.log('inserting', docs.length, options._type);
   var tc = [];
   docs.forEach(function(d) {
     tc.push({ index : options});
     tc.push(d);
   });
-console.log(tc);
+//console.log(tc);
   es.bulk(tc, function (err, data) {
     if (err) {
       console.log('on', options, docs);
