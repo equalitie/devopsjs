@@ -273,7 +273,7 @@ function getRotateAdvice(hostSummaries, hosts) {
 		throw "no host to activate";
 	}
 
-  if (hostSummaries[inactiveAdvice.host.name].worryWeight > hostSummaries[activeAdvice.host.name].worryWeight) {
+  if (hostSummaries[inactiveAdvice.host.name] && hostSummaries[inactiveAdvice.host.name].worryWeight > hostSummaries[activeAdvice.host.name].worryWeight) {
     throw 'inactive host ('+ hostSummaries[inactiveAdvice.host.name].worryWeight + ') has greater worry than active host (' + hostSummaries[activeAdvice.host.name].worryWeight + ')';
   }
 
@@ -340,7 +340,7 @@ function getAddInactive(hosts, hostSummaries) {
 	}
 	
 	if (!addInactive && lowestError) {
-		addReason = 'lowest worry (' + hostSummaries[lowestError].worryWeight + ')';
+		addReason = 'lowest worry (' + (hostSummaries[lowestError] ? hostSummaries[lowestError].worryWeight : 'NO RECORDS')+ ')';
 		addInactive = { name : lowestError, stats : hosts.inactiveHosts[lowestError]};
 		console.log('selecting lowest errored host');
 	}
