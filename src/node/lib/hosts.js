@@ -16,7 +16,7 @@ var config = {
 	defaultUnits : 'hours',
 	errorThreshold : 15000	// threshold for disqualified host
 }
-var worryVals = {OK : 0, WARNING : 5, CRITICAL : 20, UNKNOWN : 100, ERROR : 100};
+var worryVals = {OK : 0, WARNING : 5, CRITICAL : 20, UNKNOWN : 100, ERROR : 100, EXCEPTION: 100};
 
 /**
  * 
@@ -144,10 +144,12 @@ var hosts = {
       console.log(advice.notTime.message);
       process.exit(1);
     } else { 
-      
+      if (!config.program.comment) {
+        config.program.comment = advice.summary;
+      }
       var hp = activate(advice.addInactive.name);
       hp = deactivate(advice.removeActive.name, hp.hosts);
-      writeHosts(hp.hosts);	// FIXME: move storage to higher level
+      writeHosts(hp.hosts, ['rotate', advice.removeActive.name, advice.addInactive.name]);	// FIXME: move storage to higher level
       console.log(advice.summary);
    }
   },
@@ -164,8 +166,8 @@ var hosts = {
     });
   }, 
 
-  writeHosts : function(hosts, changedHost) {
-    return writeHosts(hosts, changedHost);
+  writeHosts : function(hosts, operation, changedHost) {
+    return writeHosts(hosts, operation, changedHost);
   },
 
   getHostsSummary : function() {
@@ -525,7 +527,10 @@ function writeHostsJson(hosts) {
   fs.writeFileSync(config.hostsFile, JSON.stringify(hosts, null, 2));
 }
 
-function writeHosts(hosts, changedHost) {
+function writeHosts(hosts, operation, changedHost) {
+  if (!operation) {
+    throw "missing reason";
+  }
 	validateConfiguration(hosts);
 	
 	writeHostsJson(hosts);
@@ -541,7 +546,7 @@ function writeHosts(hosts, changedHost) {
   }
 	
 	var sum = getHostsSummary(hosts);
-	var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER
+	var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER, dnet : config.program.dnet, operation : operation
        , lastActive: sum.active, lastInactive: sum.inactive, lastOffline: sum.offline
        , '@timestamp' : NOW, 'program': config.program};
 	GLOBAL.CONFIG.getStore().index({_index : 'devopsjs', _type : 'edgeManage'}, summary, function(err,obj){

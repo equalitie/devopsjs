@@ -13,10 +13,13 @@ exports.getChecks = function(filter) {
 			
 			return true;
 		},
-		fields : { bytesPerSecond_i : defaultNumber},
+		fields : { bytesPerSecond : defaultNumber, bytesIn : defaultNumber, bytesOut : defaultNumber},
 		assign: function(stdout) { 
+      var base = stdout.split('|');
 			return {
-        bytesPerSecond : stdout.split('|')[0].split(' ')[4] 
+        bytesPerSecond : base[0].split(' ')[4],
+        bytesIn : base[1].split('=')[2].replace(/;.*/, ''),
+        bytesOut : base[1].split('=')[3].replace(/;.*/, '') 
       }
 		} 
 	};

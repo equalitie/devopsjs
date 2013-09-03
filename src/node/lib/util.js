@@ -22,25 +22,29 @@ exports.slashedDir = function(d) {
   return d + '/';
 }
 
-exports.config = function() {
+exports.config = function(config) {
   if (process.env.DEVOPSCONFIG) {
     configBase = process.env.DEVOPSCONFIG;
   } else {
     configBase = process.cwd() + '/config/';
   }
 
+  var trying = configBase + 'localConfig.js';
   try {
-    require(configBase + 'localConfig.js');
+    require(trying);
     GLOBAL.CONFIG.configBase = configBase;
-
-    if (process.env.DEVOPS_DEBUG) {
-      GLOBAL.CONFIG.DEBUG = true;
-      require('node-monkey').start();
+    if (config) {
+      trying = configBase + config + '.js';
+      require(trying);
     }
-
   } catch (e) {
-    throw 'Could not require "' + configBase + '/localConfig.js" — define DEVOPSCONFIG or run this program from its parent directory.';
+    throw 'Could not require "' + trying + '" — define DEVOPSCONFIG or run this program from its parent directory.';
   }
+  if (process.env.DEVOPS_DEBUG) {
+    GLOBAL.CONFIG.DEBUG = true;
+    require('node-monkey').start();
+  }
+
   GLOBAL.CONFIG.getStore = function() {
     return store || require('./elasticSearchStore.js');
   }
