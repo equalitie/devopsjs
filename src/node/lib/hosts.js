@@ -44,7 +44,7 @@ var hosts = {
       throw Error("host already exists: " + newHost, hosts);
     }
 
-    var host = { hostname : newHost, added : NOW, comment : config.program.comment};
+    var host = { hostname : newHost, added : NOW, comment : config.program.comment, state : 'inactive', lastInactive: NOW};
     hp.hosts.push(host);
     hp.host = host;
     return hp;
@@ -91,7 +91,7 @@ var hosts = {
     }
           
     host.state = 'inactive';
-    host.lastOnline = new Date().toISOString();
+    host.lastOnline = NOW;
     host.comment = config.program.comment;
     return hp;
   },
@@ -108,7 +108,7 @@ var hosts = {
     }
     
     host.state = 'offline';
-    host.lastOffline = new Date().toISOString();
+    host.lastOffline = NOW;
     host.comment = config.program.comment;
 
     return hp;
@@ -390,7 +390,7 @@ function getRemoveActive(hosts, hostSummaries) {
 
 function getHostsSummary(hosts) {
   if (!hosts) {
-	hosts = require(config.hostsFile);
+  	hosts = require(config.hostsFile);
   }
 	
   var available = 0;
@@ -465,7 +465,7 @@ function activate(hostIn, hosts) {
 		throw "host is already online";
 	}
   host.state = 'active';
-	host.lastActive = new Date().toISOString();
+	host.lastActive = NOW;
 	host.comment = config.program.comment;
 	return hp;
 }
@@ -484,7 +484,7 @@ function deactivate(hostIn, hosts) {
 	}
 	
 	host.state = 'inactive';
-	host.lastInactive = new Date().toISOString();
+	host.lastInactive = NOW;
 	host.comment = config.program.comment;
 	return hp;
 }

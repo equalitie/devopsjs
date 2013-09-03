@@ -34,7 +34,7 @@ program
   .option('-s --stats', 'current statistics')
 
   .option('--override', 'override validation error')
-  .option('-c, --comment <\'description\'>', 'comment for the action')
+  .option('-c, --comment <description>', 'comment for the action')
   .option('-i, --incident', 'file comment as an incident report');
 
 /* argument processing **/
@@ -47,6 +47,7 @@ program.on('--help', function() {
 });
 
 program.parse(process.argv);
+if (program.comment && program.args) { program.comment = [program.comment].concat(program.args).join(' ') } // FIXME
 
 hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.json');
 
