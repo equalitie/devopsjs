@@ -1,27 +1,84 @@
 devopsjs
 ========
 
-Work in progress project to support development and operations around a semantic wiki, BDD, NRPE. Emphasizing minimum invention, data reuse, comprehensibility, ability to 'drill-down.' Advice and contributions welcome.
+Support comprehensive configuration, resource usage, monitoring and development using high level components.
 
 # Install
 
-    sudo npm install -g cucumber
     cd devopsjs 
     npm install
 
 edit config/localConfig.js based on this:
 
-
 ```javascript
 var c = {};
 
-c.flatHostsFile = 'name of hosts flat file';
-c.solrConfig = { host: 'yourhost', core: 'yourcore'};
+/* configure DNets */
+
+c.dnets = ['dnet1.deflect.ca', 'dnet2.deflect.ca'];
+c.domain = '.deflect.ca';
+
+/* configuration for notifier */
+c.notify = {emailSubject : 'devopsjs notifications',
+  emailFrom : 'someone@somewhere'
+}
+
+var nodemailer = require("nodemailer");
+var transport = nodemailer.createTransport("Sendmail", "/usr/sbin/sendmail");
+
+transport.sendNotification = function(msg, callback) {
+  this.sendMail(msg, callback);
+}
+
+c.notify.notifyTransport = transport;
+
+/* configuration for wiki */
+
+c.wikiConfig = {
+  server: 'your.configwiki',
+  protocol: 'https',
+  path: '/mediawiki',
+  username: 'Wiki bot',
+  password: 'wiki password',
+  debug: false
+}
+
+/* configuration for elasticsearch */
+c.elasticSearchConfig = {
+  _index : 'devopsjs',
+  server : {
+      host : 'your.elasticsearchinstance',
+      port : 9200
+  }
+}
+
+GLOBAL.CONFIG = c;
+
+```
+
+DNets can be added to the config directory, eg, 
+
+```javascript
+var c = GLOBAL.CONFIG;
+c.flatHostsFile = '/usr/local/deflect/etc/edges/edges.dnet1.live';
+c.minActive = 6;
+c.subdomain = 'deflect.ca';
+
+c.rotationTimeMinutes = 60;
 GLOBAL.CONFIG = c;
 ```
 
+# Operations
 
-# General workflow
+1. Set up the general Deflect system - https://wiki.deflect.ca/wiki/Deflect_DIY
+1. Configure src/node/nrpeCheck.js to run frequently
+1. Configure src/node/edgemanage.js -r to auto-rotate as required
+1. Configure src/node/watchnotify.js to run regularly
+1. Use edgemanage on its own for edge management operations
+
+# General development workflow
+
+Under development itself.
 
 1. Initial wiki definition
   1. Refine with stakeholders
