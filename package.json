@@ -18,7 +18,8 @@
     "nodemailer": "latest",
     "timekeeper": "latest",
     "moment": "latest",
-    "geoip": "latest"
+    "geoip": "latest",
+    "winston": "latest"
   }, "optionalDependencies": {
     "mocha": "latest",
     "chai": "latest"
