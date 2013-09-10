@@ -1,4 +1,5 @@
 var semwiki = require('./semwiki.js');
+var logger = GLOBAL.CONFIG.logger;
 var queue = require('queue-async');
 
 /**
@@ -12,33 +13,27 @@ var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 
 /**
 *
-*  Get current pages focusing on tickets, and users if not configured, from wiki according to query, then process them
+*  Get current pages from wiki according to query, wiki expand and return populated notifier
 *
 **/
 
-exports.processTickets = function(pageQuery, callback) {
+exports.retrieveTickets = function(pageQuery, users, callback) {
+  notifier.allUsers = users;
   var getWikiQueue = queue();
   getWikiQueue.defer(function(cb) {
     semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, cb);
   });
   getWikiQueue.awaitAll(function(err) {
-    var getPagesQueue = queue(1);
+    var getPagesQueue = queue();
 
-    if (!notifier.allUsers) {
-      getPagesQueue.defer(function(cb) {
-        semwiki.getUsers(function(users) {
-          notifier.allUsers = users;
-          cb();
-        });
-      });
-    }
     getPagesQueue.defer(function(cb) {
       semwiki.getTickets(pageQuery, function(pages) {
         var c = 0, g = Object.keys(pages).length;
+        logger.debug('getting expanded pages');
         for (var page in pages) {
-console.log(page);
           (function(page) {
           semwiki.getExpandedText('{{:'+page+'}}', null, function(text) {
+            logger.debug('getExpandedText', page);
             notifier.addCandidate(pages[page], text);
             if (++c == g) { cb(); }
           });
@@ -56,12 +51,11 @@ console.log(page);
 * get notifier with these users
 **/
 
-exports.getNotifier = function(users) {
+exports.getNotifier = function(users, pages) {
   notifier.reset();
   notifier.allUsers = users;
   return notifier;
 }
-
 
 /**
 * 
@@ -69,6 +63,7 @@ exports.getNotifier = function(users) {
 */
 
 exports.composeNotifications = function(notifier) {
+  logger.debug('composeNotifications');
   var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
   notifier.toProcess.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
@@ -151,6 +146,7 @@ exports.sendNotifications = function(notifications) {
 
   var transport = GLOBAL.CONFIG.notify.notifyTransport;
 
+  var sendMailQueue = queue();
   for (var u in notifications) {
     var addy = null, user = notifier.getUser(u);
     if (user) {
@@ -166,18 +162,24 @@ exports.sendNotifications = function(notifications) {
           html: note
       }
 
-      if (!GLOBAL.CONFIG.DEBUG) {
+      logger.debug('sendNotification', addy, transport);
+
+      sendMailQueue.defer(function(cb) {
         transport.sendNotification(messageOptions, function(error, response) {
           if (error){
-            console.error(error);
+            logger.error(error);
           }
+          logger.debug('sentNotification', addy);
+          cb();
         });
-      }
+      });
     } else {
-      console.error('missing Contact address for ' + u);
+      logger.error('missing Contact address for ' + u);
     }
   }
-  transport.close(); 
+  sendMailQueue.awaitAll(function(err) {
+    transport.close(); 
+  });
 }
 
 /**
@@ -244,7 +246,7 @@ var notifier = {
         semwiki.val(user, 'Current activity').forEach(function (a) { if (a == jt.name) jt.tags.push('Current'); });
         semwiki.val(user, 'Planned activity').forEach(function (a) { if (a == jt.name) jt.tags.push('Planned'); });
       } else {
-        console.error("Missing user " + u);
+        logger.error("Missing user " + u);
       }
     });
 

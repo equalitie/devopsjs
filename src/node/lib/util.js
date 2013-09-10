@@ -22,7 +22,14 @@ exports.slashedDir = function(d) {
   return d + '/';
 }
 
-exports.config = function(config) {
+/** 
+
+determine config directories according to local directory or DEVOPSCONFIG
+set some useful GLOBAL.CONFIG variables
+
+**/
+
+exports.config = function(dnetconfig) {
   if (process.env.DEVOPSCONFIG) {
     configBase = process.env.DEVOPSCONFIG;
   } else {
@@ -33,8 +40,8 @@ exports.config = function(config) {
   try {
     require(trying);
     GLOBAL.CONFIG.configBase = configBase;
-    if (config) {
-      trying = configBase + config + '.js';
+    if (dnetconfig) {
+      trying = configBase + dnetconfig + '.js';
       require(trying);
     }
   } catch (e) {
@@ -48,5 +55,14 @@ exports.config = function(config) {
   GLOBAL.CONFIG.getStore = function() {
     return store || require('./elasticSearchStore.js');
   }
+  var winston = require('winston');
+  var logger = new (winston.Logger)({
+    transports: [
+      new (winston.transports.Console)({ level: process.env.DEVOPSDEBUG || 'error' })
+    ]
+  });
+
+  logger.emitErrs = false;
+  GLOBAL.CONFIG.logger = logger;
 }
 
