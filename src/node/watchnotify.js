@@ -32,18 +32,18 @@ try {
   query = '[[Modification date::+]]|limit=2';
 }
 
-/** get users then process tickets **/
+/** get users then process activitys **/
 logger.debug('getting wiki');
 semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, function() {
   logger.debug('getting users');
   semwiki.getUsers(function(users) { 
-    logger.debug('processing tickets');
-    processTickets(users);
+    logger.debug('processing activitys');
+    processActivities(users);
   });
 });
 
-function processTickets(users) {
-  notify.retrieveTickets(query, users, function(err, notifier) {
+function processActivities(users) {
+  notify.retrieveActivities(query, users, function(err, notifier) {
     notifier.toProcess.forEach(function(t) {
       if (nextSince == null || moment(t.modificationDate[0]).isAfter(nextSince)) {
         nextSince = t.modificationDate[0];

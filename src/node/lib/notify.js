@@ -17,7 +17,7 @@ var emailSubject = GLOBAL.CONFIG.notify.emailSubject;
 *
 **/
 
-exports.retrieveTickets = function(pageQuery, users, callback) {
+exports.retrieveActivities = function(pageQuery, users, callback) {
   notifier.allUsers = users;
   var getWikiQueue = queue();
   getWikiQueue.defer(function(cb) {
@@ -27,7 +27,7 @@ exports.retrieveTickets = function(pageQuery, users, callback) {
     var getPagesQueue = queue();
 
     getPagesQueue.defer(function(cb) {
-      semwiki.getTickets(pageQuery, function(pages) {
+      semwiki.getActivities(pageQuery, function(pages) {
         var c = 0, g = Object.keys(pages).length;
         logger.debug('getting expanded pages');
         for (var page in pages) {
@@ -67,11 +67,11 @@ exports.composeNotifications = function(notifier) {
   var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
   notifier.toProcess.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
-    var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Ticket:/, '') + '</a>'
+    var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Activity:/, '') + '</a>'
     var message =  linktext + ' <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
 /** Action item for validator, notify for updater */ 
-    if (jt.categories.indexOf('Ticket tracker') > -1) {
+    if (jt.categories.indexOf('Activity tracker') > -1) {
       if (jt.status == 'Validate') {
         var seen = {};
         jt.validator.forEach(function (v) {
@@ -219,7 +219,7 @@ var notifier = {
       });
     }
     var jt = {
-      status : semwiki.val(page, 'Ticket status'),
+      status : semwiki.val(page, 'Activity status'),
       assignedTo : semwiki.val(page, 'Assigned to'),
       validator : semwiki.val(page, 'Validator'),
       contact : semwiki.val(page, 'Contact'),
