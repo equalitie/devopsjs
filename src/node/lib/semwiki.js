@@ -49,10 +49,10 @@ var semwiki = {
 	getWikibot : function() {
 		return wikibot;
 	},
-  getTickets : function(spec, callback) {
+  getActivities : function(spec, callback) {
     var params = {
       action: 'ask',
-      query: spec + '|?Assigned to|?Contact|?Date created|?Date required|?Description|?Ticket for|?Importance|?Project|?Ticket status|?Validator|?Last update|?Last provider|?Last comment|?Importance|?Modification date|sort=Modification date|order=desc,desc'
+      query: spec + '|?Assigned to|?Contact|?Date created|?Date required|?Description|?Activity for|?Importance|?Project|?Activity status|?Validator|?Last update|?Last provider|?Last comment|?Importance|?Modification date|sort=Modification date|order=desc,desc'
     };
 
     semwiki.call(params, function(info, next, data) {
