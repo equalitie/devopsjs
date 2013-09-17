@@ -3,12 +3,22 @@ devopsjs
 
 Support comprehensive configuration, resource usage, monitoring and development using high level components.
 
+* BDD to define systems
+* NRPE for system tests
+* node.js for scripting components and command line interaction
+* Semantic Mediawiki for configuration
+* node-logstatsh for systems data processing
+* ElasticsEarch for data storage
+* Kibana for visualization
+
 # Install
+
+You will need some additional system libraries, including libgeoip-dev, libpcre3-dev.
 
     cd devopsjs 
     npm install
 
-edit config/localConfig.js based on this:
+Edit config/localConfig.js based on this:
 
 ```javascript
 var c = {};
@@ -56,7 +66,7 @@ GLOBAL.CONFIG = c;
 
 ```
 
-DNets can be added to the config directory, eg, 
+DNets can be added to the config directory as dnetname.js, eg, 
 
 ```javascript
 var c = GLOBAL.CONFIG;
