@@ -10,11 +10,8 @@ function doHosts() {
 console.log('doHosts', new Date());
 
   $('.devopsHost').each(function() { // iterate over hosts
-      var t, name
-      t = $(this);
-      
-      name = t.find('.name').text();
-
+      var t = $(this);
+      var name = t.find('.name').text();
       solrQuery('name_s:'+name, function(data) {  // get summary
         var values = {}, high = {}, low = {};
         var res = data.response.docs[0];
@@ -22,59 +19,53 @@ console.log('doHosts', new Date());
           console.log('no results for host', name);
           return;
         }
-      var offline = res.offline_s && res.offline_s === 'true';
-      var status = offline ? 'offline ' : 'available ';
-      if (!offline) {
-        status += res.rotatedOut_s || res.rotatedOut_s === 'true' ? 'rotated' : 'in';
-      }
-      t.find('.status').html(status);
-      t.find('.checkDate').html(prettyDate(res.tickDate_dt));
-      var checks = {
-        tcptraffic : ['bytesPerSecond_i'],
-        fail2ban : [ 'httpBans_i', 'sshBans_i'],
-        connections : ['established_i', 'waiting_i', 'listeners_i']
-      };
-
-      for (var check in checks) {
-        var fields = checks[check];
-  
-        for (var f in fields) {
-        var field = fields[f];
-        values[check] = [];
-        high[check] = 0;
-        low[check] = 0;
-        solrQuery('edge_s:' + name + ' AND aCheck_s:check_' + check, function(data) {
-            console.log(name, check, field, fields);
-          $.each(data.response.docs, function(i, doc)  {
-          var checkVal = doc[field];
-            if (checkVal) {
-              values[check].push(checkVal);
-              if (checkVal < low[check] || low[check] === 0) {
-                low[check] = checkVal;
-              } else if (checkVal > high[check]) {
-                high[check] = checkVal;
-              }
-            }
-            var p = t.find('.graph_' + field);
-            if (!p.length) {
-              t.find('.graphs').append('<span class="graph_' + field + '" style="padding: 10px"></span><span class="label_' + field + '">' + check + ':' + field.replace(/_.*$/, '') + '</span><br />');
-              p = t.find('.graph_' + field);
-              console.log('created', name, field, check);
-            }
-            
-            p.sparkline(values[check], {});
-            var sum = hunits(low[check]);
-            if (low[check] != high[check]) {
-              sum = hunits(low[check]) + '&mdash;' + hunits(high[check]);
-            }
-            var detail = t.find('.label_' + checkVal).text().replace(/:.*/, '') + ': ' + sum;
-            t.find('.label_' + check).html('<a href="' + solrQuery + '?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
-          });
-          }, { sort : 'tickDate_dt desc', rows: 20});
-          }
-        }
+	    var offline = res.offline_s && res.offline_s == 'true';
+	    var status = offline ? 'offline ' : 'available ';
+	    if (!offline) {
+	      status += res.rotatedOut_s || res.rotatedOut_s == 'true' ? 'rotated' : 'in';
+	    }
+	    t.find('.status').html(status);
+	    t.find('.checkDate').html(prettyDate(res.tickDate_dt));
+	    var checks = {tcptraffic : ['bytesPerSecond_i'], fail2ban : ['httpBans_i', 'sshBans_i'], connections : ['established_i', 'waiting_i', 'listeners_i']};
+	    for (var check in checks) {
+	      var fields = checks[check];
+	
+	      for (var f in fields) {
+		    var field = fields[f];
+		    values[check] = [];
+		    high[check] = 0;
+		    low[check] = 0;
+		    solrQuery('edge_s:' + name + ' AND aCheck_s:check_' + check, function(data) {
+	          console.log(name, check, field, fields);
+		      $.each(data.response.docs, function(i, doc)  {
+		    	var checkVal = doc[field];
+		        if (checkVal) {
+		          values[check].push(checkVal);
+		          if (checkVal < low[check] || low[check] == 0) {
+		            low[check] = checkVal;
+		          } else if (checkVal > high[check]) {
+		            high[check] = checkVal;
+		          }
+		        }
+		        var p = t.find('.graph_' + field);
+		        if (!p.length) {
+		        	t.find('.graphs').append('<span class="graph_' + field + '" style="padding: 10px"></span><span class="label_' + field + '">' + check + ':' + field.replace(/_.*$/, '') + '</span><br />');
+		        	p = t.find('.graph_' + field);
+		        	console.log('created', name, field, check);
+	        	}
+		        
+		        p.sparkline(values[check], {});
+		        var sum = hunits(low[check]);
+		        if (low[check] != high[check]) {
+		          sum = hunits(low[check]) + '&mdash;' + hunits(high[check]);
+		        }
+		        var detail = t.find('.label_' + checkVal).text().replace(/:.*/, '') + ': ' + sum;
+		        t.find('.label_' + check).html('<a href="' + solrQuery + '?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
+		      });
+		      }, { sort : 'tickDate_dt desc', rows: 20});
+	      	}
+	      }
       }, {sort: 'tickDate_dt desc', rows: 20});
-
   });
 }
   

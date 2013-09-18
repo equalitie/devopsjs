@@ -20,13 +20,23 @@
     "moment": "latest",
     "geoip": "latest",
     "winston": "latest"
-  }, "optionalDependencies": {
+  },
+  "devDependencies": {
+    "grunt":"latest",
+    "grunt-contrib-jshint":"latest",
+    "grunt-docco2": "latest",
+    "grunt-plato": "latest",
+    "yadda": "~0.4.7"
+  },
+  "optionalDependencies": {
     "mocha": "latest",
     "chai": "latest"
-  }, "directories": {
+  },
+  "directories": {
     "bin" : "./bin",
     "test" : "./test"
-  }, "scripts": {
+  },
+  "scripts": {
     "test": "make test"
   }
 }

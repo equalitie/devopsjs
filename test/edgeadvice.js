@@ -3,7 +3,7 @@
 var fs = require('fs');
 
 var mockSolr = {
-    createQuery : function() {
+    createQuery: function() {
 		return this;
 	},
 	q : function(parameters) {
@@ -16,12 +16,12 @@ var mockSolr = {
 		return this;
 	},
 	add : function(docs, callback) {
-	}
-}
+  }
+};
 
 var program = {verbose:0};
 
-GLOBAL.CONFIG = { minActive: 6, flatHostsFile : 'edges.test', solrConfig : { host: 'testinghost', core: 'testingcore'} }
+GLOBAL.CONFIG = { minActive: 6, flatHostsFile : 'edges.test', solrConfig : { host: 'testinghost', core: 'testingcore'} };
 
 var testHostsFile = process.cwd() + '/test/work/testHosts.json';
 

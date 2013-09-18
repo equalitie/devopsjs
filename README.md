@@ -3,6 +3,7 @@ devopsjs
 
 Support comprehensive configuration, resource usage, monitoring and development using high level components.
 
+
 # Install
 
     cd devopsjs 
@@ -75,6 +76,9 @@ GLOBAL.CONFIG = c;
 1. Configure src/node/edgemanage.js -r to auto-rotate as required
 1. Configure src/node/watchnotify.js to run regularly
 1. Use edgemanage on its own for edge management operations
+
+# Style Guide
+[idi] https://github.com/equalitie/idiomatic.js 'idiomatic.js'
 
 # General development workflow
 
