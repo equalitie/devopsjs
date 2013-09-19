@@ -154,7 +154,7 @@ var hosts = {
    }
   },
 
-  getStats : function(num, callback) {
+  getCheckStats : function(num, callback) {
     num = 0 + parseInt(num, 10);
     
     var hosts = require(config.hostsFile);
@@ -260,7 +260,7 @@ function getRotateAdvice(hostSummaries, hosts) {
   var inactiveAdvice = getAddInactive(hosts, hostSummaries);
   
   if (config.program.rin && !inactiveAdvice.host) {
-    throw "Can't rotate in " + config.program.rin; 
+    throw "Can't rotate in " + config.program.rin;
   }
   
   if (config.program.rout && !activeAdvice.host) {
@@ -279,9 +279,7 @@ function getRotateAdvice(hostSummaries, hosts) {
     throw 'inactive host ('+ hostSummaries[inactiveAdvice.host.name].worryWeight + ') has greater worry than active host (' + hostSummaries[activeAdvice.host.name].worryWeight + ')';
   }
 
-  var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host,
-    removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason,
-    summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
+  var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason , summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
   /** Should we rotate even if it's not time **/
   var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > 0;
@@ -305,7 +303,6 @@ function getAddInactive(hosts, hostSummaries) {
   for (var i in hosts.inactiveHosts) { // get oldest inactive host to activate
     var host = hosts.inactiveHosts[i];
     if (config.program.rin) {
-
       if (config.program.rin === i) {
         addInactive = { name : i, stats : host};
         addReason = 'request in';
@@ -389,7 +386,7 @@ function getRemoveActive(hosts, hostSummaries) {
   return { host : removeActive, reason : removeReason, newest: newest };
 }
 
-function getHostsSummary(hosts) {
+function getHostsSummary(hosts, detailscb) {
   if (!hosts) {
     hosts = require(config.hostsFile);
   }
@@ -404,28 +401,28 @@ function getHostsSummary(hosts) {
   var offlineHosts = {};
   var total = 0;
 
-  for (var h in hosts) { 
+  for (var h in hosts) {
     total++;
-  var host = hosts[h];
+    var host = hosts[h];
 
-  if (isAvailable(host)) {
-    available++;
-  } else{
-    unavailable++;
+    if (isAvailable(host)) {
+      available++;
+    } else{
+      unavailable++;
+    }
+    if (isActive(host)) {
+      active++;
+      activeHosts[hosts[h].hostname] = { lastActive : host.lastActive, since : moment(host.lastActive).fromNow(), commment : hosts[h].comment };
+    }
+    if (isOffline(host)) {
+      offline++;
+      offlineHosts[hosts[h].hostname] = { lastOffline : host.lastOffline, since : moment(host.lastOffline).fromNow(), comment : hosts[h].comment };
+    } else if (isInactive(host)) {
+      inactive++;
+      inactiveHosts[hosts[h].hostname] = { lastInactive : host.lastInactive, since : moment(host.lastInactive).fromNow(), comment : hosts[h].comment };
+    }
   }
-  if (isActive(host)) {
-    active++;
-    activeHosts[hosts[h].hostname] = { lastActive : host.lastActive, since : moment(host.lastActive).fromNow(), commment : hosts[h].comment };
-  }
-  if (isOffline(host)) {
-    offline++;
-    offlineHosts[hosts[h].hostname] = { lastOffline : host.lastOffline, since : moment(host.lastOffline).fromNow(), comment : hosts[h].comment };
-  } else if (isInactive(host)) {
-    inactive++;
-    inactiveHosts[hosts[h].hostname] = { lastInactive : host.lastInactive, since : moment(host.lastInactive).fromNow(), comment : hosts[h].comment };
-  }
-  }
-  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.CONFIG.minActive};
+  return { total : total, active : active, activeHosts: activeHosts, inactive : inactive, inactiveHosts: inactiveHosts, available : available, unavailable : unavailable, offline : offline, offlineHosts: offlineHosts, required : GLOBAL.CONFIG.minActive, '@timestamp' : NOW};
 }
 
 function validateConfiguration(hosts) {  // make sure the resulting config makes sense
@@ -545,9 +542,7 @@ function writeHosts(hosts, operation, changedHost) {
   }
   
   var sum = getHostsSummary(hosts);
-  var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER, dnet : config.program.dnet, operation : operation,
-       lastActive: sum.active, lastInactive: sum.inactive, lastOffline: sum.offline,
-       '@timestamp' : NOW, 'program': config.program};
+  var summary = {comment : config.program.comment, operator : process.env.SUDO_USER || process.env.USER, dnet : config.program.dnet, operation : operation , lastActive: sum.active, lastInactive: sum.inactive, lastOffline: sum.offline , '@timestamp' : NOW, 'program': config.program};
   GLOBAL.CONFIG.getStore().index({_index : 'devopsjs', _type : 'edgeManage'}, summary, function(err,obj){
     if(err){
       throw "commit ERROR: " + err;
@@ -557,7 +552,7 @@ function writeHosts(hosts, operation, changedHost) {
   var docs = [];
   for (var i in hosts) {
     var host = hosts[i];
-    if (changedHost && (changedHost !== host.hostname)) {
+    if (changedHost && changedHost !== host.hostname) {
       continue;
     }
     
