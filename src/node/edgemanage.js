@@ -148,7 +148,7 @@ if (program.query) {
 if (program.stats) {
 	hostLib.getCheckStats(timespan, function(err, stats) {
     var sums = hostLib.getHostsSummary(function(host){ return stats[host];});
-    console.log(sums, 'STATS', stats );
+    console.log(sums);
   });
 }
 
