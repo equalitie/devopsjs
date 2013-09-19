@@ -22,22 +22,22 @@
     "winston": "latest"
   },
   "devDependencies": {
-    "grunt":"latest",
-    "grunt-contrib-jshint":"latest",
-    "grunt-docco2": "latest",
+    "grunt": "latest",
+    "grunt-contrib-jshint": "latest",
     "grunt-plato": "latest",
-    "yadda": "~0.4.7"
+    "yadda": "~0.4.7",
+    "docco": "~0.6.2",
+    "grunt-docco2": "~0.1.2"
   },
   "optionalDependencies": {
     "mocha": "latest",
     "chai": "latest"
   },
   "directories": {
-    "bin" : "./bin",
-    "test" : "./test"
+    "bin": "./bin",
+    "test": "./test"
   },
   "scripts": {
     "test": "make test"
   }
 }
-

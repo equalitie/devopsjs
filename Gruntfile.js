@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     'src/node/lib/nrpe/*.js',
     'src/node/util/*.js',
     // frontend
-    'src/widget/dojs/do.js',
+    'src/widget/dojs/do.js'
   ];
 
 
@@ -17,14 +17,14 @@ module.exports = function(grunt) {
     docco: {
       docs: {
         src: srcFiles,
-        options: {
-          output: 'docs/annotated-source'
-        }
+        dest: 'docs/annotated-source'
       }
     },
     plato: {
-      files: {
-        'devopsjs': srcFiles
+      devopsjs: {
+        files: {
+          'reports': srcFiles
+        }
       }
     }
   });

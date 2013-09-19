@@ -13,4 +13,5 @@ npm-debug.log
 work
 config
 node_modules
-docs
+annotated-source
+reports
