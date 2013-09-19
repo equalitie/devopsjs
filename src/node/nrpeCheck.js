@@ -1,8 +1,10 @@
+/*jslint node: true */
+
 'use strict';
 
 GLOBAL.exception = function(s) {
-	console.log('*** EXCEPTION', s);
-}
+  console.log('*** EXCEPTION', s);
+};
 
 var program = require('commander');
 var hostLib = require('./lib/hosts.js');
@@ -17,6 +19,7 @@ var nrpe = require('./lib/nrpe/check.js');
 
 var tick = utils.getTick();
 var numChecks = 0;
+var docs = [];
 
 program
   .option('-c, --check <regex>', 'only execute checks that match this regex')
@@ -34,29 +37,28 @@ for (var key in nrpeChecks) {
   if (nrpeChecks.hasOwnProperty(key)) { numChecks++; }
 }
 
-var docs = [];
 
 // only include one host
 if (program.host) {
-	var onlyEdge = program.host;
-	var newHosts = [];
-	for (var i in hosts) {
-		var host = hosts[i];
-		if (host.hostname === onlyEdge) {
-			newHosts.push(host);
-		}
-	}
-	
-	if (!newHosts.length == 1) {
-		throw "'" + onlyEdge + "' not found ";
-	}
-	hosts = newHosts;
+  var onlyEdge = program.host;
+  var newHosts = [];
+  for (var i in hosts) {
+    var host = hosts[i];
+    if (host.hostname === onlyEdge) {
+      newHosts.push(host);
+    }
+  }
+  
+  if (newHosts.length !== 1) {
+    throw "'" + onlyEdge + "' not found ";
+  }
+  hosts = newHosts;
 }
 
 if (numChecks < 1) {
-	throw "No checks";
+  throw "No checks";
 } else if (hosts.length < 1) {
-	throw "No hosts";
+  throw "No hosts";
 }
 
 if (doSave) {
@@ -65,26 +67,28 @@ if (doSave) {
     hosts.forEach(function(h) { bareHosts.push(h.hostname); });
     var nom = require('./lib/nomination.js');
     nom.resolve(bareHosts, GLOBAL.CONFIG.dnets, function(resolved) {
- 	    commitEdgeSummary(hosts, tick, store, nom);
+       commitEdgeSummary(hosts, tick, store, nom);
     });
   } else {
- 	  commitEdgeSummary(hosts, tick, store);
+     commitEdgeSummary(hosts, tick, store);
   }
 }
 
-for (var checkName in nrpeChecks) {
-	for (var i = 0; i < hosts.length; i++) {
-		var res = nrpe.checkHost(hosts[i].hostname, nrpeChecks[checkName], checkName, tick, function(res) {
-			if (doSave) {
+function processCheck(res) {
+      if (doSave) {
         docs.push(res);
         if (docs.length == (numChecks * hosts.length)) {
           store.index({_index : 'devopsjs', _type : 'hostCheck', refresh : true}, docs);
         }
-			} else {
-				console.log(res);
-			}
-		});
-	}
+      } else {
+        console.log(res);
+      }
+    }
+
+for (var checkName in nrpeChecks) {
+  for (var i = 0; i < hosts.length; i++) {
+    var res = nrpe.checkHost(hosts[i].hostname, nrpeChecks[checkName], checkName, tick, processCheck) ;
+  }
 }
 
 function commitEdgeSummary(hosts, tick, store, nom) {

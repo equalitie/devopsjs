@@ -2,9 +2,9 @@ var queue = require('queue-async');
 var program = require('commander');
 var moment = require('moment');
 
-var semwiki = require('./lib/semwiki.js');
 var utils = require('./lib/util.js');
 utils.config();
+var semwiki = require('./lib/semwiki.js');
 var logger = GLOBAL.CONFIG.logger;
 var notify = require('./lib/notify.js');
 
@@ -45,7 +45,7 @@ semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, function() {
 function processActivities(users) {
   notify.retrieveActivities(query, users, function(err, notifier) {
     notifier.toProcess.forEach(function(t) {
-      if (nextSince == null || moment(t.modificationDate[0]).isAfter(nextSince)) {
+      if (nextSince === null || moment(t.modificationDate[0]).isAfter(nextSince)) {
         nextSince = t.modificationDate[0];
         logger.info('new nextSince', nextSince);
       }
@@ -62,5 +62,5 @@ function processActivities(users) {
 
 function getQuery(nextSince) {
   var since = moment(nextSince).add("minutes", moment().zone()).add("seconds", 1).format('MMM Do YYYY, H:mm:ss'); // timezone offset + 1 second since smw's > is >=
-  return '[[Modification date::>' + since+ ']]'
+  return '[[Modification date::>' + since+ ']]';
 }

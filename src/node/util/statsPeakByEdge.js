@@ -18,14 +18,14 @@ var getStatsQueue = queue();
 var solr = require('solr-client');
 var solrClient = solr.createClient({ host: 'ovh1.deflect.ca', core: 'core0'});
 
-
-for (var edge in a) {
-  getStatsQueue.defer(function(callback) {
+function query(callback) {
     var q = 'edge_s:' + edge + ' AND bytesPerSecond_i:* AND tickDate_dt:[2013-06-13T23:00:00.000Z TO 2013-06-16T23:00:00.000Z]';
     var statsQuery = solrClient.createQuery()
       .q(q).sort({bytesPerSecond_i:'desc'});
       solrClient.search(statsQuery, callback);
-  });
+  }
+for (var edge in a) {
+  getStatsQueue.defer(query(callback));
 }
 
 getStatsQueue.awaitAll(function(err, results) {

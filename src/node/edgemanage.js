@@ -26,7 +26,7 @@ program
 
   .option('--override', 'override defaults')
   .option('-c, --comment <description>', 'comment for the action')
-  .option('--tag', 'tag command')
+  .option('--tag', 'tag command');
 
 /* argument processing **/
 program.on('--help', function() {
@@ -38,122 +38,122 @@ program.on('--help', function() {
 });
 
 program.parse(process.argv);
-if (program.comment && program.args) { program.comment = [program.comment].concat(program.args).join(' ') } // FIXME. munges comment 
+if (program.comment && program.args) { program.comment = [program.comment].concat(program.args).join(' '); } // FIXME. munges comment 
 
-utils.config(program.dnet);
+utils.config({ dnet : program.dnet});
 if (!program.dnet) {
   throw "dnet is required";
 }
 
 if (!GLOBAL.CONFIG.minActive) {
-	throw "minActive not defined";
+  throw "minActive not defined";
 }
 
 var flatHostsFile = null;
 if (GLOBAL.CONFIG.flatHostsFile) {
-	flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : GLOBAL.CONFIG.configBase) + GLOBAL.CONFIG.flatHostsFile;
-}	
+  flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : GLOBAL.CONFIG.configBase) + GLOBAL.CONFIG.flatHostsFile;
+}  
 
 hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.' + program.dnet + '.json');
 
 if (program.verbose) {
-	console.log('configBase is "' + GLOBAL.CONFIG.configBase + '", flatHostsFile is "' + flatHostsFile + '"');
+  console.log('configBase is "' + GLOBAL.CONFIG.configBase + '", flatHostsFile is "' + flatHostsFile + '"');
 }
 
 if (program.add) {
-	mustComment();
+  mustComment();
   program.add = domained(program.add);
-	var hp = hostLib.addHost(program.add);
-	hostLib.writeHosts(hp.hosts, ['add', program.add], program.add);
-	console.log(program.add + ' is added');
+  var hp = hostLib.addHost(program.add);
+  hostLib.writeHosts(hp.hosts, ['add', program.add], program.add);
+  console.log(program.add + ' is added');
 }
 
 if (program.remove) {
-	mustComment();
+  mustComment();
   program.remove = domained(program.remove);
-	var hp = hostLib.removeHost(program.remove, null, function(hp) {
-		hostLib.writeHosts(hp.hosts, ['remove', program.remove], program.remove);
-	});
-	hostLib.writeHosts(hp.hosts, program.remove);
-	console.log(program.remove + ' is removed');
+  var hp = hostLib.removeHost(program.remove, null, function(hp) {
+    hostLib.writeHosts(hp.hosts, ['remove', program.remove], program.remove);
+  });
+  hostLib.writeHosts(hp.hosts, program.remove);
+  console.log(program.remove + ' is removed');
 }
 
 if (program.online) {
-	mustComment();
+  mustComment();
   program.online = domained(program.online);
-	var hp = hostLib.setOnline(program.online);
-	hostLib.writeHosts(hp.hosts, ['online', program.online], program.online);
-	console.log(program.online + ' is online');
+  var hp = hostLib.setOnline(program.online);
+  hostLib.writeHosts(hp.hosts, ['online', program.online], program.online);
+  console.log(program.online + ' is online');
 }
 
 if (program.offline) {
-	mustComment();
+  mustComment();
   program.offline = domained(program.offline);
-	var hp = hostLib.setOffline(program.offline);
-	hostLib.writeHosts(hp.hosts, ['offline', program.offline], program.offline);
-	console.log(program.offline + ' is offline');
+  var hp = hostLib.setOffline(program.offline);
+  hostLib.writeHosts(hp.hosts, ['offline', program.offline], program.offline);
+  console.log(program.offline + ' is offline');
 }
 
 if (program.activate) {
-	mustComment();
+  mustComment();
   program.activate = domained(program.activate);
-	var hp = hostLib.activate(program.activate);
-	hostLib.writeHosts(hp.hosts, ['activate', program.activate], program.activate);
-	console.log(program.activate + ' is active');
+  var hp = hostLib.activate(program.activate);
+  hostLib.writeHosts(hp.hosts, ['activate', program.activate], program.activate);
+  console.log(program.activate + ' is active');
 }
 
 if (program.deactivate) {
-	mustComment();
+  mustComment();
   program.deactivate = domained(program.deactivate);
-	var hp = hostLib.deactivate(program.deactivate);
-	hostLib.writeHosts(hp.hosts, ['deactivate', program.deactivate], program.deactivate);
-	console.log(program.deactivate + ' is inactive');
+  var hp = hostLib.deactivate(program.deactivate);
+  hostLib.writeHosts(hp.hosts, ['deactivate', program.deactivate], program.deactivate);
+  console.log(program.deactivate + ' is inactive');
 }
 
 if (program.advice) {
-	var num = program.timespan ? program.timespan :  hostLib.config.defaultPeriod;
-	hostLib.getStats(num, hostLib.advise);
+  var num = program.timespan ? program.timespan :  hostLib.config.defaultPeriod;
+  hostLib.getStats(num, hostLib.advise);
 }
 
 if (program.rotate) {
-	hostLib.getStats(num, hostLib.rotate);
+  hostLib.getStats(num, hostLib.rotate);
 }
 
 if (program.rin) {
-	mustComment();
+  mustComment();
   program.rin = domained(program.rin);
-	var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
-	hostLib.getStats(num, hostLib.rotate);
+  var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
+  hostLib.getStats(num, hostLib.rotate);
 }
 
 if (program.rout) {
-	mustComment();
+  mustComment();
   program.rout = domained(program.rout);
-	var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
-	hostLib.getStats(num, hostLib.rotate);
+  var num = program.timespan ? program.timespan : hostLib.config.defaultPeriod;
+  hostLib.getStats(num, hostLib.rotate);
 }
 
 if (program.testhost) {
   program.testhost = domained(program.testhost);
-	var check = require('./lib/nrpe/check.js');
+  var check = require('./lib/nrpe/check.js');
   var testname = 'check_tcptraffic';
-	var test = require('./lib/nrpe/allchecks.js').getChecks(testname)[testname];
-	check.checkHost(program.testhost, test, testname, utils.getTick(), function(res) {
-		console.log(res);
-	});
+  var test = require('./lib/nrpe/allchecks.js').getChecks(testname)[testname];
+  check.checkHost(program.testhost, test, testname, utils.getTick(), function(res) {
+    console.log(res);
+  });
 }
 
 if (program.query) {
-	console.log(hostLib.getHostsSummary());
+  console.log(hostLib.getHostsSummary());
 }
 
 if (program.stats) {
-	console.log(hostLib.getHostsSummary());
+  console.log(hostLib.getHostsSummary());
 }
 
 if (program.writeall) {
-	var hp = hostLib.getHosts();
-	hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
+  var hp = hostLib.getHosts();
+  hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
 }
 
 function mustComment () {

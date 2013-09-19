@@ -3,8 +3,7 @@
 // transform cucumber json output into solr results
 // TODO port to ElasticSearch
 
-var inputStream = process.stdin
-  , data = '';
+var inputStream = process.stdin, data = '';
 
 var store = require('./lib/solrNagios.js');
 var util = require('./lib/util.js');
@@ -20,12 +19,13 @@ inputStream.on('data', function(chunk) {
 });
  
 inputStream.on('end', function() {
+  var json;
   try {
-  	var json = JSON.parse(data);
-	} catch (e) {
+    json = JSON.parse(data);
+  } catch (e) {
     console.log("failing: ", e, data);
     throw e;
-	}
+  }
   processResult(json[0]);
 });
 

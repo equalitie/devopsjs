@@ -1,8 +1,8 @@
-var queue = require('queue-async')
-  , dns = require('dns')
-  , geoip = require('geoip')
-  , city = new geoip.City('/usr/local/geoip/GeoLiteCity.dat')
-  , resolved = { dnets : {}, hosts: {}, geo : {}};
+var queue = require('queue-async'), 
+  dns = require('dns'), 
+  geoip = require('geoip'),
+  city = new geoip.City('/usr/local/geoip/GeoLiteCity.dat'),
+  resolved = { dnets : {}, hosts: {}, geo : {}};
 
 var resolver = {
   resolve : function(hosts, dnets, callback) {
@@ -26,7 +26,7 @@ var resolver = {
       resolveQueue.defer(function(callback) {
         dns.resolve4(c, function(err, addies) { 
           resolved.dnets[c] = addies; 
-          callback() 
+          callback();
         });
       });
     });
@@ -52,7 +52,6 @@ var resolver = {
   }, getGeo : function(host) {
     return resolved.geo[host];
   }
-
-}
+};
 
 module.exports = resolver;

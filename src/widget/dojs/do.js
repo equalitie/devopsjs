@@ -10,7 +10,7 @@ function doHosts() {
 console.log('doHosts', new Date());
 
   $('.devopsHost').each(function() { // iterate over hosts
-      var t, name
+      var t, name;
       t = $(this);
       
       name = t.find('.name').text();
@@ -43,6 +43,7 @@ console.log('doHosts', new Date());
         values[check] = [];
         high[check] = 0;
         low[check] = 0;
+        /* rewrite for es & frontend
         solrQuery('edge_s:' + name + ' AND aCheck_s:check_' + check, function(data) {
             console.log(name, check, field, fields);
           $.each(data.response.docs, function(i, doc)  {
@@ -67,10 +68,11 @@ console.log('doHosts', new Date());
             if (low[check] != high[check]) {
               sum = hunits(low[check]) + '&mdash;' + hunits(high[check]);
             }
-            var detail = t.find('.label_' + checkVal).text().replace(/:.*/, '') + ': ' + sum;
+            var detail = t.find('.label_' + checkVal).text().replace(/:.* /, '') + ': ' + sum;
             t.find('.label_' + check).html('<a href="' + solrQuery + '?q=edge_s%3A' + name + '%20AND%20aCheck_s%3Acheck_' + check + '&sort=tickdate_dt%20desc">' + detail + '</a>');
           });
           }, { sort : 'tickDate_dt desc', rows: 20});
+        */
           }
         }
       }, {sort: 'tickDate_dt desc', rows: 20});
@@ -91,7 +93,7 @@ function hunits(v) {
 
 function prettyDate(solrTime){
   var ret = parseISO8601(solrTime),
-    dt = new Date,
+    dt = new Date(),
     seconds = (dt.getTime() - ret.getTime()) / 1000;
 
   return dt + '<br />' + Math.round(seconds) + ' second' + (seconds == 1 ? '' : 's') + ' ago';
@@ -107,7 +109,7 @@ function parseISO8601(str) {
  timeSubParts = timeParts[0].split(':'),
  timeSecParts = timeSubParts[2].split('.'),
  timeHours = Number(timeSubParts[0]),
- _date = new Date;
+ _date = new Date();
 
  _date.setUTCFullYear(Number(dateParts[0]));
  _date.setUTCMonth(Number(dateParts[1])-1);
@@ -152,16 +154,17 @@ function processGherkins(data) {
     var scenario = $(this).find('.testcase_scenario_def').text();
 
     $(this).find('.testcase_content').each(function() {
-      var n1 = $(this).text().replace(/\n([A-Z\<])/g, '\f$1').replace(/\n/g, '');
+      var n1 = $(this).text().replace(/\n([A-Z<])/g, '\f$1').replace(/\n/g, '');
       n1 = n1.replace(/^/g, '\n').replace(/\f/g, '\n').replace(/^\s/g, '');
       var s = n1.split("\n");
       $(this).html('');
       for (var i = 0; i < s.length; i++) {
         var n = s[i].replace(/ *$/, '');
 
+    var q;
     if (scenario && response) {
           testLine++;
-          var q = window.feature + "/" + scenario + "/" + n + "/" + response.tickTime_l;
+          q = window.feature + "/" + scenario + "/" + n + "/" + response.tickTime_l;
           getResult(q, testLine);
         } else {
           console.log('no scenario or response', q);
@@ -210,7 +213,7 @@ function solrQuery(data, callback, extra) {
       'success': callback,
       'dataType': 'jsonp',
       'jsonp': 'json.wrf'
-    }
+    };
     if (extra) {
       $.extend(p.data, extra);
     }

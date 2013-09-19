@@ -1,4 +1,5 @@
 var bot = require('nodemw');
+var logger = GLOBAL.CONFIG.logger;
 
 /* 
 
@@ -11,30 +12,43 @@ var loggedIn = false;
 
 var semwiki = {
   getWiki : function(wikiConfig, callback) {
-		if (!loggedIn) {
+    if (!loggedIn) {
       wikibot = new bot(wikiConfig);
       wikibot.logIn(function() {
         loggedIn = true;
-				callback();
+        callback();
       });
-		} else {
-			callback();
-		}
+    } else {
+      callback();
+    }
   }, 
 
   call : function(params, callback) {
     wikibot.api.call(params, callback);
   },
 
-  getExpandedText : function(text, title, callback) {
-    var q = { action: 'expandtemplates', text: text, generatexml: 1 }
-    if (title) { q.title = title };
-    wikibot.api.call(q, function(data, next, raw) {
-      var ret = raw.expandtemplates[Object.keys(raw.expandtemplates)[0]];
-      callback && callback(ret);
-    }, 'POST');
+/** 
+ * Default template expansion for a page
+ **/
+  expand : function(page, callback) {
+    console.log('EXPANDY', page);
+    getExpandedText('{{:'+page+'}}', null, callback);
   },
 
+  getExpandedText : function(text, title, callback) {
+     getExpandedText(text, title, callback);
+  },
+
+  getDeflecteeSites : function(callback) {
+    var params = {
+      action: 'ask',
+      query: ' [[Site of::+]] |mainlabel=- |?Site of=Client |?Address |?Status |?Comment |?ATS config |?Zonefile status |?EasyDNS status |?Pre-client test |?Deflectee test |?Origin monitored |?Logging and monitoring |?Acceptance passed |?DNS delegation'
+    };
+
+    semwiki.call(params, function(info, next, data) {
+      callback(data.query.results);
+    });
+  }, 
 
   getUsers : function(callback) {
     var params = {
@@ -46,9 +60,9 @@ var semwiki = {
       callback(data.query.results);
     });
   },
-	getWikibot : function() {
-		return wikibot;
-	},
+  getWikibot : function() {
+    return wikibot;
+  },
   getActivities : function(spec, callback) {
     var params = {
       action: 'ask',
@@ -81,6 +95,7 @@ var semwiki = {
     return ret;
   },
   val : function(result, field){
+    logger.debug('val', result);
     var ret = [];
     if (!result.printouts[field]) {
       return ret;
@@ -90,7 +105,16 @@ var semwiki = {
     });
     return ret;
   }
-}
+};
 
 module.exports = semwiki;
 
+function getExpandedText(text, title, callback) {
+
+    var q = { action: 'expandtemplates', text: text, generatexml: 1 };
+    if (title) { q.title = title;}
+    wikibot.api.call(q, function(data, next, raw) {
+      var ret = raw.expandtemplates[Object.keys(raw.expandtemplates)[0]];
+      if (callback) { callback(ret); }
+    }, 'POST');
+}

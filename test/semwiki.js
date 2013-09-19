@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+var utils = require('../src/node/lib/util.js');
+utils.config();
+
 var semwiki = require('../src/node/lib/semwiki.js');
 
 var expect = require('chai').expect;

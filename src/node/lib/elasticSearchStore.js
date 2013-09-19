@@ -1,5 +1,4 @@
-var elasticsearch = require('elasticsearch')
- , es = elasticsearch(GLOBAL.CONFIG.elasticSearchConfig);
+var elasticsearch = require('elasticsearch'), es = elasticsearch(GLOBAL.CONFIG.elasticSearchConfig);
 
 /**
 *
@@ -8,7 +7,7 @@ var elasticsearch = require('elasticsearch')
 */
 
 exports.index = function(options, docs, callback) {
-  if (!Array.isArray(docs)) { docs = [docs] };
+  if (!Array.isArray(docs)) { docs = [docs]; }
 //console.log('inserting', docs.length, options._type);
   var tc = [];
   docs.forEach(function(d) {
@@ -23,11 +22,10 @@ exports.index = function(options, docs, callback) {
     }
     if (callback) callback();
   });
-}
-
+};
 exports.search = function(options, query, callback) {
   es.search(options, query, callback);
-}
+};
 
 exports.getChecks = function(hosts, nrpeChecks, callback) {
   var qchecks = [], qhosts = [];
@@ -63,10 +61,10 @@ exports.getChecks = function(hosts, nrpeChecks, callback) {
         }
       }
     }
-  }
+  };
 
   es.search({ _index : 'devopsjs', _type : 'hostCheck'}, q, function(err, res) {
     callback(err, res);
   });
-}
+};
 

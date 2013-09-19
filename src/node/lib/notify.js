@@ -1,3 +1,4 @@
+/*jshint loopfunc: true*/
 var semwiki = require('./semwiki.js');
 var logger = GLOBAL.CONFIG.logger;
 var queue = require('queue-async');
@@ -45,7 +46,7 @@ exports.retrieveActivities = function(pageQuery, users, callback) {
       callback(err, notifier);
     });
   });
-}
+};
 
 /** 
 * get notifier with these users
@@ -55,7 +56,7 @@ exports.getNotifier = function(users, pages) {
   notifier.reset();
   notifier.allUsers = users;
   return notifier;
-}
+};
 
 /**
 * 
@@ -67,13 +68,14 @@ exports.composeNotifications = function(notifier) {
   var action = {}, cc = {}, watch = {}, actionTitle = '<h2>Action items</h2>\n', ccTitle = '<h2>Monitoring items</h2>\n', watchTitle = "<h2>Watchwords</h2>\n";
 
   notifier.toProcess.forEach(function(jt) { // first break out if it's an action item or watching item and assign it to appropriate section
-    var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Activity:/, '') + '</a>'
+    var linktext = '<a href="' + jt.link + '">'+jt.name.replace(/^Activity:/, '') + '</a>';
     var message =  linktext + ' <b>' + jt.importance + '</b> ' + (jt.tags.length > 0 ? '['+jt.tags+']' : ''); 
     message = message + ' ' + jt.lastUpdate + ' by ' + jt.lastProvider + (jt.lastComment ? '; ' + jt.lastComment : '');
 /** Action item for validator, notify for updater */ 
+    var seen;
     if (jt.categories.indexOf('Activity tracker') > -1) {
       if (jt.status == 'Validate') {
-        var seen = {};
+        seen = {};
         jt.validator.forEach(function (v) {
           action[v] = (action[v] || actionTitle) + '* <span style="font-style:italic; color: green">Validate</span> ' + message + '<br />\n';
           seen[v] = 1;
@@ -85,7 +87,7 @@ exports.composeNotifications = function(notifier) {
         });
 /** Notify assignee **/
       } else if (jt.status == 'Update') {
-        var seen = {};
+        seen = {};
         jt.assignedTo.forEach(function (a) {
           action[a] = (action[a] || actionTitle) + '* <span style="font-style:italic; color: green">Update</span> ' + message + '<br />\n';
           seen[a] = 1;
@@ -97,7 +99,7 @@ exports.composeNotifications = function(notifier) {
         });
 /** notify both **/
       } else {
-        var seen = {};
+        seen = {};
         jt.validator.forEach(function (v) {
           cc[v] = (cc[v] || ccTitle) + '* <span style="font-style:italic; color: peach">' + jt.status + '</span> ' + message + '<br />\n';
           seen[v] = 1;
@@ -117,7 +119,7 @@ exports.composeNotifications = function(notifier) {
         var re = new RegExp(w, 'gi');
         if (t.search(re) > -1) {
           var matches = '';
-          while (match = re.exec(t)) {
+          while ((match = re.exec(t)) !== null) {
             matches += ' …' + t.substring(Math.max(match.index - 15, 0), Math.min(match.index + w.length + 15, t.length)) + '…';
           }
           watch[u] = (watch[u] || watchTitle) + '* <span style="font-style:italic; color: orange">' + w + '</span> ' + linktext + ': ' + matches + '<br />\n';
@@ -126,17 +128,18 @@ exports.composeNotifications = function(notifier) {
     }
   });
   var m = {}; // then create grouped message texts in appropriate order
-  for (var user in action) {
+  var user;
+  for (user in action) {
     m[user] = (m[user] || '') + action[user];
   }
-  for (var user in cc) {
+  for (user in cc) {
     m[user] = (m[user] || '') + cc[user];
   }
-  for (var user in watch) {
+  for (user in watch) {
     m[user] = (m[user] || '') + watch[user];
   }
   return m;
-}
+};
 
 /**
 * Send notifications according to configured GLOBAL.CONFIG.notify
@@ -160,7 +163,7 @@ exports.sendNotifications = function(notifications) {
           subject: emailSubject,
           text: note.replace(/<.*?>/g, ''),
           html: note
-      }
+      };
 
       logger.debug('sendNotification', addy, transport);
 
@@ -180,7 +183,7 @@ exports.sendNotifications = function(notifications) {
   sendMailQueue.awaitAll(function(err) {
     transport.close(); 
   });
-}
+};
 
 /**
 * a particular notification
@@ -235,7 +238,7 @@ var notifier = {
       text : text,
       categories : cats,
       tags: []
-    }
+    };
     if (jt.dateRequired[0] && jt.dateRequired[0].getTime() < new Date().getTime()) {
       jt.tags.push('OVERDUE');
     }
@@ -252,5 +255,5 @@ var notifier = {
 
     this.toProcess.push(jt);
   }
-}
+};
 

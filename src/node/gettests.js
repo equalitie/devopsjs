@@ -11,7 +11,7 @@ function processTests() {
     query: '[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item type'
   };
 
-	semwiki.call(params, function(info, next, data) {
+  semwiki.call(params, function(info, next, data) {
     processTestItems(data);
   });
 
@@ -23,7 +23,7 @@ function processTestItems(data) {
 
   for (var r in data.query.results) {
 //    var b = data.info.results[r]['printouts'];
-    var b = data.query.results[r]['printouts'];
+    var b = data.query.results[r].printouts;
     var page = b['Test item page'][0].fulltext;
     var type = b['Test item type'][0].fulltext;
     var desc = b['Test item description'][0].fulltext;
@@ -41,7 +41,7 @@ function processTestItems(data) {
 }
 
 function writeFeature(name, feature) {
-	name += ".generated.feature";
+  name += ".generated.feature";
   console.log("writing tests/features/" + name);
   fs.writeFileSync("tests/features/" + name, feature);
 }
