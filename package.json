@@ -22,11 +22,10 @@
     "winston": "latest"
   },
   "devDependencies": {
-    "grunt": "latest",
+    "grunt": "~0.4.1",
     "grunt-contrib-jshint": "latest",
     "grunt-plato": "latest",
     "yadda": "~0.4.7",
-    "docco": "~0.6.2",
     "grunt-docco2": "~0.1.2"
   },
   "optionalDependencies": {
