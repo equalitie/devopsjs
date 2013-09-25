@@ -28,7 +28,8 @@
     "yadda": "~0.4.7",
     "grunt-docco2": "~0.1.2",
     "expect.js": "~0.2.0",
-    "grunt-mocha-test": "~0.7.0"
+    "grunt-mocha-test": "~0.7.0",
+    "grunt-contrib-watch": "~0.5.3"
   },
   "optionalDependencies": {
     "mocha": "latest",

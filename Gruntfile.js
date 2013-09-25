@@ -34,11 +34,19 @@ module.exports = function(grunt) {
           'reports': srcFiles
         }
       }
+    },
+    watch: {
+      files: [
+        '<%= jshint.files %>',
+        'yadda-tests/*-test.js'
+      ],
+      tasks: ['jshint', 'mochaTest']
     }
   });
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-docco2');
   grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-mocha-test');
