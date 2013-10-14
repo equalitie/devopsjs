@@ -1,0 +1,250 @@
+#!/bin/sh
+# mappings for elasticsearch
+
+echo -n '\ncheckSummary'
+curl -XPUT http://localhost:9200/devopsjs/checkSummary/_mapping?ignore_conflicts=true -d '
+{
+  "checkSummary" : {
+    "properties" : {
+      "@timestamp" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "countryCode" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "dnet" : {
+        "type" : "string",
+        "index" : "not_analyzed"
+      },
+      "dnetChange" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "hostname" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "id" : {
+        "type" : "string"
+      },
+      "lonlat" : {
+        "type" : "double"
+      }
+    }
+  }
+}' 
+
+echo -n '\nhostSummary'
+curl -XPUT http://localhost:9200/devopsjs/hostSummary/_mapping?ignore_conflicts=true -d '
+{
+  "hostSummary" : {
+    "properties" : {
+      "@timestamp" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "added" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "comment" : {
+        "type" : "string"
+      },
+      "hostname" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "id" : {
+        "type" : "string"
+      },
+      "lastActive" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "lastInactive" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "lastOffline" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "lastOnline" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "state" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      }
+    }
+  }
+}' 
+echo -n '\nhostCheck'
+curl -XPUT http://localhost:9200/devopsjs/hostCheck/_mapping?ignore_conflicts=true -d '
+{
+  "hostCheck" : {
+    "properties" : {
+      "@timestamp" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "checkName" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "check_connections" : {
+        "properties" : {
+          "established" : {
+            "type" : "integer"
+          },
+          "listeners" : {
+            "type" : "integer"
+          },
+          "waiting" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "check_fail2ban" : {
+        "properties" : {
+          "httpBans" : {
+            "type" : "integer"
+          },
+          "sshBans" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "check_tcptraffic" : {
+        "properties" : {
+          "bytesIn" : {
+            "type" : "integer"
+          },
+          "bytesOut" : {
+            "type" : "integer"
+          },
+          "bytesPerSecond" : {
+            "type" : "integer"
+          }
+        }
+      },
+      "error" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "execTime" : {
+        "type" : "integer"
+      },
+      "hostname" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "id" : {
+        "type" : "string"
+      },
+      "status" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "stdout" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      }
+    }
+  }
+}' 
+echo -n '\nedgeManage'
+curl -XPUT http://localhost:9200/devopsjs/edgeManage/_mapping?ignore_conflicts=true -d '
+{
+  "edgeManage" : {
+    "properties" : {
+      "@timestamp" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "comment" : {
+        "type" : "string"
+      },
+      "dnet" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "lastActive" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "lastInactive" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "lastOffline" : {
+        "type" : "date",
+        "format" : "dateOptionalTime"
+      },
+      "operation" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "operator" : {
+        "type" : "string", 
+        "index" : "not_analyzed"
+      },
+      "program" : {
+        "properties" : {
+          "_events" : {
+            "type" : "object"
+          },
+          "_name" : {
+          "type" : "string", 
+          "index" : "not_analyzed"
+          },
+          "comment" : {
+            "type" : "string"
+          },
+          "dnet" : {
+            "type" : "string"
+          },
+          "options" : {
+            "properties" : {
+              "bool" : {
+                "type" : "boolean"
+              },
+              "description" : {
+                "type" : "string"
+              },
+              "flags" : {
+                "type" : "string"
+              },
+              "long" : {
+                "type" : "string"
+              },
+              "optional" : {
+                "type" : "long"
+              },
+              "required" : {
+                "type" : "long"
+              },
+              "short" : {
+                "type" : "string"
+              }
+            }
+          },
+          "override" : {
+            "type" : "boolean"
+          },
+          "rawArgs" : {
+            "type" : "string", 
+            "index" : "not_analyzed"
+          },
+          "rotate" : {
+            "type" : "boolean"
+          }
+        }
+      }
+    }
+  }
+}'
+echo
