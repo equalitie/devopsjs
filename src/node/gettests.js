@@ -21,6 +21,7 @@ function processTests() {
 function processTestItems(data) {
   var features = {};
 
+  //TODO b? no single letter vars please!!
   for (var r in data.query.results) {
 //    var b = data.info.results[r]['printouts'];
     var b = data.query.results[r].printouts;

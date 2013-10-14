@@ -14,6 +14,14 @@ module.exports = function(grunt) {
     jshint: {
       files: srcFiles
     },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['yadda-tests/*-test.js']
+      }
+    },
     docco: {
       docs: {
         src: srcFiles,
@@ -26,16 +34,25 @@ module.exports = function(grunt) {
           'reports': srcFiles
         }
       }
+    },
+    watch: {
+      files: [
+        '<%= jshint.files %>',
+        'yadda-tests/*-test.js'
+      ],
+      tasks: ['jshint', 'mochaTest']
     }
   });
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-docco2');
   grunt.loadNpmTasks('grunt-plato');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task(s).
-  grunt.registerTask('default', ['jshint', 'docco', 'plato']);
+  grunt.registerTask('default', ['jshint', 'mochaTest', 'docco', 'plato']);
 
 };
 

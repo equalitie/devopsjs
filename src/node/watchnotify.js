@@ -1,3 +1,4 @@
+/*jshint node:true */
 var queue = require('queue-async');
 var program = require('commander');
 var moment = require('moment');
@@ -36,7 +37,7 @@ try {
 logger.debug('getting wiki');
 semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, function() {
   logger.debug('getting users');
-  semwiki.getUsers(function(users) { 
+  semwiki.getUsers(function(users) {
     logger.debug('processing activitys');
     processActivities(users);
   });
@@ -55,6 +56,7 @@ function processActivities(users) {
     if (notifier.toProcess.length > 0) {
       query = getQuery(nextSince);
       notifier.toProcess = [];
+      // why we use Sync?
       fs.writeFileSync(utils.slashedDir(conf) + 'notifyTimestamp.json', JSON.stringify(nextSince));
     }
   });

@@ -14,4 +14,5 @@ work
 config
 node_modules
 annotated-source
+docs
 reports
