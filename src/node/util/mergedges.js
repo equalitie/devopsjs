@@ -1,5 +1,5 @@
-var deflect1 = require('/usr/local/devopsjs/deflect1//hosts.json');
-var staging = require('/usr/local/devopsjs/staging/hosts.json');
+var staging = require('/home/devopsjs/n/devopsjs/config/hosts.staging.json');
+var deflect1 = require('/home/devopsjs/n/devopsjs/config/hosts.deflect1.json');
 
 var all = deflect1;
 all = all.concat(staging);
