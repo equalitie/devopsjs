@@ -40,6 +40,7 @@ exports.getChecks = function(hosts, nrpeChecks, callback) {
     size : 500,
     "query": {
       "filtered": {
+/* FIXME
         "query": {
           "bool": {
             "must": [
@@ -52,6 +53,7 @@ exports.getChecks = function(hosts, nrpeChecks, callback) {
             ]
           }
         },
+*/
         "filter": {
           "range": {
             "@timestamp": {
@@ -63,8 +65,6 @@ exports.getChecks = function(hosts, nrpeChecks, callback) {
     }
   };
 
-  es.search({ _index : 'devopsjs', _type : 'hostCheck'}, q, function(err, res) {
-    callback(err, res);
-  });
+  es.search({ _index : 'devopsjs', _type : 'hostCheck'}, q, callback);
 };
 

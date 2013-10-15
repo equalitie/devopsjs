@@ -1,8 +1,11 @@
 var fs = require('fs');
 var utils = require( "./lib/util.js");
+
+utils.config();
+
 var semwiki = require("./lib/semwiki.js");
 
-var wiki = semwiki.getWiki("../../"+utils.confFile, processTests);
+var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 
 function processTests() {
 
