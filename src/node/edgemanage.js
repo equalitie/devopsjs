@@ -40,10 +40,10 @@ program.on('--help', function() {
 program.parse(process.argv);
 if (program.comment && program.args) { program.comment = [program.comment].concat(program.args).join(' '); } // FIXME. munges comment
 
-utils.config({ dnet: program.dnet});
 if (!program.dnet) {
   throw "dnet is required";
 }
+utils.config({ dnet: program.dnet});
 
 if (!GLOBAL.CONFIG.minActive) {
   throw "minActive not defined";
