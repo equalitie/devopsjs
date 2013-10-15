@@ -3,15 +3,14 @@ var hosts = require('/home/devopsjs/n/devopsjs/config/hosts.json');
 function get(q, hosts, dnet) {
   var r = null;
   for (var h in hosts) {
-    var host = hosts[h]
-    if (host.hostname == q){
+    var host = hosts[h];
+    if (host.hostname == q) {
       if (host.dnetChange) {
         r = host.dnet + ' (' + dnet + ') ' + Math.round((new Date().getTime() - new Date(host.dnetChange).getTime())/1000) + " seconds ago";
       } else {
         r = "no data";
       }
       return r;
-      break;
     }
   }
 }
