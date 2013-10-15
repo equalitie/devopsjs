@@ -247,4 +247,98 @@ curl -XPUT http://localhost:9200/devopsjs/edgeManage/_mapping?ignore_conflicts=t
     }
   }
 }'
+
+echo 'logstash template'
+
+curl -XPUT localhost:9200/_template/logstash -d '
+{
+  "template" : "logstash-*",
+  "mappings" : {  
+    "_default_" : {
+      "_all" : {"enabled" : false},
+      "properties" : {
+        "@timestamp" : {
+          "type" : "date",
+          "format" : "dateOptionalTime"
+        },
+        "@version" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "atsresult" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "bytes_sent" : {
+          "type" : "long"
+        },
+        "contenttype" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "domain" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "dunno" : {
+          "type" : "long"
+        },
+        "host" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "ip" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "ip_geo_city" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "ip_geo_country" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "ip_geo_lonlat" : {
+          "type" : "double"
+        },
+        "ip_geo_region" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "message" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "method" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "originloc" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "path" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "request" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        },
+        "status" : {
+          "type" : "long"
+        },
+        "user_agent" : {
+          "type" : "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}'
+
 echo
+echo 'completed'
+
+
