@@ -8,6 +8,9 @@ var Yadda = require('yadda').Yadda;
 require('yadda').plugins.mocha();
 
 var library = require('./devops-library');
-var yadda  = new Yadda(library);
+var ctx = {
+  myhost: 'secure.wikifier.org'
+};
+var yadda  = new Yadda(library, ctx);
 
 yadda.mocha('Origin', './yadda-tests/origin-spec.feature');
