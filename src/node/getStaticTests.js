@@ -1,6 +1,12 @@
+/**
+ *
+ * Creator: DavidM
+ * Retrieve static BDD tests from wiki for processing
+ *
+ **/
+
 var fs = require('fs');
 var utils = require( "./lib/util.js");
-
 utils.config();
 
 var semwiki = require("./lib/semwiki.js");
@@ -8,7 +14,6 @@ var semwiki = require("./lib/semwiki.js");
 var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 
 function processTests() {
-
   var params = {
     action: 'ask',
     query: '[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item type'
@@ -17,22 +22,18 @@ function processTests() {
   semwiki.call(params, function(info, next, data) {
     processTestItems(data);
   });
-
-//  wikibot.getAsk({ query: "[[Test item type::+]]|?Test item page|?Test item type|?Test item description|?Test item content|?Test item tags|sort=Test item page|sort=Test item type"}, processTestItems);
 }
 
 function processTestItems(data) {
   var features = {};
-
-  //TODO b? no single letter vars please!!
+    
   for (var r in data.query.results) {
-//    var b = data.info.results[r]['printouts'];
-    var b = data.query.results[r].printouts;
-    var page = b['Test item page'][0].fulltext;
-    var type = b['Test item type'][0].fulltext;
-    var desc = b['Test item description'][0].fulltext;
-    var content = b['Test item content'][0].split("\n");
-
+    var result = data.query.results[r].printouts;
+    var page = result['Test item page'][0].fulltext;
+    var type = result['Test item type'][0].fulltext;
+    var desc = result['Test item description'][0].fulltext;
+    var content = result['Test item content'][0].split("\n");
+    
     var feature = features[page] || "";
     feature += type + ": " + desc + "\n  " + content.join("\n  ") + "\n\n";
     features[page] = feature;

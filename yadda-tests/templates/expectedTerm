@@ -1,0 +1,3 @@
+  Scenario: expected term
+    Given retrieved @validatePage@
+    It should contain "@expectedTerm@"
