@@ -1,16 +1,22 @@
-/*global require*/
+/*global require, feature*/
 /*jshint node:true*/
 // Author: Cormac McGuire
 // ### Description: inclued the test specs
 // 
 
-var Yadda = require('yadda').Yadda;
-require('yadda').plugins.mocha();
+var Yadda = require('yadda');
+Yadda.plugins.mocha();
 
-var library = require('./devops-library');
 var ctx = {
   myhost: 'secure.wikifier.org'
 };
-var yadda  = new Yadda(library, ctx);
+feature('./yadda-tests/origin-spec.feature', function(feature) {
+  var library = require('./devops-library');
+  var yadda  = new Yadda.Yadda(library, ctx);
 
-yadda.mocha('Origin', './yadda-tests/origin-spec.feature');
+  scenarios(feature.scenarios, function(scenario, done) {
+    yadda.yadda(scenario.steps, done);
+  });
+
+});
+

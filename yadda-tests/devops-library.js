@@ -17,7 +17,6 @@ module.exports = (function() {
   library = new Library()
 
     .given('$HOST looked up', function(hostname, next) {
-      console.log(this);
       then = parseInt((Date.now() / 1000), 10);
       dns.lookup(hostname, function (err, address) {
         now = parseInt((Date.now() / 1000), 10);
