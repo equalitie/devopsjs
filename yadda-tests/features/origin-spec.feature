@@ -3,7 +3,7 @@ Feature: Test secure.wikifier.org
     Given secure.wikifier.org looked up
     Then the address should resolve
     And it should return within 20 seconds
-    And it should include the word presentation    
+    And it should include the word "presentation" 
 
   Scenario: should make a request via a proxy
     Given staging.deflect.ca looked up
