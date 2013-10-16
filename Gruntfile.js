@@ -17,6 +17,12 @@ module.exports = function(grunt) {
     mochaTest: {
       test: {
         options: {
+          reporter: 'json'
+        },
+        src: ['yadda-tests/*-test.js']
+      },
+      devTest: {
+        options: {
           reporter: 'spec'
         },
         src: ['yadda-tests/*-test.js']
@@ -39,9 +45,10 @@ module.exports = function(grunt) {
       files: [
         '<%= jshint.files %>',
         'yadda-tests/*.js',
-        'yadda-tests/*.feature'
+        'yadda-tests/library/*.js',
+        'yadda-tests/features/*.feature'
       ],
-      tasks: ['jshint', 'mochaTest']
+      tasks: ['jshint', 'mochaTest:devTest']
     }
   });
 

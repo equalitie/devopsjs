@@ -10,8 +10,8 @@ Yadda.plugins.mocha();
 var ctx = {
   myhost: 'secure.wikifier.org'
 };
-feature('./yadda-tests/origin-spec.feature', function(feature) {
-  var library = require('./devops-library');
+feature('./yadda-tests/features/origin-spec.feature', function(feature) {
+  var library = require('./library/devops-library');
   var yadda  = new Yadda.Yadda(library, ctx);
 
   scenarios(feature.scenarios, function(scenario, done) {

@@ -24,7 +24,6 @@ module.exports = (function() {
         next();
       });
     })
-
     .when('used as a proxy to make a request to $HOST', function(hostname, next) {
       var options = {
         host: hostAddress,
@@ -63,7 +62,9 @@ module.exports = (function() {
       expect(now - then).to.be.lessThan(seconds);
       next();
     })
-    .then('it should include the word $WORD', function(seconds, next) {
+
+    .then('it should include the word $WORD', function(word, next) {
+      console.log(word);
       next();
     });
 
