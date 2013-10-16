@@ -1,0 +1,4 @@
+  Scenario: should not cache
+    When retrieving @nocacheAddress@
+    Then retrieving it again
+    It should not be cached

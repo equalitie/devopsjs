@@ -1,0 +1,3 @@
+  Scenario: exclude locations
+    When retrieving @excludeLocations@
+    It should be the Deflect logo

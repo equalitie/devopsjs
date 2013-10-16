@@ -1,0 +1,10 @@
+  Scenario: should retrieve site
+    Given performed DNS lookup
+    Then it should retrieve @validatePage@
+    And it should have a status of 200
+    And it should return within 20 seconds
+
+  Scenario: should cache
+    When retrieving @validatePage@
+    It should have a Deflect Via header
+    And it should be cached
