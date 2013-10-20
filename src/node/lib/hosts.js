@@ -235,10 +235,10 @@ function getHostStats(results, nrpeChecks) {
       worry = worryVals[status] * timeWeight;
       hostStat.worries.push({state : status, weight: worry});
     }
-    var worryFactor = worryFactor(host, checkName);
-    hostStat.worryWeight = hostStat.worryWeight + worry * worryFactor;
+    var wf = worryFactor(host, checkName);
+    hostStat.worryWeight = hostStat.worryWeight + worry * wf;
     if (verbose) {
-      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, worryFactor, '∑', hostStat.worryWeight);
+      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, wf, '∑', hostStat.worryWeight);
     }
   }
   
