@@ -238,7 +238,7 @@ function getHostStats(results, nrpeChecks) {
     var wf = worryFactor(host, checkName);
     hostStat.worryWeight = hostStat.worryWeight + worry * wf;
     if (verbose) {
-      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, wf, '∑', hostStat.worryWeight);
+      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '*', wf, '∑', hostStat.worryWeight);
     }
   }
   
@@ -261,7 +261,6 @@ function worryFactor(host, check) {
       ret = g.global[check];
     }
   }
-  console.log('returning', ret, host, check);
   return ret;
 }
 
@@ -303,7 +302,7 @@ function getRotateAdvice(hostSummaries, hosts) {
   var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason , summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
   /** Should we rotate even if it's not time **/
-  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > 0;
+  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > GLOBAL.CONFIG.worryBase || 0;
   
   if (!doRotate) {
     if (!GLOBAL.CONFIG.rotationTimeMinutes) {
