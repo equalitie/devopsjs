@@ -208,7 +208,7 @@ function getHostStats(results, nrpeChecks) {
   var hostStats = {}, maxCount = 0;
   for (var d in results) {  // parse host results
     var doc = results[d]._source;
-    var status = doc.status, utc = moment.utc(doc['@timestamp']), host = doc.hostname, hostStat = hostStats[host];
+    var status = doc.status, checkName = doc.checkName, utc = moment.utc(doc['@timestamp']), host = doc.hostname, hostStat = hostStats[host];
     if (!hostStat) {
       hostStat = {worryWeight : 0, resultCount : 0, worries: []};
       for (var name in nrpeChecks) {
@@ -235,7 +235,7 @@ function getHostStats(results, nrpeChecks) {
       worry = worryVals[status] * timeWeight;
       hostStat.worries.push({state : status, weight: worry});
     }
-    hostStat.worryWeight = hostStat.worryWeight + worry;
+    hostStat.worryWeight = hostStat.worryWeight + worry * worryFactor(host, checkName);
     if (verbose) {
       console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '∑', hostStat.worryWeight);
     }
@@ -243,6 +243,27 @@ function getHostStats(results, nrpeChecks) {
   
   return hostStats;
 }
+
+/**
+ *
+ * Return global, per host, per check factor for worry
+ *
+ **/
+
+function worryFactor(host, check) {
+  var ret = 1;
+  if (GLOBAL.CONFIG.checkFactors) {
+    var g = GLOBAL.CONFIG.checkFactors;
+    if (g[host] && g[host][check]) {
+      ret = g[host][check];
+    } else if (g.global && g.global[check]) {
+      ret = g.global[check];
+    }
+  }
+  console.log('returning', ret, host, check);
+  return ret;
+}
+
 
 /**
 *
