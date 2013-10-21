@@ -19,13 +19,13 @@ module.exports = function(grunt) {
         options: {
           reporter: 'json'
         },
-        src: ['yadda-tests/*-test.js']
+        src: ['src/node/yadda-tests/*-test.js']
       },
       devTest: {
         options: {
           reporter: 'spec'
         },
-        src: ['yadda-tests/*-test.js']
+        src: ['src/node/yadda-tests/*-test.js']
       }
     },
     docco: {
@@ -44,11 +44,11 @@ module.exports = function(grunt) {
     watch: {
       files: [
         '<%= jshint.files %>',
-        'yadda-tests/*.js',
-        'yadda-tests/library/*.js',
-        'yadda-tests/features/*.feature'
+        'src/node/yadda-tests/*.js',
+        'src/node/yadda-tests/library/*.js',
+        'src/node/yadda-tests/features/*.feature'
       ],
-      tasks: ['jshint', 'mochaTest:devTest']
+      tasks: [/*'jshint',*/ 'mochaTest:devTest']
     }
   });
 

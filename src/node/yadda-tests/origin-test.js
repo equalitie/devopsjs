@@ -8,9 +8,12 @@ var Yadda = require('yadda');
 Yadda.plugins.mocha();
 
 var ctx = {
-  myhost: 'secure.wikifier.org'
+  deflectServers: {
+    deflect: 'staging.deflect.ca'
+  }
 };
-feature('./yadda-tests/features/origin-spec.feature', function(feature) {
+feature('src/node/yadda-tests/features/origin-spec.feature', function(feature) {
+
   var library = require('./library/devops-library');
   var yadda  = new Yadda.Yadda(library, ctx);
 

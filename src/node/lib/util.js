@@ -47,6 +47,7 @@ exports.config = function(conf) {
       require(trying);
     }
   } catch (e) {
+    console.log(e);
     throw 'Could not require "' + trying + '" — define DEVOPSCONFIG or run this program from its parent directory.';
   }
   if (process.env.DEVOPS_DEBUG) {
