@@ -1,9 +1,45 @@
 var defaultNumber = function() { };
+var http = require('http');
 
 exports.getChecks = function(filter) {
-
   var checks = [];
-   checks.check_tcptraffic = {
+
+  checks.check_http = {
+    isExec : false,
+    run: function(host, callback) {
+      if (!GLOBAL.CONFIG.httpCheckURI) {
+        throw 'GLOBAL.CONFIG.httpCheckURI not defined';
+      }
+      var options = {
+        host: host,
+        port: 80,
+        path: GLOBAL.CONFIG.httpCheckURI,
+        method: 'GET'
+      };
+
+      var req = http.request(options, function(res) {
+        if (res.headers.via) {
+          callback('OK', null, res.headers.via);
+        }
+      });
+
+      req.shouldKeepAlive = false;
+
+      req.on('socket', function (socket) {
+        socket.setTimeout(10000);  
+        socket.on('timeout', function() {
+            req.abort();
+        });
+      });
+      req.on('error', function(e) {
+          callback('CRITICAL', e, null);
+      });
+
+      req.end();
+    }
+  };
+  checks.check_tcptraffic = {
+    isExec : true,
     isError: function(error, stdout) { 
       if (/^TCPTRAFFIC UNKNOWN/.test(stdout)) {
         return true; 
@@ -23,7 +59,8 @@ exports.getChecks = function(filter) {
       };
     } 
   };
-   checks.check_connections = {
+  checks.check_connections = {
+    isExec : true,
     isError: function(error, stdout) { 
       if (/^CONNECTIONS/.test(stdout)) {
         return false; 
@@ -43,6 +80,7 @@ exports.getChecks = function(filter) {
       } 
     };
   checks.check_fail2ban = {
+    isExec : true,
     isError: function(error, stdout) { 
       if (/^fail2ban UNKNOWN/.test(stdout)) return true; 
       if (/^fail2ban/.test(stdout)) return false; 

@@ -208,7 +208,7 @@ function getHostStats(results, nrpeChecks) {
   var hostStats = {}, maxCount = 0;
   for (var d in results) {  // parse host results
     var doc = results[d]._source;
-    var status = doc.status, utc = moment.utc(doc['@timestamp']), host = doc.hostname, hostStat = hostStats[host];
+    var status = doc.status, checkName = doc.checkName, utc = moment.utc(doc['@timestamp']), host = doc.hostname, hostStat = hostStats[host];
     if (!hostStat) {
       hostStat = {worryWeight : 0, resultCount : 0, worries: []};
       for (var name in nrpeChecks) {
@@ -235,13 +235,33 @@ function getHostStats(results, nrpeChecks) {
       worry = worryVals[status] * timeWeight;
       hostStat.worries.push({state : status, weight: worry});
     }
-    hostStat.worryWeight = hostStat.worryWeight + worry;
+    var wf = worryFactor(host, checkName);
+    hostStat.worryWeight = hostStat.worryWeight + worry * wf;
     if (verbose) {
-      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '∑', hostStat.worryWeight);
+      console.log(host.yellow + ' ' + doc.checkName.replace('check_', '') + ' from ' + timeAgo + ': ' + msg + '(' +worryVals[status] + ') *' , 'timeWeight(' + timeWeight + ') =', worry, '*', wf, '∑', hostStat.worryWeight);
     }
   }
   
   return hostStats;
+}
+
+/**
+ *
+ * Return global, per host, per check factor for worry
+ *
+ **/
+
+function worryFactor(host, check) {
+  var ret = 1;
+  if (GLOBAL.CONFIG.checkFactors) {
+    var g = GLOBAL.CONFIG.checkFactors;
+    if (g.edges[host] && g.edges[host][check] !== undefined) {
+      ret = g.edges[host][check];
+    } else if (g.global && g.global[check] !== undefined) {
+      ret = g.global[check];
+    }
+  }
+  return ret;
 }
 
 /**
@@ -282,7 +302,7 @@ function getRotateAdvice(hostSummaries, hosts) {
   var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason , summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
   /** Should we rotate even if it's not time **/
-  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > 0;
+  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > GLOBAL.CONFIG.worryBase || 0;
   
   if (!doRotate) {
     if (!GLOBAL.CONFIG.rotationTimeMinutes) {
