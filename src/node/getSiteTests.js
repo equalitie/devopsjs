@@ -96,7 +96,6 @@ var convertTestTypeToFile = function (templatesObject, testType) {
 
 /**
  * create a context for the test
- * TODO separate the results of this into a json file to be read into yadda as a context
  * TODO convert each of the RHS value generation statements into a function
  * @param result
  * @returns {{siteOf: *, address: *, aliases: *, expectedTerm: *, nocacheAddress: *, excludeLocations: (Array|*), status: *}}
