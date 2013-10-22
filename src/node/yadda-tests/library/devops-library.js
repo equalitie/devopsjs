@@ -4,33 +4,46 @@
 // ### Description:
 // Define the steps that can be used in devops features
 
+var dns = require('dns');
+var http = require('http');
+
+
+var _ = require('lodash');
+
 var expect = require('expect.js');
 var Library = require('yadda').localisation.English;
 
-var dns = require('dns');
-var http = require('http');
 var Q = require('q');
+
+var httpHelper = require('../lib/http-helpers.js');
 
 module.exports = function () {
   'use strict';
-  var resolvedAddresses, library, responseCode, then, now;
+  var resolvedAddresses, aliasAddresses, library, responseCode, then, now, retrievedUrls;
 
   library = new Library()
 
     .given('$HOST looked up', function (hostname, next) {
       then = parseInt((Date.now() / 1000), 10);
-      dns.resolveCname(hostname, function (err, addresses) {
+      dns.resolve(hostname, function (err, addresses) {
         now = parseInt((Date.now() / 1000), 10);
         resolvedAddresses = addresses;
         next();
-
       });
     })
+
+    .given('performed DNS lookup', function(next) {
+      if (resolvedAddresses.length < 1) {
+        throw Exception('didn\'t resolve intially');
+      }
+      next();
+    })
+
     .when('used as a proxy to make a request to $HOST', function (hostname, next) {
       var options = {
         host   : hostAddress,
         port   : 80,
-        path   : 'http://' + hostname,
+        path   : hostname,
         headers: {
           Host: hostname
         }
@@ -47,7 +60,58 @@ module.exports = function () {
       }
     })
 
-    .then('the address should resolve', function (next) {
+    .when('retrieving $urls', function (urls, next) {
+      if (_.contains(urls, ',')) {
+        retrievedUrls = urls.split(',');
+      }
+      else retrievedUrls = [urls];
+      next();
+    })
+
+    .then('$subdomain should resolve', function (subdomain, next) {
+      var site  = subdomain + this.siteOf;
+      dns.resolve(site, function (err, addresses) {
+        expect(addresses).not.to.be(undefined);
+        aliasAddresses = addresses;
+        next();
+      });
+    })
+
+    .then('retrieving it again', function(next) {
+      next();
+    })
+
+    .then('it should not be cached', function(next) {
+      next();
+    })
+
+    .then('they should match addresses', function (next) {
+      _.each(aliasAddresses, function (address){
+        var contains = _.contains(resolvedAddresses, address);
+        expect(contains).to.be(true);
+      });
+      next();
+    })
+
+    .then('it should be the Deflect logo', function(next) {
+      var hostname = this.siteOf,
+          paths = retrievedUrls,
+          contentKey = 'deflect';
+
+      httpHelper.searchForContentInRequest(hostname, paths, contentKey)
+        .then(function (results) {
+          results.forEach(function (result) {
+            expect(result).to.be(true);
+          })
+        })
+        .done(function () {
+          next();
+        });
+
+    })
+
+
+    .then('it should resolve', function (next) {
       expect(resolvedAddresses).not.to.be(undefined);
       next();
     })
@@ -57,12 +121,17 @@ module.exports = function () {
     })
 
     .then('the addresses should be $ADDRESS', function (address, next) {
-      var deflectServer = this.deflectServers[address];
       var checkAddresses = function (previousValue, hostAddress) {
-        return hostAddress === deflectServer;
+        return hostAddress === this.deflectServers.cname && previousValue;
       };
-      expect(resolvedAddresses.reduce(checkAddresses, true))
-        .to.be(true);
+      var checkIpAddresses = function (previousValue, hostAddress) {
+        var ipAddressFound = _.contains(this.deflectServers.ipAddresses, hostAddress);
+        return ipAddressFound || previousValue;
+      };
+      var resolveViaCname = resolvedAddresses.reduce(checkAddresses.bind(this), true);
+      var resolveViaIp    = resolvedAddresses.reduce(checkIpAddresses.bind(this), false);
+      var resolved = resolveViaCname || resolveViaIp;
+      expect(resolved).to.be(true);
       next();
     })
 

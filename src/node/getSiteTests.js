@@ -10,10 +10,10 @@ var fs = require('fs');
 //  give us some of the nice object iterators
 var _ = require('lodash');
 var FS = require('Q-io/fs');
-var utils = require( "./lib/util.js");
+var utils = require( './lib/util.js');
 utils.config();
 
-var semwiki = require("./lib/semwiki.js");
+var semwiki = require('./lib/semwiki.js');
 
 var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 
@@ -41,6 +41,7 @@ var testTypes = [
   'nocacheAddress'
 ];
 
+// template directory for the scenario tests
 var templateDir = './yadda-tests/templates/';
 
 
@@ -53,7 +54,7 @@ var processTestItems = function (data) {
 };
 
 /**
- * main runloop for our test generation this is an iterator that runs over each result
+ * main run loop for our test generation this is an iterator that runs over each result
  * from the query to the wiki for tests
  * Generates vars (context) for each test
  * Generates the test file
@@ -127,7 +128,7 @@ var generateFileName = function (vars) {
  * @returns {string}
  */
 var generateFeatureHeader = function (vars) {
-  return "Feature: Test " + vars.address + '\n';
+  return 'Feature: Test ' + vars.address + '\n';
 };
 
 // write the context for each test to a file
@@ -141,7 +142,7 @@ var writeContextFile = function (baseDir, vars) {
           {vars: JSON.stringify(vars)}
         )
       );
-    })
+    });
 };
 
 /**
@@ -162,7 +163,7 @@ function writeFeature(name, feature, vars) {
       return FS.makeDirectory(baseDir);
     })
     .then(function (){
-      return FS.write(baseDir + '/site.feature', feature)
+      return FS.write(baseDir + '/site.feature', feature);
     })
     .then(function () {
       return writeContextFile(baseDir, vars);
@@ -171,9 +172,7 @@ function writeFeature(name, feature, vars) {
       console.log(name + ' test generation failed');
     })
     .done(function() {
-      console.log("yadda-tests/generated/" + name + "/site.feature written");
+      console.log('yadda-tests/generated/' + name + '/site.feature written');
     });
 
 }
-
-
