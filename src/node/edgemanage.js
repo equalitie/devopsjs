@@ -54,7 +54,7 @@ if (GLOBAL.CONFIG.flatHostsFile) {
   flatHostsFile = (GLOBAL.CONFIG.flatHostsFile.substring(0, 1) === '/' ? '' : GLOBAL.CONFIG.configBase) + GLOBAL.CONFIG.flatHostsFile;
 }
 
-hostLib = hostLib.setConfig(program, GLOBAL.CONFIG.configBase + 'hosts.' + program.dnet + '.json');
+hostLib = hostLib.setConfig(program, program.dnet);
 
 // TODO are you trying to co-erce to int?
 //var timespan =  0 + (program.timespan ? program.timespan : hostLib.config.defaultPeriod);

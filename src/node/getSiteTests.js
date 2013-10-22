@@ -20,7 +20,7 @@ var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 function processTests() {
   var params = {
     action: 'ask',
-    query: '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|?Nocache address|?Exclude locations|?Status'
+    query: '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|?Nocache address|?Exclude locations|?Status|?DNET'
   };
 
   semwiki.call(params, function(info, next, data) {
@@ -109,7 +109,8 @@ var mapPrintoutToVars = function (result) {
     expectedTerm : result['Expected term'][0],
     nocacheAddress : result['Nocache address'].length ? result['Nocache address'][0].fulltext : null,
     excludeLocations : result['Exclude locations'].length ? result['Exclude locations'][0].split('\n') : null,
-    status : result.Status[0]
+    status : result.Status[0],
+    DNET : result.Status[0] || GLOBAL.CONFIG.defaultDNET
   };
 };
 

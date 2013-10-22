@@ -30,13 +30,16 @@ var hosts = {
    * Set invocation configuration. You probably want to do this.
    * 
    */
-  setConfig : function(program, hostsFile) {
-    config.hostsFile = hostsFile;
+  setConfig : function(program, dnet) {
+    config.hostsFile = GLOBAL.CONFIG.configBase + 'hosts.' + dnet + '.json';
+//    config.hostsFile = hostsFile;
     config.program = program;
     verbose = program.verbose;
 
     return this;
   },
+
+  getHosts : getHosts,
 
   addHost : function(newHost, hosts) {
     var hp = getHostFromHosts(newHost, hosts);
@@ -157,7 +160,7 @@ var hosts = {
   getCheckStats : function(num, callback) {
     num = 0 + parseInt(num, 10);
     
-    var hosts = require(config.hostsFile);
+    var hosts = getHosts();
     var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
 
     GLOBAL.CONFIG.getStore().getChecks(hosts, nrpeChecks, function(err, res) {
@@ -408,7 +411,7 @@ function getRemoveActive(hosts, hostSummaries) {
 
 function getHostsSummary(hosts, detailscb) {
   if (!hosts) {
-    hosts = require(config.hostsFile);
+    hosts = getHosts();
   }
   
   var available = 0;
@@ -514,7 +517,11 @@ function deactivate(hostIn, hosts) {
  */
 
 function getHosts() {
-  return require(config.hostsFile);
+  try {
+   return require(config.hostsFile);
+  } catch (e) {
+    throw 'can\'t require ' + config.hostsFile + ' from ' + process.cwd();
+  }
 }
 
 /** 
@@ -523,12 +530,7 @@ function getHosts() {
 
 function getHostFromHosts(hostIn, hosts) {
   if (!hosts) {
-    try {
-      hosts = require(config.hostsFile);
-    } catch (e) {
-      throw 'can\'t require ' + config.hostsFile + ' from ' + process.cwd();
-    }
-    
+    hosts = getHosts();
   }
   for (var h in hosts) {
     var host = hosts[h];
