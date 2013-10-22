@@ -31,7 +31,7 @@ var hosts = {
    * 
    */
   setConfig : function(program, dnet) {
-    config.hostsFile = GLOBAL.CONFIG.configBase + 'hosts.' + dnet + '.json';
+    config.hostsFile = getDnetConfig(dnet);
 //    config.hostsFile = hostsFile;
     config.program = program;
     verbose = program.verbose;
@@ -39,7 +39,15 @@ var hosts = {
     return this;
   },
 
-  getHosts : getHosts,
+/**
+* 
+* Get a dnet from its path
+*
+**/
+
+  getDNET : function(dnet) {
+    return require(getDnetConfig(dnet));
+  },
 
   addHost : function(newHost, hosts) {
     var hp = getHostFromHosts(newHost, hosts);
@@ -176,10 +184,6 @@ var hosts = {
   getHostsSummary : function() {
     return getHostsSummary();
   },
-
-  getHosts : function() {
-    return getHosts();
-  }, 
 
   writeHostsJson : function(hosts) {
     return writeHostsJson(hosts);
@@ -515,6 +519,23 @@ function deactivate(hostIn, hosts) {
  * Utilities
  * 
  */
+
+
+/**
+*
+* Get the config path for a DNET
+*
+**/
+
+function getDnetConfig(dnet) {
+  return GLOBAL.CONFIG.configBase + 'hosts.' + dnet + '.json';
+}
+
+/**
+*
+* Load default DNET config
+*
+**/
 
 function getHosts() {
   try {
