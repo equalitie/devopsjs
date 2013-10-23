@@ -48,7 +48,9 @@ var testTypes = [
   'nocacheAddress'
 ];
 
-var templateDir = require("path").resolve(__dirname) + '/yadda-tests/templates/';
+var rootDir     = require("path").resolve(__dirname),
+    templateDir = rootDir + '/yadda-tests/templates/',
+    outputDir   = rootDir + '/yadda-tests/generated/';
 
 
 /**
@@ -163,13 +165,13 @@ var writeContextFile = function (baseDir, vars) {
  * @param vars
  */
 function writeFeature(name, feature, vars) {
-  var baseDir = 'yadda-tests/generated/' + name;
+  var baseDir = outputDir + name;
 
   FS.removeTree(baseDir)
     .then(function (){
       return FS.makeDirectory(baseDir);
     })
-    .fail(function() {
+    .fail(function(err) {
       return FS.makeDirectory(baseDir);
     })
     .then(function (){
@@ -178,11 +180,11 @@ function writeFeature(name, feature, vars) {
     .then(function () {
       return writeContextFile(baseDir, vars);
     })
-    .fail(function () {
-      console.log(name + ' test generation failed');
+    .fail(function (err) {
+      console.log(err + '\n test generation failed');
     })
     .done(function() {
-      console.log("yadda-tests/generated/" + name + "/site.feature written");
+      //console.log("yadda-tests/generated/" + name + "/site.feature written");
     });
 
 }
