@@ -10,7 +10,7 @@ var http = require('http');
 
 var _ = require('lodash');
 
-var expect = require('expect.js');
+var expect = require('chai').expect;
 var Library = require('yadda').localisation.English;
 
 var Q = require('q');
@@ -100,7 +100,7 @@ module.exports = function () {
         return alias + this.siteOf;
       });
       dns.resolve(site, function (err, addresses) {
-        expect(addresses).not.to.be(undefined);
+        expect(addresses).not.to.be.undefined;
         aliasAddresses = addresses;
         next();
       });
@@ -116,7 +116,7 @@ module.exports = function () {
     .then('they should match addresses', function (next) {
       _.each(aliasAddresses, function (address){
         var contains = _.contains(resolvedAddresses, address);
-        expect(contains).to.be(true);
+        expect(contains).to.be.true;
       });
       next();
     })
@@ -129,7 +129,7 @@ module.exports = function () {
       httpHelper.searchForContentInRequest(hostname, paths, contentKey)
         .then(function (results) {
           results.forEach(function (result) {
-            expect(result).to.be(true);
+            expect(result).to.be.true;
           })
         })
         .done(function () {
@@ -138,9 +138,8 @@ module.exports = function () {
 
     })
 
-
     .then('it should resolve', function (next) {
-      expect(resolvedAddresses).not.to.be(undefined);
+      expect(resolvedAddresses).not.to.be.undefined;
       next();
     })
 
@@ -159,20 +158,20 @@ module.exports = function () {
       var resolveViaCname = resolvedAddresses.reduce(checkAddresses.bind(this), true);
       var resolveViaIp    = resolvedAddresses.reduce(checkIpAddresses.bind(this), false);
       var resolved = resolveViaCname || resolveViaIp;
-      expect(resolved).to.be(true);
+      expect(resolved).to.be.true;
       next();
     })
 
     .then('it should receive a $RESPONSENUM response',
     function (responseNum, next) {
-      expect(responseCode).to.be(200);
+      expect(responseCode).to.equal(200);
       next();
 
     })
 
     .then('it should return within $SECONDS seconds',
     function (seconds, next) {
-      expect(now - then).to.be.lessThan(seconds);
+      expect(now - then).to.be.below(seconds);
       next();
     })
 
