@@ -9,14 +9,36 @@ var notify = require('../src/node/lib/notify.js');
 * A hash of status types and results expected for each.
 **/
 
-var expectedMap = { Created : { 'User:BotU': 1, 'User:BotV': 1}
-  , Update : {'User:BotU' : 1, 'User:BotV' : 1}
-  , Validate : {'User:BotV' : 1, 'User:BotU' : 1}
-  , Completed : { 'User:BotV' : 1, 'User:BotU' : 1}
-  , Cancelled : {'User:BotU' : 1, 'User:BotV' : 1}
-  , 'Re-Opened' : { 'User:BotU' : 1, 'User:BotV' : 1}
-  , Postponed : { 'User:BotU' : 1, 'User:BotV' : 1}};
-
+var expectedMap = {
+  Created : {
+    'User:BotU': 1,
+    'User:BotV': 1
+  },
+  Update : {
+    'User:BotU': 1,
+    'User:BotV': 1
+  },
+  Validate : {
+    'User:BotV': 1,
+    'User:BotU': 1
+  },
+  Completed : {
+    'User:BotV': 1,
+    'User:BotU': 1
+  },
+  Cancelled : {
+    'User:BotU': 1,
+    'User:BotV': 1
+  },
+  'Re-Opened': {
+    'User:BotU': 1,
+    'User:BotV' : 1
+  },
+  Postponed: {
+    'User:BotU' : 1,
+    'User:BotV' : 1
+  }
+};
 var baseTicket = require('./mock/ticket.json');
 var baseUser = require('./mock/users.json');
 var notifier;
