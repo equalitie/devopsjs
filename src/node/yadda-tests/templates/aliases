@@ -1,4 +1,4 @@
-  Scenario: aliases should match
+Scenario: aliases should match
     Given performed DNS lookup
     Then aliases should resolve
     And they should match addresses
