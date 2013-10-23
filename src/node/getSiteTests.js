@@ -9,7 +9,7 @@ var fs = require('fs');
 
 //  give us some of the nice object iterators
 var _ = require('lodash');
-var FS = require('Q-io/fs');
+var FS = require('q-io/fs');
 var utils = require( './lib/util.js');
 utils.config();
 
