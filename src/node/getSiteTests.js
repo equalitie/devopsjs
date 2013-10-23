@@ -10,17 +10,18 @@ var fs = require('fs');
 //  give us some of the nice object iterators
 var _ = require('lodash');
 var FS = require('q-io/fs');
-var utils = require( './lib/util.js');
+var utils = require('./lib/util.js');
 utils.config();
+var hosts = require('./lib/hosts.js');
 
-var semwiki = require('./lib/semwiki.js');
+var semwiki = require("./lib/semwiki.js");
 
 var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 
 function processTests() {
   var params = {
     action: 'ask',
-    query: '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|?Nocache address|?Exclude locations|?Status'
+    query: '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|?Nocache address|?Exclude locations|?Status|?DNET'
   };
 
   semwiki.call(params, function(info, next, data) {
@@ -41,7 +42,6 @@ var testTypes = [
   'nocacheAddress'
 ];
 
-// template directory for the scenario tests
 var templateDir = './yadda-tests/templates/';
 
 
@@ -54,7 +54,7 @@ var processTestItems = function (data) {
 };
 
 /**
- * main run loop for our test generation this is an iterator that runs over each result
+ * main runloop for our test generation this is an iterator that runs over each result
  * from the query to the wiki for tests
  * Generates vars (context) for each test
  * Generates the test file
@@ -102,6 +102,8 @@ var convertTestTypeToFile = function (templatesObject, testType) {
  * @returns {{siteOf: *, address: *, aliases: *, expectedTerm: *, nocacheAddress: *, excludeLocations: (Array|*), status: *}}
  */
 var mapPrintoutToVars = function (result) {
+  var dnet = result.DNET[0] || GLOBAL.CONFIG.defaultDNET;
+  var dnetHosts = hosts.getDNET(dnet);
   return {
     siteOf : result['Site of'][0].fulltext,
     address : result.Address[0],
@@ -109,7 +111,9 @@ var mapPrintoutToVars = function (result) {
     expectedTerm : result['Expected term'][0],
     nocacheAddress : result['Nocache address'].length ? result['Nocache address'][0].fulltext : null,
     excludeLocations : result['Exclude locations'].length ? result['Exclude locations'][0].split('\n') : null,
-    status : result.Status[0]
+    status : result.Status[0],
+    DNET : dnet,
+    dnetHosts : dnetHosts
   };
 };
 
@@ -128,7 +132,7 @@ var generateFileName = function (vars) {
  * @returns {string}
  */
 var generateFeatureHeader = function (vars) {
-  return 'Feature: Test ' + vars.address + '\n';
+  return "Feature: Test " + vars.address + '\n';
 };
 
 // write the context for each test to a file
@@ -142,7 +146,7 @@ var writeContextFile = function (baseDir, vars) {
           {vars: JSON.stringify(vars)}
         )
       );
-    });
+    })
 };
 
 /**
@@ -163,7 +167,7 @@ function writeFeature(name, feature, vars) {
       return FS.makeDirectory(baseDir);
     })
     .then(function (){
-      return FS.write(baseDir + '/site.feature', feature);
+      return FS.write(baseDir + '/site.feature', feature)
     })
     .then(function () {
       return writeContextFile(baseDir, vars);
@@ -172,7 +176,9 @@ function writeFeature(name, feature, vars) {
       console.log(name + ' test generation failed');
     })
     .done(function() {
-      console.log('yadda-tests/generated/' + name + '/site.feature written');
+      console.log("yadda-tests/generated/" + name + "/site.feature written");
     });
 
 }
+
+

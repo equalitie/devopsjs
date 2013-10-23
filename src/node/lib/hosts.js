@@ -30,12 +30,23 @@ var hosts = {
    * Set invocation configuration. You probably want to do this.
    * 
    */
-  setConfig : function(program, hostsFile) {
-    config.hostsFile = hostsFile;
+  setConfig : function(program, dnet) {
+    config.hostsFile = getDnetConfig(dnet);
+//    config.hostsFile = hostsFile;
     config.program = program;
     verbose = program.verbose;
 
     return this;
+  },
+
+/**
+* 
+* Get a dnet from its path
+*
+**/
+
+  getDNET : function(dnet) {
+    return require(getDnetConfig(dnet));
   },
 
   addHost : function(newHost, hosts) {
@@ -157,7 +168,7 @@ var hosts = {
   getCheckStats : function(num, callback) {
     num = 0 + parseInt(num, 10);
     
-    var hosts = require(config.hostsFile);
+    var hosts = getHosts();
     var nrpeChecks = require('./nrpe/allchecks.js').getChecks();
 
     GLOBAL.CONFIG.getStore().getChecks(hosts, nrpeChecks, function(err, res) {
@@ -173,10 +184,6 @@ var hosts = {
   getHostsSummary : function() {
     return getHostsSummary();
   },
-
-  getHosts : function() {
-    return getHosts();
-  }, 
 
   writeHostsJson : function(hosts) {
     return writeHostsJson(hosts);
@@ -408,7 +415,7 @@ function getRemoveActive(hosts, hostSummaries) {
 
 function getHostsSummary(hosts, detailscb) {
   if (!hosts) {
-    hosts = require(config.hostsFile);
+    hosts = getHosts();
   }
   
   var available = 0;
@@ -513,8 +520,29 @@ function deactivate(hostIn, hosts) {
  * 
  */
 
+
+/**
+*
+* Get the config path for a DNET
+*
+**/
+
+function getDnetConfig(dnet) {
+  return GLOBAL.CONFIG.configBase + 'hosts.' + dnet + '.json';
+}
+
+/**
+*
+* Load default DNET config
+*
+**/
+
 function getHosts() {
-  return require(config.hostsFile);
+  try {
+   return require(config.hostsFile);
+  } catch (e) {
+    throw 'can\'t require ' + config.hostsFile + ' from ' + process.cwd();
+  }
 }
 
 /** 
@@ -523,12 +551,7 @@ function getHosts() {
 
 function getHostFromHosts(hostIn, hosts) {
   if (!hosts) {
-    try {
-      hosts = require(config.hostsFile);
-    } catch (e) {
-      throw 'can\'t require ' + config.hostsFile + ' from ' + process.cwd();
-    }
-    
+    hosts = getHosts();
   }
   for (var h in hosts) {
     var host = hosts[h];

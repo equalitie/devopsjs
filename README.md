@@ -13,7 +13,7 @@ Support comprehensive configuration, resource usage, monitoring and development 
 
 # Install
 
-You will need some additional system libraries, including libgeoip-dev, libpcre3-dev.
+You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev.
 
     cd devopsjs 
     npm install
@@ -27,6 +27,7 @@ var c = {};
 
 c.dnets = ['dnet1.deflect.ca', 'dnet2.deflect.ca'];
 c.domain = '.deflect.ca';
+c.defaultDNET = 'default';
 
 /* configuration for notifier */
 c.notify = {emailSubject : 'devopsjs notifications',

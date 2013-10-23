@@ -50,10 +50,6 @@ exports.config = function(conf) {
     console.log(e);
     throw 'Could not require "' + trying + '" — define DEVOPSCONFIG or run this program from its parent directory.';
   }
-  if (process.env.DEVOPS_DEBUG) {
-    GLOBAL.CONFIG.DEBUG = true;
-    require('node-monkey').start();
-  }
 
   GLOBAL.CONFIG.getStore = function() {
     return store || require('./elasticSearchStore.js');
