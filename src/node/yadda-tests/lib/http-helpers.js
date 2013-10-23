@@ -9,7 +9,8 @@ module.exports = function () {
   var contentHashes,
       createOptions,
       searchForContentInRequest,
-      resolveContent;
+      resolveContent,
+      headers;
 
   var http   = require('http');
   var Q      = require('q');
@@ -23,6 +24,7 @@ module.exports = function () {
     'deflect': '6df015757ea1cfa9cc0057293ed8f6e1'
   };
   createOptions = function (hostname, path) {
+    path = path || '/';
     var options = {
       hostname: hostname,
       port: 80,
@@ -41,6 +43,56 @@ module.exports = function () {
   resolveContent = function (contentKey) {
     return contentHashes[contentKey];
   };
+
+  /**
+   * group header functionality
+   * move to a new module?
+   *
+   * @type {{}}
+   */
+  headers = {};
+
+  var extractCacheVariable = function (header) {
+    var inspectableHeaders = header.match(/\[(.*)\]/)[1].split(' ')[0],
+      cacheIndex = inspectableHeaders.indexOf('c') + 1;
+    return inspectableHeaders[cacheIndex];
+  };
+
+  /**
+   * check to see if a header is a cache hit or miss based on it's via header from
+   * ATS, Based on:
+   * http://trafficserver.apache.org/docs/v2/admin/trouble.htm#interpret_via_header
+   * @param header
+   * @returns {boolean}
+   */
+  headers.isNotFromCache = function(header) {
+    return extractCacheVariable(header) === 'M';
+  };
+
+  headers.isFromCache = function(header) {
+    return extractCacheVariable(header) === 'H';
+  };
+
+
+  /**
+   * return the headers fro a specified hostname
+   * return a promise for the result
+   * @param hostname
+   * @returns {promise|*|Function|Q.promise}
+   */
+  headers.retrieveHeaders = function (hostname, path) {
+    var options, req, deferred;
+
+    deferred = Q.defer();
+    options = createOptions(hostname, path);
+
+    req = http.request(options, function(res){
+      deferred.resolve(res.headers);
+    });
+    req.end();
+    return deferred.promise;
+  };
+
 
   /**
    * take two paths and map them to results indicating whether or not the
@@ -69,24 +121,18 @@ module.exports = function () {
           var hash = md5sum.digest('hex');
           var contentMatch = hash === contentHash;
           deferred.resolve(contentMatch);
-
         });
-
       });
       promises.push(deferred.promise);
-
       req.end();
-
     };
     paths.forEach(runRequest);
     return Q.all(promises);
-
-
-
   };
 
   return {
-    searchForContentInRequest: searchForContentInRequest
+    searchForContentInRequest: searchForContentInRequest,
+    headers                  : headers
   };
 
 }();
