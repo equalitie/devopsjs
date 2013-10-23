@@ -8,7 +8,6 @@ module.exports = function(grunt) {
     'src/widget/dojs/do.js'
   ];
 
-
   // Project configuration.
   grunt.initConfig({
     jshint: {

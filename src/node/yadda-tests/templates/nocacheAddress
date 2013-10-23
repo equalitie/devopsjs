@@ -1,4 +1,3 @@
   Scenario: should not cache
-    When retrieving @nocacheAddress@
-    Then retrieving it again
-    It should not be cached
+    Given the no cache address was retrieved twice
+    Then it should not be cached

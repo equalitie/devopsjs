@@ -1,4 +1,4 @@
   Scenario: should perform DNS lookup
-    Given @address@ looked up
+    Given site looked up
     Then it should resolve
     And the addresses should be deflect

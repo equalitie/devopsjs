@@ -17,13 +17,27 @@ var Q = require('q');
 
 var httpHelper = require('../lib/http-helpers.js');
 
+/**
+ * create a function to be used in a reduce statement
+ * accepts a testFunction that will be applied to each value
+ * @param testFunction
+ * @returns {Function}
+ */
+var createReduceAndFunction = function (testFunction) {
+  return function (previousValue, currentValue) {
+    return previousValue && testFunction(currentValue);
+  };
+};
+
 module.exports = function () {
   'use strict';
-  var resolvedAddresses, aliasAddresses, library, responseCode, then, now, retrievedUrls;
+  var resolvedAddresses, aliasAddresses, library, responseCode, then,
+      now, retrievedUrls, viaHeaders;
 
   library = new Library()
 
-    .given('$HOST looked up', function (hostname, next) {
+    .given('site looked up', function (next) {
+      var hostname = this.siteOf;
       then = parseInt((Date.now() / 1000), 10);
       dns.resolve(hostname, function (err, addresses) {
         now = parseInt((Date.now() / 1000), 10);
@@ -36,6 +50,26 @@ module.exports = function () {
       if (resolvedAddresses.length < 1) {
         throw Exception('didn\'t resolve intially');
       }
+      next();
+    })
+
+    .given('the no cache address was retrieved twice', function (next) {
+      var hostname = this.nocacheAddress;
+      var promises = [];
+      promises.push(httpHelper.headers.retrieveHeaders(hostname));
+      promises.push(httpHelper.headers.retrieveHeaders(hostname));
+      Q.all(promises)
+       .then(function (results) {
+         viaHeaders = results.map(function (header) {
+           return header.via;
+         });
+         next();
+       });
+
+    })
+
+    .given('excluded locations retrieved', function (next) {
+      retrievedUrls = this.excludeLocations;
       next();
     })
 
@@ -60,16 +94,11 @@ module.exports = function () {
       }
     })
 
-    .when('retrieving $urls', function (urls, next) {
-      if (_.contains(urls, ',')) {
-        retrievedUrls = urls.split(',');
-      }
-      else retrievedUrls = [urls];
-      next();
-    })
 
-    .then('$subdomain should resolve', function (subdomain, next) {
-      var site  = subdomain + this.siteOf;
+    .then('aliases should resolve', function (next) {
+      var sites = this.aliases.map(function(alias) {
+        return alias + this.siteOf;
+      });
       dns.resolve(site, function (err, addresses) {
         expect(addresses).not.to.be(undefined);
         aliasAddresses = addresses;
@@ -77,11 +106,10 @@ module.exports = function () {
       });
     })
 
-    .then('retrieving it again', function(next) {
-      next();
-    })
-
     .then('it should not be cached', function(next) {
+      var reductionFunction =
+        createReduceAndFunction(httpHelper.headers.isNotFromCache);
+      var isNotFromCache = viaHeaders.reduce(reductionFunction, true);
       next();
     })
 
