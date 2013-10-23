@@ -48,7 +48,7 @@ var testTypes = [
   'nocacheAddress'
 ];
 
-var templateDir = './yadda-tests/templates/';
+var templateDir = require("path").resolve(__dirname) + '/yadda-tests/templates/';
 
 
 /**
@@ -108,7 +108,7 @@ var convertTestTypeToFile = function (templatesObject, testType) {
  * @returns {{siteOf: *, address: *, aliases: *, expectedTerm: *, nocacheAddress: *, excludeLocations: (Array|*), status: *}}
  */
 var mapPrintoutToVars = function (result) {
-  var dnet = result.DNET[0] || GLOBAL.CONFIG.defaultDNET;
+  var dnet = result.DNET[0] ? result.DNET[0].fulltext.toLowerCase() : GLOBAL.CONFIG.defaultDNET;
   var dnetHosts = hosts.getDNET(dnet);
   return {
     siteOf : result['Site of'][0].fulltext,
