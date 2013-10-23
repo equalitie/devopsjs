@@ -11,6 +11,8 @@ var fs = require('fs');
 var _ = require('lodash');
 var FS = require('q-io/fs');
 var utils = require('./lib/util.js');
+
+// why is this here?
 utils.config();
 var hosts = require('./lib/hosts.js');
 
@@ -18,10 +20,13 @@ var semwiki = require("./lib/semwiki.js");
 
 var wiki = semwiki.getWiki(GLOBAL.CONFIG.wikiConfig, processTests);
 
+
 function processTests() {
+  var query = '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|' +
+              '?Nocache address|?Exclude locations|?Status|?DNET';
   var params = {
     action: 'ask',
-    query: '[[Site of::+]]|?Site of|?Address|?Aliases|?Expected term|?Nocache address|?Exclude locations|?Status|?DNET'
+    query: query
   };
 
   semwiki.call(params, function(info, next, data) {
@@ -31,6 +36,7 @@ function processTests() {
 
 /**
  * a list of all the possible test types
+ * these should match the templates in yadda-tests/templates
  * @type {Array}
  */
 var testTypes = [
@@ -146,7 +152,7 @@ var writeContextFile = function (baseDir, vars) {
           {vars: JSON.stringify(vars)}
         )
       );
-    })
+    });
 };
 
 /**
@@ -167,7 +173,7 @@ function writeFeature(name, feature, vars) {
       return FS.makeDirectory(baseDir);
     })
     .then(function (){
-      return FS.write(baseDir + '/site.feature', feature)
+      return FS.write(baseDir + '/site.feature', feature);
     })
     .then(function () {
       return writeContextFile(baseDir, vars);

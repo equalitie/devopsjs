@@ -1,3 +1,3 @@
   Scenario: exclude locations
-    When retrieving excluded locations
+    Given excluded locations retrieved
     It should be the Deflect logo
