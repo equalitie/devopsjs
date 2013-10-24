@@ -26,7 +26,7 @@ var ctx = {
 
 var testDirectory = 'src/node/yadda-tests/generated/';
 var directories = [
-  'Addisnegeronline.com#http%3A%2F%2Faddisnegeronline.com'
+  'Equality#equalit.ie'
 ];
 
 var iterateOverFeatureDirectories = function (featureDir) {
@@ -47,7 +47,7 @@ var runFeatures = function (featureDirs) {
  */
 var runFeature = function (featureDir) {
   feature(testDirectory + featureDir + '/site.feature', function(feature) {
-    var featureContext = require('./generated/' + featureDir + '/context.js')();
+    var featureContext = require('./generated/' + featureDir + '/context.js');
     ctx = _.defaults(featureContext, ctx);
     var library = require('./library/devops-library');
     var yadda  = new Yadda.Yadda(library, ctx);

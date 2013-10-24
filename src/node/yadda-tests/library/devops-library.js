@@ -9,48 +9,58 @@ var http = require('http');
 
 
 var _ = require('lodash');
+var Q = require('q');
 
 var expect = require('chai').expect;
 var Library = require('yadda').localisation.English;
 
-var Q = require('q');
 
 var httpHelper = require('../lib/http-helpers.js');
+var dnsHelper = require('../lib/dns-helpers.js');
 
 /**
  * create a function to be used in a reduce statement
- * accepts a testFunction that will be applied to each value
+ * applies testFunction to each value
+ * ANDs it with the previous value
  * @param testFunction
  * @returns {Function}
  */
 var createReduceAndFunction = function (testFunction) {
   return function (previousValue, currentValue) {
+    if (previousValue === undefined) {
+      previousValue = true;
+    }
     return previousValue && testFunction(currentValue);
   };
 };
 
 module.exports = function () {
   'use strict';
-  var resolvedAddresses, aliasAddresses, library, responseCode, then,
-      now, retrievedUrls, viaHeaders;
+  var resolvedAddresses, aliasAddressesArr, library, responseCode,
+      resolveTime, retrievedUrls, viaHeaders;
 
   library = new Library()
 
     .given('site looked up', function (next) {
-      var hostname = this.siteOf;
-      then = parseInt((Date.now() / 1000), 10);
-      dns.resolve(hostname, function (err, addresses) {
-        now = parseInt((Date.now() / 1000), 10);
-        resolvedAddresses = addresses;
-        next();
-      });
+      dnsHelper.resolveAddress(this.address)
+        .then(function(result) {
+          resolvedAddresses = result.addresses;
+          resolveTime = result.resolveTime;
+        })
+        .done(function () {
+          next();
+        });
     })
 
     .given('performed DNS lookup', function(next) {
-      if (resolvedAddresses.length < 1) {
-        throw Exception('didn\'t resolve intially');
-      }
-      next();
+      dnsHelper.resolveAddress(this.address)
+        .then(function(result) {
+          resolvedAddresses = result.addresses;
+          resolveTime = result.resolveTime;
+        })
+        .done(function () {
+          next();
+        });
     })
 
     .given('the no cache address was retrieved twice', function (next) {
@@ -96,14 +106,16 @@ module.exports = function () {
 
 
     .then('aliases should resolve', function (next) {
-      var sites = this.aliases.map(function(alias) {
-        return alias + this.siteOf;
-      });
-      dns.resolve(site, function (err, addresses) {
-        expect(addresses).not.to.be.undefined;
-        aliasAddresses = addresses;
-        next();
-      });
+      dnsHelper.resolveAliases(this.aliases, this.address)
+        .then(function (resolvedAliasAddressesArr) {
+          aliasAddressesArr = resolvedAliasAddressesArr;
+          aliasAddressesArr.forEach(function (aliasAddresses) {
+            expect(aliasAddresses).to.not.be.undefined;
+          });
+        })
+        .done(function () {
+          next();
+        });
     })
 
     .then('it should not be cached', function(next) {
@@ -114,27 +126,44 @@ module.exports = function () {
     })
 
     .then('they should match addresses', function (next) {
-      _.each(aliasAddresses, function (address){
-        var contains = _.contains(resolvedAddresses, address);
-        expect(contains).to.be.true;
-      });
+      var errors = [];
+      aliasAddressesArr.forEach(function (aliasAddresses) {
+        _.each(aliasAddresses, function (address){
+          var contains = _.contains(resolvedAddresses, address);
+          try {
+            expect(contains).to.be.true;
+          }
+          catch (e) {
+            errors.push('alias ' + address + ' not found in resolved addresses' +
+                  ' for ' + this.siteOf + '\n');
+          }
+        }, this);
+      }.bind(this));
+      if (errors.length > 0) {
+        throw errors.join();
+      }
       next();
     })
 
     .then('it should be the Deflect logo', function(next) {
-      var hostname = this.siteOf,
+      var hostname = this.address,
           paths = retrievedUrls,
           contentKey = 'deflect';
 
-      httpHelper.searchForContentInRequest(hostname, paths, contentKey)
-        .then(function (results) {
-          results.forEach(function (result) {
-            expect(result).to.be.true;
+      if (retrievedUrls.length > 0) {
+        httpHelper.searchForContentInRequest(hostname, paths, contentKey)
+          .then(function (results) {
+            results.forEach(function (result) {
+              expect(result).to.be.true;
+            })
           })
-        })
-        .done(function () {
-          next();
-        });
+          .done(function () {
+            next();
+          });
+      }
+      else {
+        next();
+      }
 
     })
 
@@ -171,7 +200,7 @@ module.exports = function () {
 
     .then('it should return within $SECONDS seconds',
     function (seconds, next) {
-      expect(now - then).to.be.below(seconds);
+      expect(resolveTime).to.be.below(seconds);
       next();
     })
 

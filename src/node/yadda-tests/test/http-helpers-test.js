@@ -26,26 +26,26 @@ describe('Test http helper functions', function () {
         listener = function() {},
         mock;
 
-    emitter  = new EventEmitter();
-    mock = sinon.stub(request, 'get')
-                .yields(null, emitter);
-
     fs.readFile(mockDir + 'user.png', function(err, fileData) {
-      emitter.emit('data', fileData);
-      emitter.emit('end');
+
+      mock = sinon.stub(request, 'get')
+                  .yields(null, {body: fileData});
+
+
+      httpHelper.searchForContentInRequest(hostname, path, contentKey)
+        .then(function (results) {
+          results.forEach(function(result){
+            expect(result).to.be.true;
+          })
+        })
+        .done(function(){
+          mock.restore();
+          done();
+        });
     });
 
-    httpHelper.searchForContentInRequest(hostname, path, contentKey)
-      .then(function (results) {
-        results.forEach(function(result){
-          expect(result).to.be.true;
-        })
-      })
-      .done(function(){
-        mock.restore();
-        done();
-      });
   });
+
   it('should retrieve headers', function(done) {
     var mock =
       sinon.stub(request, 'get')
@@ -60,7 +60,6 @@ describe('Test http helper functions', function () {
       });
     mock.restore();
   });
-
 
   it('should check a header to see if it came from the cache', function() {
     var viaHeader   = 'http/1.1 hetzner8.deflect.ca (ApacheTrafficServer/3.2.5 [uScMsSf pSeN:t cCMi p sS])',
