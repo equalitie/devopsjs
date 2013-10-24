@@ -12,9 +12,10 @@ module.exports = function () {
       resolveContent,
       headers;
 
-  var http   = require('http');
-  var Q      = require('q');
-  var crypto = require('crypto');
+  var http    = require('http');
+  var Q       = require('q');
+  var crypto  = require('crypto');
+  var request = require('request');
 
   /**
    * hashes of expected content
@@ -26,14 +27,13 @@ module.exports = function () {
   createOptions = function (hostname, path) {
     path = path || '/';
     var options = {
-      hostname: hostname,
+      uri: 'http://' + hostname,
       port: 80,
       path: path,
       method: 'GET'
     };
     return options;
   };
-
 
   /**
    * return a hash of the expected content
@@ -86,10 +86,9 @@ module.exports = function () {
     deferred = Q.defer();
     options = createOptions(hostname, path);
 
-    req = http.request(options, function(res){
+    req = request.get(options, function(err, res){
       deferred.resolve(res.headers);
     });
-    req.end();
     return deferred.promise;
   };
 
@@ -111,7 +110,7 @@ module.exports = function () {
           deferred = Q.defer(),
           responseData, req;
 
-      req = http.request(options, function (res) {
+      req = request.get(options, function (err, res) {
         var responseData = '',
             md5sum = crypto.createHash('md5');
         res.on('data', function (chunk) {
@@ -124,7 +123,6 @@ module.exports = function () {
         });
       });
       promises.push(deferred.promise);
-      req.end();
     };
     paths.forEach(runRequest);
     return Q.all(promises);
