@@ -114,17 +114,37 @@ var mapPrintoutToVars = function (result) {
   var dnetHosts = hosts.getDNET(dnet);
   return {
     siteOf : result['Site of'][0].fulltext,
-    address : result.Address[0],
-    aliases : result.Aliases.length ? result.Aliases[0] : null,
+    address : unprefixedAddress(result.Address[0]),
+    aliases : formatAliases(result.Aliases[0]),
     expectedTerm : result['Expected term'][0],
     nocacheAddress : result['Nocache address'].length ? result['Nocache address'][0].fulltext : null,
-    excludeLocations : result['Exclude locations'].length ? result['Exclude locations'][0].split('\n') : null,
+    excludeLocations : result['Exclude locations'].length ? result['Exclude locations'][0].split('\n') : [],
     status : result.Status[0],
     DNET : dnet,
     dnetHosts : dnetHosts
   };
 };
 
+/**
+ * return the address without http:// or any other protoclol
+ * @param address
+ * @returns {*|XML|replace|parameterizedNumbersStepName.replace|stepName.replace|string}
+ */
+var unprefixedAddress = function(address) {
+  return address.replace(/.*?:\/\//g, '')
+                .replace(/\/+$/, '');
+};
+
+var formatAliases = function (aliases) {
+  if (aliases) {
+    aliases = aliases.replace(' ', '');
+    aliases = aliases.split(',');
+    return aliases.map(function (alias) {
+      return alias.replace(/\.+$/, '');
+    });
+  }
+  else return [];
+};
 /**
  * Return a filename for the generated feature
  * @param vars

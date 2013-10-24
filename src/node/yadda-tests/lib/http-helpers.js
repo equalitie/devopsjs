@@ -13,7 +13,9 @@ module.exports = function () {
       headers;
 
   var http    = require('http');
+
   var Q       = require('q');
+  var _       = require('lodash');
   var crypto  = require('crypto');
   var request = require('request');
 
@@ -22,7 +24,11 @@ module.exports = function () {
    * @type {{deflect: string}}
    */
   contentHashes = {
-    'deflect': '6df015757ea1cfa9cc0057293ed8f6e1'
+    'deflect':
+      [
+        '6df015757ea1cfa9cc0057293ed8f6e1',
+        'e55cc36c1fdf86b12bf0fecf8d3e79b6'
+      ]
   };
   createOptions = function (hostname, path) {
     path = path || '/';
@@ -108,19 +114,15 @@ module.exports = function () {
     runRequest = function (path) {
       var options = createOptions(hostname, path),
           deferred = Q.defer(),
-          responseData, req;
+          req;
 
       req = request.get(options, function (err, res) {
-        var responseData = '',
+        var hash, contentMatch,
             md5sum = crypto.createHash('md5');
-        res.on('data', function (chunk) {
-          md5sum.update(chunk);
-        });
-        res.on('end', function () {
-          var hash = md5sum.digest('hex');
-          var contentMatch = hash === contentHash;
-          deferred.resolve(contentMatch);
-        });
+        md5sum.update(res.body);
+        hash = md5sum.digest('hex');
+        contentMatch = _.contains(contentHash, hash);
+        deferred.resolve(contentMatch);
       });
       promises.push(deferred.promise);
     };
