@@ -4,6 +4,8 @@
 // ### Description: include the test specs
 // 
 var FS = require('Q-io/fs');
+var Q = require('Q');
+var fs = require('fs');
 var _ = require('lodash');
 
 var Yadda = require('yadda');
@@ -30,11 +32,32 @@ var directories = [
 ];
 
 var iterateOverFeatureDirectories = function (featureDir) {
-//  FS.list(featureDir)
-//    .then(function (directories) {
-//      return runFeatures(directories);
-//    });
-  runFeatures(directories);
+  var deferred  = Q.defer();
+
+  fs.readdir(featureDir, function (err, files) {
+    console.log('dir read');
+    if (err) {
+      deferred.reject(err);
+    }
+    deferred.resolve(files);
+  });
+
+  deferred.promise
+    .then(function (foundDirectories) {
+      console.log('inside then');
+      directories = foundDirectories;
+      console.log(directories);
+      return runFeatures(directories);
+    })
+    .fail(function () {
+      console.log('fail dir list')
+
+    })
+    .done(function () {
+      console.log('done dir list');
+    });
+
+//  runFeatures(directories);
 };
 
 var runFeatures = function (featureDirs) {
@@ -46,6 +69,7 @@ var runFeatures = function (featureDirs) {
  * @param featureDir
  */
 var runFeature = function (featureDir) {
+  console.log('runFeature');
   feature(testDirectory + featureDir + '/site.feature', function(feature) {
     var featureContext = require('./generated/' + featureDir + '/context.js');
     ctx = _.defaults(featureContext, ctx);
