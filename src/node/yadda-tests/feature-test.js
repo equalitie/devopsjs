@@ -3,14 +3,17 @@
 // Author: Cormac McGuire
 // ### Description: include the test specs
 // 
-var FS = require('Q-io/fs');
-var Q = require('Q');
 var fs = require('fs');
 var _ = require('lodash');
 
 var Yadda = require('yadda');
 Yadda.plugins.mocha();
 
+/**
+ * sme context for our tests -
+ * TODO - these ip addresses need to be generated
+ * @type {{deflectServers: {cname: string, ipAddresses: Array}}}
+ */
 var ctx = {
   deflectServers: {
     cname: 'staging.deflect.ca',
@@ -26,50 +29,36 @@ var ctx = {
   }
 };
 
+// the directory where test locations are kept
 var testDirectory = 'src/node/yadda-tests/generated/';
 var directories = [
-  'Equality#equalit.ie'
 ];
 
+/**
+ * read the directory containing tests and call the iterator
+ * @param featureDir
+ */
 var iterateOverFeatureDirectories = function (featureDir) {
-  var deferred  = Q.defer();
-
-  fs.readdir(featureDir, function (err, files) {
-    console.log('dir read');
-    if (err) {
-      deferred.reject(err);
-    }
-    deferred.resolve(files);
-  });
-
-  deferred.promise
-    .then(function (foundDirectories) {
-      console.log('inside then');
-      directories = foundDirectories;
-      console.log(directories);
-      return runFeatures(directories);
-    })
-    .fail(function () {
-      console.log('fail dir list')
-
-    })
-    .done(function () {
-      console.log('done dir list');
-    });
-
-//  runFeatures(directories);
+  // sync read file for simplicity and because I've wasted enough time getting it to work with
+  // promises and callbacks :( execution was ending before promise resolved
+  // promises version can be seen in commit 889fb893e0bc2167ef6665d20521f93dc3be9c4a
+  directories = fs.readdirSync(featureDir);
+  runFeatures(directories);
 };
 
+/**
+ * iterator to run tests on each directory
+ * @param featureDirs
+ */
 var runFeatures = function (featureDirs) {
   featureDirs.forEach(runFeature);
 };
 
 /**
- * run the
+ * run the generated tests
  * @param featureDir
  */
 var runFeature = function (featureDir) {
-  console.log('runFeature');
   feature(testDirectory + featureDir + '/site.feature', function(feature) {
     var featureContext = require('./generated/' + featureDir + '/context.js');
     ctx = _.defaults(featureContext, ctx);
@@ -83,5 +72,3 @@ var runFeature = function (featureDir) {
   });
 };
 iterateOverFeatureDirectories(testDirectory);
-
-
