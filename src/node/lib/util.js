@@ -37,7 +37,6 @@ exports.config = function(conf) {
   } else {
     configBase = process.cwd() + '/config/';
   }
-  console.log(configBase);
 
   var trying = configBase + 'localConfig.js';
   try {
