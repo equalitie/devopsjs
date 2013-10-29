@@ -1,17 +1,22 @@
 /*jslint node: true */
 
-'use strict';
+/**
+ *
+ * Author: DavidM
+ *
+ * Merge configured dnets then run tests, storing them and the updated merged hosts.
+ * 
+ * Options for host, test, whether to store.
+ *
+ **/
 
-GLOBAL.exception = function(s) {
-  console.log('*** EXCEPTION', s);
-};
+'use strict';
 
 var program = require('commander');
 var utils = require('./lib/util.js');
 utils.config();
 var hostLib = require('./lib/hosts.js');
 hostLib = hostLib.setConfig(program, 'MERGED');
-
 
 var hosts = require(GLOBAL.CONFIG.configBase + 'hosts.json');
 
