@@ -31,8 +31,6 @@ var ctx = {
 
 // the directory where test locations are kept
 var testDirectory = 'src/node/yadda-tests/generated/';
-var directories = [
-];
 
 /**
  * read the directory containing tests and call the iterator
@@ -42,6 +40,7 @@ var iterateOverFeatureDirectories = function (featureDir) {
   // sync read file for simplicity and because I've wasted enough time getting it to work with
   // promises and callbacks :( execution was ending before promise resolved
   // promises version can be seen in commit 889fb893e0bc2167ef6665d20521f93dc3be9c4a
+  var directories;
   directories = fs.readdirSync(featureDir);
   runFeatures(directories);
 };
