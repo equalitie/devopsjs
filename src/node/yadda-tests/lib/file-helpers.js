@@ -23,7 +23,6 @@ module.exports = (function() {
 
   var readFileToPromise = function (source) {
     var template = source || get('source');
-    console.log('readFileToPromise', template);
     return readFile(template);
   };
 
@@ -35,7 +34,6 @@ module.exports = (function() {
     context = context || get ('context');
     resultObjectString = JSON.stringify(context);
     resultString = resultTemplate({ vars: resultObjectString });
-    console.log(resultFilename, resultString);
 
     return writeFile(resultFilename, resultString);
 
@@ -46,13 +44,10 @@ module.exports = (function() {
     var deferred = Q.defer();
 
     fs.readFile(sourceFile, { encoding: 'utf8' }, function (err, data) {
-      console.log('readFile callback');
       if (err) {
-        console.log('readFile rejected');
         deferred.reject(err);
       }
       else {
-        console.log('readFile resolved');
         deferred.resolve(data);
       }
     });
@@ -61,12 +56,9 @@ module.exports = (function() {
 
   // promises wrapper around writeFile
   var writeFile = function(filename, contents) {
-    console.log('writeFile: %s\n %s', filename, contents);
     var deferred = Q.defer();
     fs.writeFile(filename, contents, function (err) {
-      console.log('in write file callback');
       if (err) {
-        console.log(err);
         deferred.reject(err);
       }
       else {
