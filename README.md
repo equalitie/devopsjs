@@ -13,7 +13,7 @@ Support comprehensive configuration, resource usage, monitoring and development 
 
 # Install
 
-You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev.
+You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev. Also, install MaxMind's GeoLiteCity.dat to /usr/local/geoip. Then:
 
     cd devopsjs 
     npm install
@@ -28,6 +28,8 @@ var c = {};
 c.dnets = ['dnet1.deflect.ca', 'dnet2.deflect.ca'];
 c.domain = '.deflect.ca';
 c.defaultDNET = 'default';
+
+c.httpCheckURI = 'http://somedefaultURLonhosts';
 
 /* configuration for notifier */
 c.notify = {emailSubject : 'devopsjs notifications',
