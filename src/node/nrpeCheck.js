@@ -18,8 +18,6 @@ utils.config();
 var hostLib = require('./lib/hosts.js');
 hostLib = hostLib.setConfig(program, 'MERGED');
 
-var hosts = require(GLOBAL.CONFIG.configBase + 'hosts.json');
-
 var store = GLOBAL.CONFIG.getStore();
 var nrpe = require('./lib/nrpe/check.js');
 
