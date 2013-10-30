@@ -29,6 +29,8 @@ c.dnets = ['dnet1.deflect.ca', 'dnet2.deflect.ca'];
 c.domain = '.deflect.ca';
 c.defaultDNET = 'default';
 
+c.httpCheckURI = 'http://somedefaultURLonhosts';
+
 /* configuration for notifier */
 c.notify = {emailSubject : 'devopsjs notifications',
   emailFrom : 'someone@somewhere'
