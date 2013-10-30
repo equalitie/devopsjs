@@ -22,6 +22,7 @@ module.exports = (function() {
 
 
   var readFileToPromise = function (source) {
+    console.log('readFileToPromise');
     var template = source || get('source');
     return readFile(template);
   };
@@ -44,6 +45,7 @@ module.exports = (function() {
     var deferred = Q.defer();
 
     fs.readFile(sourceFile, { encoding: 'utf8' }, function (err, data) {
+      console.log(data);
       if (err) {
         deferred.reject(err);
       }

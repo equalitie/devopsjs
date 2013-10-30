@@ -23,6 +23,7 @@ hosts.forEach(function(host) {
     response = host.lastDNET + ' (' + host.DNET + ') ' + moment(host.lastDNETChange).fromNow();
   }
 });
+
 if (response) {
   console.log(response);
 } else {

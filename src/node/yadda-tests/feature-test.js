@@ -45,8 +45,8 @@ var iterateOverFeatureDirectories = function (featureDir) {
     directories = require('./single-test.js');
   }
   catch(e) {
-    directories = fs.readdirSync(featureDir);
   }
+  directories = directories || fs.readdirSync(featureDir);
   runFeatures(directories);
 };
 

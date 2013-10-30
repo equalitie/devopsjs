@@ -11,81 +11,80 @@ var _ = require('lodash');
 
 var fileHelper = require('./lib/file-helpers.js');
 
-module.exports = FileReporter;
+module.exports = function() {
+  var resultObject, outFile, format;
 
-var resultObject;
-function FileReporter(runner) {
-  var passes, fails;
-  passes = 0;
-  fails = 0;
-  resultObject = {
-    tests: [],
-    passes: 0,
-    fails: 0
+  var FileReporter = function(runner) {
+    var passes, fails;
+    passes = 0;
+    fails = 0;
+    resultObject = {
+      tests: [],
+      passes: 0,
+      fails: 0
+    };
+
+
+    runner.on('pass', function(test) {
+      passes++;
+      resultObject.tests.push({
+        title: test.fullTitle(),
+        result: 'pass'
+      });
+    });
+
+    runner.on('fail', function(test) {
+      fails++;
+      resultObject.tests.push({
+        title: test.fullTitle(),
+        result: 'fail'
+      });
+    });
+
+    runner.on('end', function(test) {
+      resultObject.passes = passes;
+      resultObject.fails = fails;
+      resultObject.total = passes + fails;
+      writeTestResults();
+
+    });
   };
 
+  var config = function(defaults) {
+    outFile = defaults.outFile;
+    format  = defaults.format;
+  };
 
-  runner.on('pass', function(test) {
-    passes++;
-    resultObject.tests.push({
-      title: test.fullTitle(),
-      result: 'pass'
-    });
-  });
+  /**
+   * write the test results to a file
+   */
+  var writeTestResults = function() {
+    var rootDir = require("path").resolve(__dirname),
+        resultString,
+        dest = outFile,
+        source = rootDir + '/templates/context.tpl';
 
-  runner.on('fail', function(test) {
-    fails++;
-    resultObject.tests.push({
-      title: test.fullTitle(),
-      result: 'fail'
-    });
-  });
-
-  runner.on('end', function(test) {
-    resultObject.passes = passes;
-    resultObject.fails = fails;
-    resultObject.total = passes + fails;
-    fileNotWritten = true;
-
-    var testsWritten = writeTestResults();
-    testsWritten
-      .then(function () {
-        console.log('in then in main loop');
-        process.exit(fails);
-        fileNotWritten = false;
-      })
-      .fail(function() {
-        console.log('in fail in main loop');
-        fileNotWritten = false;
-      })
-      .done(function() {
-        console.log('in done in main loop');
-        fileNotWritten = false;
-      });
-    while(fileNotWritten) {
+    console.log(dest, source, resultObject);
+    fileHelper.set('source', source);
+    fileHelper.set('dest', dest);
+    fileHelper.set('context', resultObject);
+    if (format === 'json') {
+      resultString = JSON.stringify(resultObject);
     }
-    return;
+    else {
+      var template = _.template(fs.readFileSync(source, {encoding: 'utf8' }));
+       resultString = template({
+        vars: JSON.stringify(resultObject)
+      });
+    }
 
-  });
-}
+    fs.writeFileSync(dest, resultString);
+  };
 
-var writeTestResults = function() {
-  var rootDir = require("path").resolve(__dirname),
-      dest = rootDir + '/results.js',
-      source = rootDir + '/templates/context.tpl',
-      deferred = Q.defer();
+  return {
+    config  : config,
+    reporter: FileReporter
+  };
+}();
 
-  console.log(dest, source, resultObject);
-  fileHelper.set('source', source);
-  fileHelper.set('dest', dest);
-  fileHelper.set('context', resultObject);
-
-  fileHelper.readFileToPromise()
-    .then(fileHelper.writeTemplateFile)
-    .then(function() {
-      console.log('after write');
-      deferred.resolve();
-    });
-  return deferred.promise;
-};
 
