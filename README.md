@@ -13,7 +13,7 @@ Support comprehensive configuration, resource usage, monitoring and development 
 
 # Install
 
-You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev.
+You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev. Also, install MaxMind's GeoLiteCity.dat to /usr/local/geoip. Then:
 
     cd devopsjs 
     npm install
