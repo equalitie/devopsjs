@@ -10,11 +10,12 @@ var fs = require('fs');
 //  give us some of the nice object iterators
 var _ = require('lodash');
 var FS = require('q-io/fs');
-var utils = require('./lib/util.js');
+var util = require('./lib/util.js');
+util.config();
 
-// why is this here?
-utils.config();
-var hosts = require('./lib/hosts.js');
+var hostLib = require('./lib/hosts.js');
+
+var allDNETs = demerge(hostLib.getDNET('MERGED'));
 
 var semwiki = require("./lib/semwiki.js");
 
@@ -111,7 +112,7 @@ var convertTestTypeToFile = function (templatesObject, testType) {
  */
 var mapPrintoutToVars = function (result) {
   var dnet = result.DNET[0] ? result.DNET[0].fulltext.toLowerCase() : GLOBAL.CONFIG.defaultDNET;
-  var dnetHosts = hosts.getDNET(dnet);
+  var dnetHosts = allDNETs[dnet];
   return {
     siteOf : result['Site of'][0].fulltext,
     address : unprefixedAddress(result.Address[0]),
@@ -209,4 +210,14 @@ function writeFeature(name, feature, vars) {
 
 }
 
+function demerge(merged) {
+  var unmerged = {};
+  GLOBAL.CONFIG.dnets.forEach(function(d) { unmerged[d.replace(GLOBAL.CONFIG.domain, '')] = []; });
+  merged.forEach(function(m) {  // copy interesting properties from last iteration
+    if (unmerged[m.DNET]) {
+      unmerged[m.DNET.replace(GLOBAL.CONFIG.domain, '')].push(m);
+    }
+  });
+  return unmerged;
+}
 
