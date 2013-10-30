@@ -4,7 +4,7 @@
  * test helpers for http requests
  */
 
-module.exports = function () {
+module.exports = (function () {
   'use strict';
   var contentHashes,
       createOptions,
@@ -121,7 +121,6 @@ module.exports = function () {
             md5sum = crypto.createHash('md5');
         md5sum.update(res.body);
         hash = md5sum.digest('hex');
-        console.log(hash);
         contentMatch = _.contains(contentHash, hash);
         deferred.resolve(contentMatch);
       });
@@ -136,4 +135,4 @@ module.exports = function () {
     headers                  : headers
   };
 
-}();
+}());

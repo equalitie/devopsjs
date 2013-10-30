@@ -18,3 +18,6 @@ annotated-source
 docs
 reports
 src/node/yadda-tests/generated/*
+src/node/yadda-tests/results.js
+src/node/yadda-tests/single-test.js
+

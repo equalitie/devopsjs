@@ -195,7 +195,6 @@ module.exports = function () {
     function (responseNum, next) {
       expect(responseCode).to.equal(200);
       next();
-
     })
 
     .then('it should return within $SECONDS seconds',

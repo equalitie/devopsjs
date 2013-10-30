@@ -41,7 +41,12 @@ var iterateOverFeatureDirectories = function (featureDir) {
   // promises and callbacks :( execution was ending before promise resolved
   // promises version can be seen in commit 889fb893e0bc2167ef6665d20521f93dc3be9c4a
   var directories;
-  directories = fs.readdirSync(featureDir);
+  try {
+    directories = require('./single-test.js');
+  }
+  catch(e) {
+    directories = fs.readdirSync(featureDir);
+  }
   runFeatures(directories);
 };
 

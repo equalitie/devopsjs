@@ -7,7 +7,7 @@
 var Q = require('q');
 var dns = require('dns');
 
-module.exports = function () {
+module.exports = (function () {
   var resolveAddress, resolveAliases;
 
   var getTimeIntegerInSeconds = function () {
@@ -50,8 +50,6 @@ module.exports = function () {
       var deferred;
       deferred = Q.defer();
       dns.resolve(alias, function (err, addresses) {
-        console.log(err);
-        console.log(addresses);
         if (addresses === undefined) {
           throw new Error('alias ' + alias + ' did not resolve');
         }
@@ -67,4 +65,4 @@ module.exports = function () {
     resolveAddress: resolveAddress,
     resolveAliases: resolveAliases
   };
-}();
+}());

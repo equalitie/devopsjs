@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+  var cwd = require("path").resolve(__dirname);
   var srcFiles = [
     'src/node/*.js',
     'src/node/lib/*.js',
@@ -16,7 +17,7 @@ module.exports = function(grunt) {
     mochaTest: {
       prodTest: {
         options: {
-          reporter: 'json'
+          reporter: cwd + '/src/node/yadda-tests/file-reporter.js'
         },
         src: ['src/node/yadda-tests/*-test.js']
       },
@@ -62,14 +63,16 @@ module.exports = function(grunt) {
           '<%= jshint.files %>',
           'src/node/yadda-tests/*.js',
           'src/node/yadda-tests/**/*.js',
-          'src/node/yadda-tests/generated/**/*.feature'
+          'src/node/yadda-tests/generated/**/*.feature',
+          'src/node/yadda-tests/test/!(outfile)'
         ],
         tasks: ['jshint', 'mochaTest:devUnitTest']
       },
       prod: {
         files: [
           '<%= jshint.files %>',
-          'src/node/yadda-tests/*.js',
+          'src/node/yadda-tests/feature-test.js',
+          'src/node/yadda-tests/file-reporter.js',
           'src/node/yadda-tests/library/*.js',
           'src/node/yadda-tests/generated/**/*.feature'
         ],
