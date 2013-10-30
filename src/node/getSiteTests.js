@@ -210,10 +210,14 @@ function writeFeature(name, feature, vars) {
 
 }
 
+
+// break merged DNET edges into entries
+// this will eventually get redesigned.
+
 function demerge(merged) {
   var unmerged = {};
   GLOBAL.CONFIG.dnets.forEach(function(d) { unmerged[d.replace(GLOBAL.CONFIG.domain, '')] = []; });
-  merged.forEach(function(m) {  // copy interesting properties from last iteration
+  merged.forEach(function(m) {
     if (unmerged[m.DNET]) {
       unmerged[m.DNET.replace(GLOBAL.CONFIG.domain, '')].push(m);
     }
