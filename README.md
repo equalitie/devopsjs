@@ -100,8 +100,10 @@ development follows two tracks:
 grunt watch:devUnit  
 This will run unit tests against the test helper classes
 
-2. running the bdd tests 
-src/node/yadda-tests/lib/bdd-test-runner.js will run the tests  
+2. running the bdd tests  
+```
+src/node/yadda-tests/lib/bdd-test-runner.js 
+```
 Following Flags available:  
   1. -S or --site [sitename] site to run the tests against
   2. -f write the results to a file src/node/yadda-tests/results.js
