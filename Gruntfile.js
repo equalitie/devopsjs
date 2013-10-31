@@ -39,10 +39,6 @@ module.exports = function(grunt) {
       configTest: {
         options: {
           reporter: 'spec',
-          ui: 'tdd',
-          require: [
-            'chai'
-          ],
         },
         src: ['test/configuration.js']
       }
@@ -61,6 +57,13 @@ module.exports = function(grunt) {
       }
     },
     watch: {
+      config: {
+        files: [
+          'config/*.js'
+          ],
+          tasks: ['jshint', 'mochaTest:configTest']
+      },
+    
       dev: {
         files: [
           '<%= jshint.files %>',
@@ -101,7 +104,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task(s).
-  grunt.registerTask('default', ['jshint', 'mochaTest', 'docco', 'plato', 'configTest']);
-  grunt.registerTask('configuration', ['configTest']);
+  grunt.registerTask('default', ['jshint', 'mochaTest', 'docco', 'plato']);
 
 };

@@ -5,7 +5,6 @@
  * Updated 21/10/2013
  * Cormac
  **/
-"use strict";
 
 var fs = require('fs');
 

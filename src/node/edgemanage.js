@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
-
 var utils = require('./lib/util.js');
 
 var program = require('commander');
