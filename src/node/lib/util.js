@@ -43,8 +43,9 @@ exports.config = function(conf) {
     require(trying);
     GLOBAL.CONFIG.configBase = configBase;
     if (conf.dnet) {
-      trying = configBase + conf.dnet + '.js';
+      trying = configBase + conf.dnet.replace(GLOBAL.CONFIG.domain, '') + '.js';
       require(trying);
+      GLOBAL.CONFIG.DNET = conf.dnet;
     }
   } catch (e) {
     console.log(e);
