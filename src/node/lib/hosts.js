@@ -309,7 +309,7 @@ function getRotateAdvice(hostSummaries, hosts) {
   var ret = {newest: activeAdvice.newest, removeActive : activeAdvice.host , addInactive : inactiveAdvice.host , removeReason : activeAdvice.reason , addReason : inactiveAdvice.reason , summary : 'replace ' + activeAdvice.host.name + ' ' + activeAdvice.host.stats.since +  ' [' + activeAdvice.reason + '] w ' + inactiveAdvice.host.name + ' ' + inactiveAdvice.host.stats.since + ' [' + inactiveAdvice.reason + ']'};
 
   /** Should we rotate even if it's not time **/
-  var doRotate = config.program.rout || config.program.rin || config.program.override || activeAdvice.host.stats.worry > GLOBAL.CONFIG.worryBase || 0;
+  var doRotate = config.program.rout || config.program.rin || config.program.override || (activeAdvice.host.stats.worry > (GLOBAL.CONFIG.worryBase || 0));
   
   if (!doRotate) {
     if (!GLOBAL.CONFIG.rotationTimeMinutes) {
