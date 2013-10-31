@@ -41,10 +41,10 @@ module.exports = function(grunt) {
           reporter: 'spec',
           ui: 'tdd',
           require: [
-            'chai',
+            'chai'
           ],
         },
-        src: ['tests/configuration.js']
+        src: ['test/configuration.js']
       }
     },
     docco: {

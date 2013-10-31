@@ -3,32 +3,36 @@
 var chai = require('chai');
 var expect = chai.expect;
 var utils = require('../src/node/lib/util.js');
+var configFile = 'config/localSettings.js'; // global config
 
-suite("configuration tests", function() {
   setup(function(done){
     utils.config();
     done();
   });
 
   test('GLOBAL.CONFIG', function testGlobalConfig() {
-    expect(GLOBAL.CONFIG).to.be.notnull;
+    expect(GLOBAL.CONFIG).to.be.a('object', 'Define '+ configFile);
   });
-  test("flatHostsFile", function testFlatHostsFile() {
-    expect(GLOBAL.CONFIG.flatHostsFile).to.be.a.string;
+
+  describe('String variables', function() {
+    ['flatHostsFile', 'domain', 'defaultDNET', 'httpCheckURI'].forEach(function(v) {
+      it('must have the string variable ' + v, function() {
+        expect(GLOBAL.CONFIG[v]).to.be.a('string', 'define string ' + v + ' in ' + configFile);
+      });
+    });
   });
 	
+  describe('Numeric variables', function() {
+    ['minActive', 'rotationTimeMinutes'].forEach(function(v) {
+      it(v, function testNumericVariable() {
+        expect(GLOBAL.CONFIG[v]).to.be.a('number', 'define number ' + v + ' in ' + configFile);
+      });
+    });
+  });
+
+
   /*
-  c.flatHostsFile = 'edges.live';
-  c.minActive = 6;
   c.dnets = ['deflect1.deflect.ca', 'staging.deflect.ca'];
-  c.domain = '.deflect.ca';
-  c.defaultDNET = 'deflect1';
-
-  c.httpCheckURI = 'http://www.equalit.ie/10k';
-
-
-  c.rotationTimeMinutes = 60;
-
   c.notify = {emailSubject : '[eqwiki] Ticket notifications',
     emailFrom : 'david@equalit.ie'
   };
@@ -59,4 +63,3 @@ suite("configuration tests", function() {
                         }
 
 */
-});
