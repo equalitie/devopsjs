@@ -35,6 +35,16 @@ module.exports = function(grunt) {
           timeout : '5000'
         },
         src: ['src/node/yadda-tests/*-test.js']
+      },
+      configTest: {
+        options: {
+          reporter: 'spec',
+          ui: 'tdd',
+          require: [
+            'expect.js',
+          ],
+        },
+        src: ['tests/configuration.js']
       }
     },
     docco: {
@@ -91,6 +101,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task(s).
-  grunt.registerTask('default', ['jshint', 'mochaTest', 'docco', 'plato']);
+  grunt.registerTask('default', ['jshint', 'mochaTest', 'docco', 'plato', 'configTest']);
+  grunt.registerTask('configuration', ['configTest']);
 
 };
