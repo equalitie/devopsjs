@@ -35,6 +35,7 @@ module.exports = function() {
 
     runner.on('fail', function(test) {
       fails++;
+      console.log(test);
       resultObject.tests.push({
         title: test.fullTitle(),
         result: 'fail'

@@ -1,5 +1,5 @@
-module.exports = function(){
-  var request = {
+module.exports = (function(){
+  var response = {
     "headers": {
       "date"          : "Wed, 23 Oct 2013 18:25:54 GMT",
       "server"        : "Apache",
@@ -12,9 +12,10 @@ module.exports = function(){
       "age"           : "0",
       "connection"    : "keep-alive",
       "via"           : "http/1.1 chicago3.deflect.ca (ApacheTrafficServer/3.2.5 [uScMsSf pSeN:t cCMi p sS])"
-    }
+    },
+    "body": "this is a sample body that contains a test phrase"
   };
   return {
-    request: request
+    response: response
   };
-}();
+}());

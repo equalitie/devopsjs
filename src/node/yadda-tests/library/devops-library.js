@@ -3,6 +3,8 @@
 // Author: Cormac McGuire
 // ### Description:
 // Define the steps that can be used in devops features
+// use assert style assertions to show fail messages
+// uses http and dns helpers from the lib folder to do the heavy lifting
 
 var dns = require('dns');
 var http = require('http');
@@ -12,6 +14,7 @@ var _ = require('lodash');
 var Q = require('q');
 
 var expect = require('chai').expect;
+var assert = require('chai').assert;
 var Library = require('yadda').localisation.English;
 
 
@@ -34,10 +37,10 @@ var createReduceAndFunction = function (testFunction) {
   };
 };
 
-module.exports = function () {
+module.exports = (function () {
   'use strict';
   var resolvedAddresses, aliasAddressesArr, library, responseCode,
-      resolveTime, retrievedUrls, viaHeaders;
+      resolveTime, retrievedUrls, viaHeaders, path;
 
   library = new Library()
 
@@ -78,39 +81,25 @@ module.exports = function () {
 
     })
 
+    .given('retrieved page $PATH', function(urlPath, next) {
+      if (urlPath === '@validatePage@') {
+        urlPath = '';
+      }
+      path = urlPath;
+      next();
+    })
+
     .given('excluded locations retrieved', function (next) {
       retrievedUrls = this.excludeLocations;
       next();
     })
-
-    .when('used as a proxy to make a request to $HOST', function (hostname, next) {
-      var options = {
-        host   : hostAddress,
-        port   : 80,
-        path   : hostname,
-        headers: {
-          Host: hostname
-        }
-      };
-      try {
-        http.get(options, function (response) {
-          responseCode = response.statusCode;
-          next();
-        });
-      }
-      catch (e) {
-        responseCode = -1;
-        next();
-      }
-    })
-
 
     .then('aliases should resolve', function (next) {
       dnsHelper.resolveAliases(this.aliases, this.address)
         .then(function (resolvedAliasAddressesArr) {
           aliasAddressesArr = resolvedAliasAddressesArr;
           aliasAddressesArr.forEach(function (aliasAddresses) {
-            expect(aliasAddresses).to.not.be.undefined;
+            assert.notEqual(aliasAddresses, undefined);
           });
         })
         .done(function () {
@@ -129,19 +118,12 @@ module.exports = function () {
       var errors = [];
       aliasAddressesArr.forEach(function (aliasAddresses) {
         _.each(aliasAddresses, function (address){
+          var errorMessage = 'alias address: ' + address + ' not found in resolved addresses, ' +
+          resolvedAddresses + ' for ' + this.siteOf + '\n';
           var contains = _.contains(resolvedAddresses, address);
-          try {
-            expect(contains).to.be.true;
-          }
-          catch (e) {
-            errors.push('alias ' + address + ' not found in resolved addresses' +
-                  ' for ' + this.siteOf + '\n');
-          }
+          assert.equal(true, contains, errorMessage); 
         }, this);
       }.bind(this));
-      if (errors.length > 0) {
-        throw errors.join();
-      }
       next();
     })
 
@@ -151,11 +133,12 @@ module.exports = function () {
           contentKey = 'deflect';
 
       if (retrievedUrls.length > 0) {
-        httpHelper.searchForContentInRequest(hostname, paths, contentKey)
+        httpHelper.checkIfImageReturned(hostname, paths, contentKey)
           .then(function (results) {
             results.forEach(function (result) {
-              expect(result).to.be.true;
-            })
+              var failString = result.path + ' is not returning the deflect logo\n';
+              assert.equal(true, result.found, failString);
+            });
           })
           .done(function () {
             next();
@@ -166,9 +149,22 @@ module.exports = function () {
       }
 
     })
+    .then('it should contain $TERM', function(term, next) {
+      httpHelper.searchForContentInRequest(this.address, path, term)
+        .then(function(matchFound) {
+          var errorMessage = 'Term: "' + term + '" not found in the page at ' +
+            this.address + this.path;
+          assert.equal(true, matchFound, errorMessage);
+        })
+        .done(function() {
+          next();
+        });
+
+    })
 
     .then('it should resolve', function (next) {
-      expect(resolvedAddresses).not.to.be.undefined;
+      var errorMessage = this.siteOf + ' did not resolve\n';
+      assert.notEqual(resolvedAddresses, undefined, errorMessage);
       next();
     })
 
@@ -193,7 +189,7 @@ module.exports = function () {
 
     .then('it should receive a $RESPONSENUM response',
     function (responseNum, next) {
-      expect(responseCode).to.equal(200);
+      assert.equal(200, responseCode, 'response code does not match');
       next();
     })
 
@@ -201,11 +197,7 @@ module.exports = function () {
     function (seconds, next) {
       expect(resolveTime).to.be.below(seconds);
       next();
-    })
-
-    .then('it should include the word $WORD', function (word, next) {
-      next();
     });
 
   return library;
-}();
+}());

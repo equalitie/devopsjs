@@ -12,7 +12,7 @@ var sinon = require('sinon');
 var httpHelper = require('../lib/http-helpers.js');
 
 
-var mocks = require('./mocks/request.js');
+var mocks = require('./mocks/response.js');
 var mockDir =  require("path").resolve(__dirname) + '/mocks/';
 
 describe('Test http helper functions', function () {
@@ -22,19 +22,22 @@ describe('Test http helper functions', function () {
         contentKey = 'deflect';
 
     var emitter,
-        listener = function() {},
-        mock;
+        listener = function() {};
 
     fs.readFile(mockDir + 'user.png', function(err, fileData) {
 
-      mock = sinon.stub(request, 'get')
-                  .yields(null, {body: fileData});
+      var mock = stubRequestGet({
+        body: fileData,
+        headers: {
+          "content-type": 'image/png'
+        }
+      });
 
 
-      httpHelper.searchForContentInRequest(hostname, path, contentKey)
+      httpHelper.checkIfImageReturned(hostname, path, contentKey)
         .then(function (results) {
           results.forEach(function(result){
-            expect(result).to.be.true;
+            expect(result.found).to.be.true;
           });
         })
         .done(function(){
@@ -46,9 +49,7 @@ describe('Test http helper functions', function () {
   });
 
   it('should retrieve headers', function(done) {
-    var mock =
-      sinon.stub(request, 'get')
-      .yields(null, mocks.request);
+    var mock = stubRequestGet(mocks.response);
     var hostname = 'test.host';
     httpHelper.headers.retrieveHeaders(hostname)
       .then(function (header) {
@@ -61,12 +62,38 @@ describe('Test http helper functions', function () {
   });
 
   it('should check a header to see if it came from the cache', function() {
-    var viaHeader   = 'http/1.1 hetzner8.deflect.ca (ApacheTrafficServer/3.2.5 [uScMsSf pSeN:t cCMi p sS])',
-        isNotFromCache = httpHelper.headers.isNotFromCache(viaHeader);
+    var isNotFromCache = httpHelper.headers.isNotFromCache(notCachedHeader());
+        isFromCache = httpHelper.headers.isFromCache(cachedHeader());
     expect(isNotFromCache).to.be.true;
-    viaHeader   = 'http/1.1 hetzner8.deflect.ca (ApacheTrafficServer/3.2.5 [uScHsSf pSeN:t cCMi p sS])',
-    isFromCache = httpHelper.headers.isFromCache(viaHeader);
     expect(isFromCache).to.be.true;
   });
 
+  it('should check a response for an expected term', function(done){
+    var mock     = stubRequestGet(mocks.response),
+        hostname = 'test.host',
+        path     = '/testing',
+        content  = 'test phrase';
+    
+    httpHelper.searchForContentInRequest(hostname, path, content)
+      .then(function (matchFound) {
+        expect(matchFound).to.be.true;
+      })
+      .done(function () {
+        done();
+      });
+    mock.restore();
+  });
+
 });
+
+var stubRequestGet = function(mockResponse) {
+   return sinon.stub(request, 'get').yields(null, mockResponse);
+};
+
+var notCachedHeader = function() {
+  return 'http/1.1 hetzner8.deflect.ca (ApacheTrafficServer/3.2.5 [uScMsSf pSeN:t cCMi p sS])';
+};
+
+var cachedHeader = function() {
+  return 'http/1.1 hetzner8.deflect.ca (ApacheTrafficServer/3.2.5 [uScHsSf pSeN:t cCMi p sS])';
+};

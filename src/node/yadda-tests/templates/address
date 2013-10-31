@@ -1,4 +1,3 @@
-@Pending
 Scenario: should perform DNS lookup
     Given site looked up
     Then it should resolve

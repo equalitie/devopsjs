@@ -8,6 +8,7 @@ module.exports = (function () {
   'use strict';
   var contentHashes,
       createOptions,
+      checkIfImageReturned,
       searchForContentInRequest,
       resolveContent,
       headers;
@@ -33,7 +34,7 @@ module.exports = (function () {
   createOptions = function (hostname, path) {
     path = path || '/';
     var options = {
-      uri: 'http://' + hostname,
+      uri: 'http://' + hostname + path,
       port: 80,
       path: path,
       method: 'GET'
@@ -99,14 +100,25 @@ module.exports = (function () {
   };
 
 
+  searchForContentInRequest = function(hostname, path, content) {
+    var deferred,
+        options = createOptions(hostname);
+    deferred = Q.defer();
+    request.get(options, function(err, res) {
+      var contentMatch = 
+        (res.body.search(content) >=0);
+
+      deferred.resolve(contentMatch);
+    });
+    return deferred.promise;
+  };
   /**
-   * take two paths and map them to results indicating whether or not the
-   * desired element was found
+   * check to see if a request returns the deflect image
    * return a promise with the results
    * @param hostname
    * @param paths
    */
-  searchForContentInRequest = function (hostname, paths, contentKey) {
+  checkIfImageReturned = function (hostname, paths, contentKey) {
     var promises = [],
         contentHash = resolveContent(contentKey),
         runRequest;
@@ -117,12 +129,19 @@ module.exports = (function () {
           req;
 
       req = request.get(options, function (err, res) {
-        var hash, contentMatch,
-            md5sum = crypto.createHash('md5');
-        md5sum.update(res.body);
-        hash = md5sum.digest('hex');
-        contentMatch = _.contains(contentHash, hash);
-        deferred.resolve(contentMatch);
+        // hash the image... should work
+        //var hash, contentMatch,
+            //md5sum = crypto.createHash('md5');
+        //md5sum.update(res.body);
+        //hash = md5sum.digest('hex');
+        //contentMatch = _.contains(contentHash, hash);
+        var contentMatch = (res.headers['content-type'] === 'image/png');
+        var result = {
+          found: contentMatch,
+          path: path
+        };
+
+        deferred.resolve(result);
       });
       promises.push(deferred.promise);
     };
@@ -131,8 +150,9 @@ module.exports = (function () {
   };
 
   return {
-    searchForContentInRequest: searchForContentInRequest,
-    headers                  : headers
+    searchForContentInRequest : searchForContentInRequest,
+    checkIfImageReturned      : checkIfImageReturned,
+    headers                   : headers
   };
 
 }());
