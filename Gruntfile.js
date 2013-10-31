@@ -41,7 +41,7 @@ module.exports = function(grunt) {
           reporter: 'spec',
           ui: 'tdd',
           require: [
-            'expect.js',
+            'chai',
           ],
         },
         src: ['tests/configuration.js']
