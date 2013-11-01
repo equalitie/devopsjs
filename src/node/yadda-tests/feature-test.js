@@ -38,7 +38,6 @@ var iterateOverFeatureDirectories = function (featureDir) {
   catch(e) {
   }
   directories = directories || fs.readdirSync(featureDir);
-  console.log(directories);
   runFeatures(directories);
 };
 
