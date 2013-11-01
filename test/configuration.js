@@ -23,12 +23,18 @@ describe('Configuration tests', function() {
 
   describe('Wiki config', function() {
     it('must have wiki configured', function() {
+      var wikiConfigKeys = [
+        'server',
+        'protocol',
+        'path',
+        'username',
+        'password'
+      ];
       assert.isObject(GLOBAL.CONFIG.wikiConfig);
-      assert.isString(GLOBAL.CONFIG.wikiConfig.server, 'define wikiConfig.server');
-      assert.isString(GLOBAL.CONFIG.wikiConfig.protocol, 'define wikiConfig.protocol');
-      assert.isString(GLOBAL.CONFIG.wikiConfig.path, 'define wikiConfig.path');
-      assert.isString(GLOBAL.CONFIG.wikiConfig.username, 'define wikiConfig.username');
-      assert.isString(GLOBAL.CONFIG.wikiConfig.password, 'define wikiConfig.password');
+      wikiConfigKeys.forEach(function(key) {
+        var errorMessage = 'wikiConfig.' + key + 'is not configured';
+        assert.isString(GLOBAL.CONFIG.wikiConfig[key], errorMessage);
+      });
     });
   });
 
@@ -47,7 +53,7 @@ describe('Configuration tests', function() {
       assert.isObject(GLOBAL.CONFIG.notify);
       assert.isString(GLOBAL.CONFIG.notify.emailSubject, 'define notify emailSubjectconfigured');
       assert.isString(GLOBAL.CONFIG.notify.emailFrom, 'define notify emailFrom');
-      assert.isObject(GLOBAL.CONFIG.notify.notifyTransport);
+      assert.isObject(GLOBAL.CONFIG.notify.notifyTransport, 'deine notifyTransport');
       assert.isFunction(GLOBAL.CONFIG.notify.notifyTransport.sendNotification, 'define sendNotification function');
     });
   });
@@ -74,4 +80,3 @@ describe('Configuration tests', function() {
     });
   });
 });
-

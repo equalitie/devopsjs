@@ -18,7 +18,7 @@ module.exports = function(grunt) {
       //
       prodTest: {
         options: {
-          reporter: cwd + '/src/node/yadda-tests/file-reporter.js'
+          reporter: 'spec'
         },
         src: ['src/node/yadda-tests/*-test.js']
       },
