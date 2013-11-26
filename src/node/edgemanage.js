@@ -69,7 +69,6 @@ if (program.add) {
   mustComment();
   program.add = domained(program.add);
   var hp = hostLib.addHost(program.add);
-  require('fs').writeFileSync('./hp.json', JSON.stringify(hp, null, 2));
   hostLib.writeHosts(hp.hosts, ['add', program.add], program.add);
   if (GLOBAL.CONFIG.allFlatHostsFile) {
     hostLib.writeFlatHosts(hp.hosts, true, GLOBAL.CONFIG.allFlatHostsFile);
