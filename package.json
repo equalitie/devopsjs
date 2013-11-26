@@ -43,6 +43,6 @@
     "test": "./test"
   },
   "scripts": {
-    "test": "mocha src/node/yadda-tests/feature-test.js -R ./src/node/yadda-tests/file-reporter.js"
+    "test": "grunt mochaTest:devUnitTest  mochaTest:configTest"
   }
 }
