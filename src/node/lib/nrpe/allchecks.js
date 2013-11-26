@@ -20,6 +20,8 @@ exports.getChecks = function(filter) {
       var req = http.request(options, function(res) {
         if (res.headers.via) {
           callback('OK', null, res.headers.via);
+        } else {
+          callback('CRITICAL', null, res.headers);
         }
       });
 
@@ -28,7 +30,8 @@ exports.getChecks = function(filter) {
       req.on('socket', function (socket) {
         socket.setTimeout(10000);  
         socket.on('timeout', function() {
-            req.abort();
+          callback('CRITICAL', 'timeout', null);
+          req.abort();
         });
       });
       req.on('error', function(e) {

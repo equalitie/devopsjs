@@ -144,7 +144,7 @@ if (program.rout) {
 if (program.testhost) {
   program.testhost = domained(program.testhost);
   var check = require('./lib/nrpe/check.js');
-  var testname = 'check_tcptraffic';
+  var testname = 'check_http';
   var test = require('./lib/nrpe/allchecks.js').getChecks(testname)[testname];
   check.checkHost(program.testhost, test, testname, utils.getTick(), function(res) {
   console.log(res);

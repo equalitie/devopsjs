@@ -20,7 +20,7 @@ exports.index = function(options, docs, callback) {
       console.log('on', options, docs);
       throw (err);
     }
-    if (callback) callback();
+    if (callback) callback(err, data);
   });
 };
 exports.search = function(options, query, callback) {

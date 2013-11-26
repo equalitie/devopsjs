@@ -29,13 +29,17 @@ program
   .option('-c, --check <regex>', 'only execute checks that match this regex')
   .option('-h, --host <host>', 'only check this host')
   .option('-v, --verbose', 'verbose')
-  .option('-s --save', 'write results (defaults to no if a check or host is specified')
+  .option('-s --save', 'write results (defaults to no if a check or host is specified)')
+  .option('--nosave', 'do not write results')
   .parse(process.argv);
 
 var hosts = mergeDNETs();
 
 var doResolve = true; // resolve edge's current cluster
 var doSave = program.save || (!program.check && !program.host);
+
+if (program.nosave) { doSave = false; }
+
 var nrpeChecks = require('./lib/nrpe/allchecks.js').getChecks(program.check ? program.check : null);
 
 for (var key in nrpeChecks) {
@@ -88,6 +92,7 @@ for (var checkName in nrpeChecks) {
   }
 }
 
+
 /** Merge dnets for processing **/
 
 function mergeDNETs() {
@@ -117,13 +122,23 @@ function mergeDNETs() {
 }
 
 function processCheck(res) {
-  if (doSave) {
-    docs.push(res);
-    if (docs.length == (numChecks * hosts.length)) {
-      store.index({_index : 'devopsjs', _type : 'hostCheck', refresh : true}, docs);
+  if (program.verbose) {
+    console.log('processCheck', res.hostname, res.checkName, res.status);
+  }
+  docs.push(res);
+  if (docs.length == (numChecks * hosts.length)) { // FIXME
+    if (doSave) {
+      if (program.verbose) { console.log('SAVING', docs.length, (numChecks * hosts.length)); }
+      store.index({_index : 'devopsjs', _type : 'hostCheck', refresh : true}, docs, function(err, data) {
+        if (err) {
+          throw err;
+        }
+        hostLib.writeHostsJson(hosts);
+        if (program.verbose) { console.log('indexed hostChecks', data.items.length); }
+      });
     }
   } else {
-    console.log(res);
+    if (program.verbose) { console.log('QUEUING', docs.length, '/', (numChecks * hosts.length)); }
   }
 }
 
@@ -153,7 +168,12 @@ function commitEdgeSummary(hosts, tick, store, nom) {
     }
     hostSummary.push({hostname: host.hostname, dnet: lookup, dnetChange : host.dnetChange, '@timestamp' : tick.tickDate, lonlat: host.lonlat, countryCode: host.countryCode});
   }
-  store.index({_index : 'devopsjs', _type : 'checkSummary'}, hostSummary);
-  hostLib.writeHostsJson(hosts);
+  store.index({_index : 'devopsjs', _type : 'checkSummary'}, hostSummary, function(err, data) {
+    if (err) {
+      throw err;
+    }
+    hostLib.writeHostsJson(hosts);
+    if (program.verbose) { console.log('indexed checkSummaries', data.items.length); }
+  });
 }
 

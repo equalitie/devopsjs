@@ -30,11 +30,10 @@ exports.checkHost = function(host, aCheck, checkName, tick, callback) {
         } catch (e) {
           res.status = 'EXCEPTION';
           res.error = e + ':' + stdout;
-          GLOBAL.exception(res);
         }
         
-        }
-        callback(res);
+      }
+      callback(res);
     });
   } else {
     aCheck.run(host, function(status, stderr, stdout) {
