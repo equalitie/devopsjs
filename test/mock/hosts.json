@@ -1,0 +1,55 @@
+ [
+  {
+    "hostname": "good.test.com",
+    "added": "2013-08-07T21:34:25.468Z",
+    "comment": "replace veeble1.test.com 2 hours ago [time] w good.test.com 3 hours ago [time]",
+    "lastInactive": "2013-10-30T10:27:01.680Z",
+    "state": "active",
+    "lastActive": "2013-10-30T13:27:01.709Z",
+    "lastOffline": "2013-10-24T15:23:27.234Z",
+    "lastOnline": "2013-10-24T19:57:24.912Z"
+  },
+  {
+    "hostname": "bad.test.com",
+    "added": "2013-08-07T21:34:25.468Z",
+    "comment": "replace bad.test.com 2 hours ago [time] w hetzner4.test.com 3 hours ago [time]",
+    "lastInactive": "2013-10-30T12:27:02.004Z",
+    "state": "inactive",
+    "lastActive": "2013-10-30T10:27:01.680Z",
+    "lastOffline": "2013-10-24T15:24:11.419Z",
+    "lastOnline": "2013-10-24T20:12:31.448Z"
+  },
+  {
+    "hostname": "great1.test.com",
+    "added": "2013-10-23T21:56:46.478Z",
+    "comment": "replace great2.test.com 2 hours ago [time] w great1.test.com 3 hours ago [time]",
+    "state": "active",
+    "lastInactive": "2013-10-30T10:57:02.079Z",
+    "lastActive": "2013-10-30T13:57:01.765Z"
+  },
+  {
+    "hostname": "great2.test.com",
+    "added": "2013-10-25T20:34:26.485Z",
+    "comment": "replace great2.test.com 2 hours ago [time] w great1.test.com 3 hours ago [time]",
+    "state": "inactive",
+    "lastInactive": "2013-10-30T13:57:01.765Z",
+    "lastOffline": "2013-10-25T20:45:13.661Z",
+    "lastOnline": "2013-10-26T12:40:09.402Z",
+    "lastActive": "2013-10-30T11:57:01.466Z"
+  },
+  {
+    "hostname": "random1.test.com",
+    "added": "2013-10-25T21:43:17.932Z",
+    "comment": "replace linode4.test.com 2 hours ago [time] w random1.test.com 3 hours ago [time]",
+    "state": "active",
+    "lastInactive": "2013-10-30T09:57:02.091Z",
+    "lastActive": "2013-10-30T12:57:02.227Z"
+  },
+  {
+    "hostname": "testing.test.com",
+    "added": "2013-11-26T18:42:16.168Z",
+    "comment": "2",
+    "state": "inactive",
+    "lastInactive": "2013-11-26T18:42:16.168Z"
+  }
+]

@@ -69,7 +69,11 @@ if (program.add) {
   mustComment();
   program.add = domained(program.add);
   var hp = hostLib.addHost(program.add);
+  require('fs').writeFileSync('./hp.json', JSON.stringify(hp, null, 2));
   hostLib.writeHosts(hp.hosts, ['add', program.add], program.add);
+  if (GLOBAL.CONFIG.allFlatHostsFile) {
+    hostLib.writeFlatHosts(hp.hosts, true, GLOBAL.CONFIG.allFlatHostsFile);
+  }
   console.log(program.add + ' is added');
 }
 
@@ -80,6 +84,9 @@ if (program.remove) {
     hostLib.writeHosts(hp.hosts, ['remove', program.remove], program.remove);
   });
   hostLib.writeHosts(hp.hosts, program.remove);
+  if (GLOBAL.CONFIG.allFlatHostsFile) {
+    hostLib.writeFlatHosts(hp.hosts, true, GLOBAL.CONFIG.allFlatHostsFile);
+  }
   console.log(program.remove + ' is removed');
 }
 
@@ -157,7 +164,8 @@ if (program.stats) {
 }
 
 if (program.writeall) {
-  var hp = hostLib.getHosts();
+  var hp = hostLib.getHostsSummary();
+  console.log(JSON.stringify(hp, null, 2));
   hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
 }
 

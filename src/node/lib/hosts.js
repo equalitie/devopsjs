@@ -31,8 +31,9 @@ var hosts = {
    * 
    */
   setConfig : function(program, dnet) {
-    config.hostsFile = getDnetConfig(dnet);
-//    config.hostsFile = hostsFile;
+    if (dnet) {
+      config.hostsFile = getDnetConfig(dnet);
+    }
     config.program = program;
     verbose = program.verbose;
 
@@ -44,6 +45,8 @@ var hosts = {
 * Get a dnet from its path
 *
 **/
+
+  writeFlatHosts : writeFlatHosts,
 
   getDNET : function(dnet) {
     return require(getDnetConfig(dnet));
