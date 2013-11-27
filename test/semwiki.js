@@ -26,16 +26,18 @@
         done();
       });
     });
-    it("getTickets", function testGetWiki(done) {
-      semwiki.getTickets('[[Assigned to::User:Bot]]', function(results) {
-        expect(results['Ticket:Be a test bot'] > 0).to.not.equal(null);
+    it("getActivities", function testGetWiki(done) {
+      semwiki.getActivities('[[Assigned to::User:Bot]]', function(results) {
+        expect(results['Activity:Be a test bot'] > 0).to.not.equal(null);
         done();
       });
     });
+    /*
     it("val", function testVal() {
-      var ticket = {"status":["Validate"],"assignedTo":["User:RodneyM","User:DavidM"],"validator":["User:DavidM"],"contact":["User:DavidM"],"dateRequired":[],"lastUpdate":["1364601600"],"importance":["0-Low"],"modificationDate":["1364661874"],"name":"Ticket:Research/System management","link":"https://wiki.equalit.ie/wiki/Ticket:Research/System_management"};
-    expect(semwiki.val(ticket, 'Modification date')).to.not.equal(null);
+      var activity = {"status":["Validate"],"assignedTo":["User:RodneyM","User:DavidM"],"validator":["User:DavidM"],"contact":["User:DavidM"],"dateRequired":[],"lastUpdate":["1364601600"],"importance":["0-Low"],"modificationDate":["1364661874"],"name":"Activities:Research/System management","link":"https://wiki.equalit.ie/wiki/Activities:Research/System_management"};
+    expect(semwiki.val(activity, 'Modification date')).to.not.equal(null);
     });
+    */
 
   });
 })();

@@ -17,6 +17,8 @@ program
   .option('-r, --rotate', 'do auto-rotation')
   .option('--rin <host>', 'auto-rotate in host')
   .option('--rout <host>', 'auto-rotate out host')
+  .option('--keepactive', 'keep host active (future)')
+  .option('--nowriteflat', 'keep this host out of flat hosts file (future)')
   .option('--timespan <hours>', 'set timespan for advice/rotate [' + hostLib.config.defaultPeriod + ' ' +  hostLib.config.defaultUnits + ']')
   .option('-t, --testhost <host>', 'live test host')
   .option('-q, --query <host> [period]', 'query host test results')

@@ -15,7 +15,7 @@
       });
     });
 
-    it("resolves", function testGetWiki(done) {
+    xit("resolves", function testGetWiki(done) {
       expect(nom.getConfig('hetzner7.deflect.ca')).to.not.equal(null);
       done();
     });
