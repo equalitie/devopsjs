@@ -70,6 +70,9 @@ if (program.add) {
   program.add = domained(program.add);
   var hp = hostLib.addHost(program.add);
   hostLib.writeHosts(hp.hosts, ['add', program.add], program.add);
+  if (GLOBAL.CONFIG.allFlatHostsFile) {
+    hostLib.writeFlatHosts(hp.hosts, true, GLOBAL.CONFIG.allFlatHostsFile);
+  }
   console.log(program.add + ' is added');
 }
 
@@ -80,6 +83,9 @@ if (program.remove) {
     hostLib.writeHosts(hp.hosts, ['remove', program.remove], program.remove);
   });
   hostLib.writeHosts(hp.hosts, program.remove);
+  if (GLOBAL.CONFIG.allFlatHostsFile) {
+    hostLib.writeFlatHosts(hp.hosts, true, GLOBAL.CONFIG.allFlatHostsFile);
+  }
   console.log(program.remove + ' is removed');
 }
 
@@ -138,7 +144,7 @@ if (program.rout) {
 if (program.testhost) {
   program.testhost = domained(program.testhost);
   var check = require('./lib/nrpe/check.js');
-  var testname = 'check_tcptraffic';
+  var testname = 'check_http';
   var test = require('./lib/nrpe/allchecks.js').getChecks(testname)[testname];
   check.checkHost(program.testhost, test, testname, utils.getTick(), function(res) {
   console.log(res);
@@ -157,8 +163,8 @@ if (program.stats) {
 }
 
 if (program.writeall) {
-  var hp = hostLib.getHosts();
-  hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
+  var hosts = hostLib.getHosts();
+  hostLib.writeFlatHosts(hosts, true, program.writeall);
 }
 
 function mustComment () {

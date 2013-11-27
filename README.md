@@ -74,6 +74,7 @@ DNets can be added to the config directory as dnetname.js, eg,
 ```javascript
 var c = GLOBAL.CONFIG;
 c.flatHostsFile = '/usr/local/deflect/etc/edges/edges.dnet1.live';
+c.allFlatHostsFile = '/usr/local/deflect/etc/edges/edges.dnet1';
 c.minActive = 6;
 c.subdomain = 'deflect.ca';
 
