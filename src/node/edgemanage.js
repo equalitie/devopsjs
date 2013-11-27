@@ -163,9 +163,8 @@ if (program.stats) {
 }
 
 if (program.writeall) {
-  var hp = hostLib.getHostsSummary();
-  console.log(JSON.stringify(hp, null, 2));
-  hostLib.writeFlatHosts(hp.hosts, true, program.writeall);
+  var hosts = hostLib.getHosts();
+  hostLib.writeFlatHosts(hosts, true, program.writeall);
 }
 
 function mustComment () {

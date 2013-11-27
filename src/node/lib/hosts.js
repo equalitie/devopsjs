@@ -48,6 +48,8 @@ var hosts = {
 
   writeFlatHosts : writeFlatHosts,
 
+  getHosts : function() { return getHosts(); },
+
   getDNET : function(dnet) {
     return require(getDnetConfig(dnet));
   },
@@ -621,7 +623,7 @@ function writeHosts(hosts, operation, changedHost) {
 }
 
 /**
- * write complete list of hosts
+ * write complete list of hosts, commenting out inactive/offline if not writeAll
  */
 function writeFlatHosts(hosts, writeAll, file) {
   if (!file) {
