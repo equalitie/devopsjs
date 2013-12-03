@@ -62,6 +62,9 @@ var processResult = function (testItem) {
   var vars, result, filename, featureHeader, templates, generatedTests;
   result = testItem.printouts;
   vars = mapPrintoutToVars(result);
+  if (vars.status.indexOf('Live') !== 0) { //FIXME: qualify a live site
+    return;
+  }
   filename = generateFileName(vars);
   featureHeader = generateFeatureHeader(vars);
 
