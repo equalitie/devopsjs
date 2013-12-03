@@ -106,7 +106,7 @@ var mapPrintoutToVars = function (result) {
   return {
     siteOf : result['Site of'][0].fulltext,
     address : unprefixedAddress(result.Address[0]),
-    aliases : formatAliases(result.Aliases[0]),
+    aliases : formatAliases(result.Aliases),
     expectedTerm : result['Expected term'][0],
     nocacheAddress : result['Nocache address'].length ? result['Nocache address'][0].fulltext : null,
     excludeLocations : result['Exclude locations'].length ? result['Exclude locations'][0].split('\n') : [],
@@ -128,10 +128,8 @@ var unprefixedAddress = function(address) {
 
 var formatAliases = function (aliases) {
   if (aliases) {
-    aliases = aliases.replace(' ', '');
-    aliases = aliases.split(',');
     return aliases.map(function (alias) {
-      return alias.replace(/\.+$/, '');
+      return alias.trim();
     });
   }
   else return [];
