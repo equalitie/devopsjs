@@ -2,8 +2,6 @@
  *
  * Creator: DavidM
  * Retrieve templated site BDD tests from wiki for processing
- * Updated 21/10/2013
- * Cormac
  **/
 
 var fs = require('fs');
@@ -36,23 +34,11 @@ function processTests() {
   });
 }
 
-/**
- * a list of all the possible test types
- * these should match the templates in yadda-tests/templates
- * @type {Array}
- */
-var testTypes = [
-  'address',
-  'aliases',
-  'validatePage',
-  'excludeLocations',
-  'expectedTerm',
-  'nocacheAddress'
-];
 
 var rootDir     = require("path").resolve(__dirname),
-    templateDir = rootDir + '/yadda-tests/templates/',
-    outputDir   = rootDir + '/yadda-tests/generated/';
+  outputDir   = rootDir + '/yadda/generated/',
+  cases = require('devopsjs-bdd-cases'),
+  testTypes = cases.getTestTypes();
 
 
 /**
@@ -100,7 +86,7 @@ var mapTemplateToTest = function (template, testType) {
  */
 var convertTestTypeToFile = function (templatesObject, testType) {
   if (this[testType]) {
-    templatesObject[testType] = fs.readFileSync(templateDir + testType);
+    templatesObject[testType] = cases.getTemplate(testType);
   }
   return templatesObject;
 };
@@ -167,16 +153,14 @@ var generateFeatureHeader = function (vars) {
 
 // write the context for each test to a file
 var writeContextFile = function (baseDir, vars) {
-  return FS.read(templateDir + 'context.tpl')
-    .then(function(templateString) {
-      var contextTemplate = _.template(templateString);
-      return FS.write(
-        baseDir + '/context.js',
-        contextTemplate(
-          {vars: JSON.stringify(vars)}
-        )
-      );
-    });
+  var templateString = cases.getContext();
+  var contextTemplate = _.template(templateString);
+  return FS.write(
+    baseDir + '/context.js',
+    contextTemplate(
+      {vars: JSON.stringify(vars)}
+    )
+  );
 };
 
 /**
@@ -206,11 +190,9 @@ function writeFeature(name, feature, vars) {
       console.log(err + '\n test generation failed');
     })
     .done(function() {
-      //console.log("yadda-tests/generated/" + name + "/site.feature written");
+      //console.log("yadda/generated/" + name + "/site.feature written");
     });
-
 }
-
 
 // break merged DNET edges into entries
 // this will eventually get redesigned.
