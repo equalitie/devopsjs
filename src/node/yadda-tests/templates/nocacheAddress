@@ -1,3 +1,0 @@
-Scenario: should not cache
-    Given the no cache address was retrieved twice
-    Then it should not be cached

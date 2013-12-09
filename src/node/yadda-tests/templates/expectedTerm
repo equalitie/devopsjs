@@ -1,3 +1,0 @@
-Scenario: expected term
-    Given retrieved page @validatePage@
-    Then it should contain @expectedTerm@
