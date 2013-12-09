@@ -13,7 +13,7 @@
     "duplexer": "0.0.x",
     "require-analyzer": "0.5.x",
     "request": "2.14.x",
-    "elasticsearch": "latest",
+    "es": "latest",
     "queue-async": "latest",
     "nodemailer": "latest",
     "timekeeper": "latest",

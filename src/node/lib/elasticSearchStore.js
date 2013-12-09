@@ -1,4 +1,4 @@
-var elasticsearch = require('elasticsearch'), es = elasticsearch(GLOBAL.CONFIG.elasticSearchConfig);
+var elasticsearch = require('es'), es = elasticsearch(GLOBAL.CONFIG.elasticSearchConfig);
 
 /**
 *
