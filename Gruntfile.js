@@ -26,6 +26,12 @@ module.exports = function(grunt) {
           reporter: 'spec'
         },
         src: ['test/*.js']
+      },
+      prodTest: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['src/node/yadda/*-test.js']
       }
     },
     docco: {
