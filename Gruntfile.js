@@ -15,32 +15,17 @@ module.exports = function(grunt) {
       files: srcFiles
     },
     mochaTest: {
-      //
-      prodTest: {
-        options: {
-          reporter: 'spec'
-        },
-        src: ['src/node/yadda-tests/*-test.js']
-      },
-      devUnitTest: {
-        options: {
-          reporter: 'spec'
-        },
-        src: ['src/node/yadda-tests/test/*-test.js']
-      },
-
-      devTest: {
-        options: {
-          reporter: 'spec',
-          timeout : '5000'
-        },
-        src: ['src/node/yadda-tests/*-test.js']
-      },
       configTest: {
         options: {
           reporter: 'spec',
         },
         src: ['test/configuration.js']
+      },
+      devUnitTest: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['test/*.js']
       }
     },
     docco: {
@@ -67,29 +52,21 @@ module.exports = function(grunt) {
       dev: {
         files: [
           '<%= jshint.files %>',
-          'src/node/yadda-tests/*.js',
-          'src/node/yadda-tests/**/*.js',
-          'src/node/yadda-tests/generated/**/*.feature'
+          'test/*.js',
         ],
         tasks: ['jshint', 'mochaTest:devTest']
       },
       devUnit: {
         files: [
           '<%= jshint.files %>',
-          'src/node/yadda-tests/*.js',
-          'src/node/yadda-tests/**/*.js',
-          'src/node/yadda-tests/generated/**/*.feature',
-          'src/node/yadda-tests/test/!(outfile)'
+          'test/*.js',
         ],
         tasks: ['jshint', 'mochaTest:devUnitTest']
       },
       prod: {
         files: [
           '<%= jshint.files %>',
-          'src/node/yadda-tests/feature-test.js',
-          'src/node/yadda-tests/file-reporter.js',
-          'src/node/yadda-tests/library/*.js',
-          'src/node/yadda-tests/generated/**/*.feature'
+          'src/node/yadda/generated/**/*.feature'
         ],
         tasks: ['jshint', 'mochaTest:prodTest']
       }
