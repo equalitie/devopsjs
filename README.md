@@ -3,15 +3,21 @@ devopsjs
 
 Support comprehensive configuration, resource usage, monitoring and development using high level components.
 
-* BDD to define systems
+This is the documentatin for setup. Further documentation is at https://wiki.deflect.ca/wiki/Devopsjs . If you'd like to set this system up please contact us so we can make the documenation better.
+
+Components of devopsjs:
+
 * NRPE for system tests
 * node.js for scripting components and command line interaction
 * Semantic Mediawiki for configuration
-* node-logstatsh for systems data processing
+* node-logstash for systems data processing
 * ElasticsEarch for data storage
 * Kibana for visualization
+* BDD to define and test systems (in development)
 
 # Install
+
+First, set up ElasticSearch. Configuration for a typical Debian server is in the host/ directory. Use the put_mapping script to push the schema.
 
 You will need some additional system libraries, on a Debian distro this may include libgeoip-dev, libpcre3-dev, zlib1g-dev. Also, install MaxMind's GeoLiteCity.dat to /usr/local/geoip. Then:
 
