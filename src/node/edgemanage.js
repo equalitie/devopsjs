@@ -166,6 +166,9 @@ if (program.stats) {
 
 if (program.writeall) {
   var hosts = hostLib.getHosts();
+  var file = program.writeall;
+  file = file.substring(0, 1) === '/' ? file : require('path').join(process.cwd(), file);
+  console.log('writing to', file);
   hostLib.writeFlatHosts(hosts, true, program.writeall);
 }
 
