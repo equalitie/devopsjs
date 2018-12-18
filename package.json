@@ -12,7 +12,7 @@
     "zombie": "latest",
     "duplexer": "0.0.x",
     "require-analyzer": "0.5.x",
-    "request": "2.15.x",
+    "request": "~>2.68.0",
     "es": "latest",
     "queue-async": "latest",
     "nodemailer": "latest",
@@ -30,7 +30,7 @@
     "grunt-mocha-test": "~0.7.0",
     "grunt-contrib-watch": "~0.5.3",
     "q": "~0.9.7",
-    "lodash": "~2.2.1",
+    "lodash": "~>4.17.5",
     "q-io": "~1.10.2",
     "sinon": "~1.7.3"
   },
